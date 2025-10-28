@@ -228,8 +228,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 63}
-  m_SizeDelta: {x: 928.0839, y: 173.7469}
+  m_AnchoredPosition: {x: -141, y: 91}
+  m_SizeDelta: {x: 906.0802, y: 263.2275}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &698241641
 MonoBehaviour:
@@ -454,8 +454,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 369, y: 222}
-  m_SizeDelta: {x: 586.1865, y: 192.5972}
+  m_AnchoredPosition: {x: 528, y: 254}
+  m_SizeDelta: {x: 732.8759, y: 265.942}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &958822482
 MonoBehaviour:
@@ -478,12 +478,12 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 169
+    m_Font: {fileID: 12800000, guid: 97c924ce15135064796ee78689140c57, type: 3}
+    m_FontSize: 230
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 10
-    m_MaxSize: 169
+    m_MaxSize: 234
     m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
@@ -955,7 +955,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 97c924ce15135064796ee78689140c57, type: 3}
     m_FontSize: 82
     m_FontStyle: 0
     m_BestFit: 0
@@ -1049,7 +1049,7 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
-        m_CallState: 0
+        m_CallState: 2
 --- !u!1 &2024944750
 GameObject:
   m_ObjectHideFlags: 0
@@ -1189,7 +1189,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_Font: {fileID: 12800000, guid: 97c924ce15135064796ee78689140c57, type: 3}
     m_FontSize: 82
     m_FontStyle: 0
     m_BestFit: 0
