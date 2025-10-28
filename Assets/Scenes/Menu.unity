@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 633956605}
+  - component: {fileID: 633956608}
   - component: {fileID: 633956607}
   - component: {fileID: 633956606}
   m_Layer: 5
@@ -194,6 +195,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 633956604}
   m_CullTransparentMesh: 1
+--- !u!114 &633956608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 633956604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 067e7a89d809fc241be9f648e65c7130, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 633956605}
+  moveStrength: 3.3333333
+  smoothSpeed: 0.05
+  maxDistance: 20
+  invertX: 1
+  invertY: 1
 --- !u!1 &698241639
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,6 +297,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 777011837}
+  - component: {fileID: 777011840}
   - component: {fileID: 777011839}
   - component: {fileID: 777011838}
   m_Layer: 5
@@ -304,7 +324,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: -488.80505, y: -34.3916}
-  m_SizeDelta: {x: 767.7219, y: 930.6381}
+  m_SizeDelta: {x: 767.7219, y: 928.8}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &777011838
 MonoBehaviour:
@@ -344,6 +364,24 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 777011836}
   m_CullTransparentMesh: 1
+--- !u!114 &777011840
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 777011836}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 067e7a89d809fc241be9f648e65c7130, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  targetObject: {fileID: 777011837}
+  moveStrength: 6.6666665
+  smoothSpeed: 0.05
+  maxDistance: 20
+  invertX: 1
+  invertY: 1
 --- !u!1 &791089574
 GameObject:
   m_ObjectHideFlags: 0
@@ -771,9 +809,9 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 633956605}
   - {fileID: 777011837}
   - {fileID: 1949827834}
+  - {fileID: 633956605}
   - {fileID: 791089575}
   m_Father: {fileID: 1113763126}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
