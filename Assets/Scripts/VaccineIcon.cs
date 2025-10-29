@@ -9,8 +9,20 @@ public class VaccineIcon : MonoBehaviour
     [Tooltip("더블클릭 시 열릴 게임오브젝트")]
     public GameObject targetObject;
 
+    [Tooltip("바이러스 알람 울리고 난 후에 켜질 수 있게 하려고 그 오브젝트 감지")]
+    public GameObject Object;   
+
     private float lastClickTime = 0f;
     private int clickCount = 0;
+    private int trueCount = 0;
+
+    private void Update()
+    {
+        if(Object.activeSelf == true)
+        {
+            trueCount = 1;
+        }
+    }
 
     void OnMouseDown()
     {
@@ -21,7 +33,7 @@ public class VaccineIcon : MonoBehaviour
             // 더블클릭!
             clickCount++;
             
-            if (clickCount >= 2)
+            if (clickCount >= 2 && trueCount == 1)
             {
                 OnDoubleClick();
                 clickCount = 0;
@@ -35,7 +47,6 @@ public class VaccineIcon : MonoBehaviour
         
         lastClickTime = Time.time;
     }
-
     private void OnDoubleClick()
     {
         Debug.Log("[VaccineIcon] 더블클릭 감지!");

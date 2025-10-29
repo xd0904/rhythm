@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: a5ffc4aa0b0797c49866e72d1f938424
+guid: 7c52d592c12dc034bb0dbf0762ddfa51
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -8380495064252029233
-    second: temporpause_0
+      213: -1265872457109709990
+    second: Group 163_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: temporpause_0
+      name: Group 163_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 138
-        height: 30
+        width: 648
+        height: 671
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fc6e75d042082bb80800000000000000
-      internalID: -8380495064252029233
+      spriteID: a5b560705b7be6ee0800000000000000
+      internalID: -1265872457109709990
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      temporpause_0: -8380495064252029233
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
