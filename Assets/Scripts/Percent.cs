@@ -10,14 +10,45 @@ public class Percent : MonoBehaviour
     public Text gaugeText2;
     public Text gaugeText3;
     public Text gaugeText4;
-    public float fillSpeed = 0.3f; // 1�ʿ� 0.3�� (�� 3.3�ʿ� 100%)
+    public float fillSpeed = 0.05f; // 1초에 0.3씩 (약 3.3초에 100%)
     private bool isFilling = false;
 
     public GameObject Object;
     public GameObject Object2;
     public GameObject Object3;
-    public GameObject Object4;
+    // public GameObject Object4;
     
+    [Header("5% 도달 시 변경될 이미지들")]
+    [Tooltip("빨간색 퍼센트바 이미지")]
+    public Image redGaugeImage;
+    
+    [Tooltip("바탕화면 알약 아이콘 (변경될 대상)")]
+    public Image desktopVaccineIcon;
+    
+    [Tooltip("빨간색 바탕화면 알약 아이콘 스프라이트")]
+    public Sprite redDesktopVaccineSprite;
+    
+    [Tooltip("프로그램 알약 아이콘 (변경될 대상)")]
+    public Image programVaccineIcon;
+    
+    [Tooltip("빨간색 프로그램 알약 아이콘 스프라이트")]
+    public Sprite redProgramVaccineSprite;
+    
+    [Tooltip("정상 마우스 GameObject")]
+    public GameObject normalMouse;
+    
+    [Tooltip("빨간 마우스 GameObject")]
+    public GameObject redMouse;
+    
+    [Tooltip("에러창 게임오브젝트")]
+    public GameObject errorWindow;
+    
+    [Header("글리치 효과 설정")]
+    [Tooltip("글리치 효과 지속 시간 (초)")]
+    public float glitchDuration = 3f;
+    
+    [Tooltip("에러창 뜨기까지 대기 시간 (초)")]
+    public float errorWindowDelay = 1f;
 
     public void OnStartButtonClicked()
     {
@@ -28,10 +59,7 @@ public class Percent : MonoBehaviour
             Object.SetActive(true);
             Object2.SetActive(true);
             Object3.SetActive(false);
-
-
         }
-            
     }
 
     IEnumerator FillGauge()
@@ -52,13 +80,142 @@ public class Percent : MonoBehaviour
         gaugeImage.fillAmount = 0.05f;
         gaugeText.text = "5%";
         gaugeText2.text = "1024";
-        gaugeText3.text = "2";
-        gaugeText4.text = "1�ܰ�";
+        gaugeText4.text = "1단계";
         isFilling = false;
 
-        Debug.Log("�������� 50%�� �����߽��ϴ�!");
+        Debug.Log("게이지가 5%에 도달했습니다!");
 
-        Object4.SetActive(true);
+        // 마우스 커서 빨간색으로 변경 (먼저 실행)
+        ChangeToRedCursor();
         
+        // "발견된 위험 요소" 텍스트 글리치 효과 (이미지 변경 전에 시작)
+        yield return ApplyTextGlitch();
+        
+        // 이미지들 빨간색으로 변경
+        ChangeToRedImages();
+        
+        // 1초 대기 후 에러창 띄우기
+        yield return new WaitForSeconds(errorWindowDelay);
+        
+        if (errorWindow != null)
+        {
+            errorWindow.SetActive(true);
+            Debug.Log("[Percent] 에러창 활성화");
+        }
+        
+        //Object4.SetActive(true);
+    }
+    
+    private void ChangeToRedImages()
+    {
+        // 초록색 게이지바 끄고 빨간색 게이지바 켜기
+        if (gaugeImage != null && redGaugeImage != null)
+        {
+            gaugeImage.gameObject.SetActive(false);
+            redGaugeImage.gameObject.SetActive(true);
+            redGaugeImage.fillAmount = 0.05f;
+            Debug.Log("[Percent] 게이지바 빨간색으로 변경");
+        }
+        
+        // 바탕화면 알약 아이콘 변경
+        if (desktopVaccineIcon != null && redDesktopVaccineSprite != null)
+        {
+            desktopVaccineIcon.sprite = redDesktopVaccineSprite;
+            Debug.Log("[Percent] 바탕화면 알약 아이콘 빨간색으로 변경");
+        }
+        
+        // 프로그램 알약 아이콘 변경
+        if (programVaccineIcon != null && redProgramVaccineSprite != null)
+        {
+            programVaccineIcon.sprite = redProgramVaccineSprite;
+            Debug.Log("[Percent] 프로그램 알약 아이콘 빨간색으로 변경");
+        }
+    }
+    
+    private void ChangeToRedCursor()
+    {
+        // 정상 마우스 끄고 빨간 마우스 켜기
+        if (normalMouse != null && redMouse != null)
+        {
+            // 정상 마우스의 현재 위치 저장
+            Vector3 lastMousePosition = normalMouse.transform.position;
+            
+            normalMouse.SetActive(false);
+            redMouse.SetActive(true);
+            
+            // 빨간 마우스를 마지막 위치로 설정
+            redMouse.transform.position = lastMousePosition;
+            
+            // 빨간 마우스의 Mouse 스크립트 비활성화 (움직임 방지)
+            Mouse redMouseScript = redMouse.GetComponent<Mouse>();
+            if (redMouseScript != null)
+            {
+                redMouseScript.enabled = false;
+            }
+            
+            Debug.Log("[Percent] 마우스 커서 빨간색으로 변경 및 고정");
+        }
+    }
+    
+    private IEnumerator ApplyTextGlitch()
+    {
+        if (gaugeText3 == null)
+        {
+            Debug.LogWarning("[Percent] gaugeText3이 없습니다!");
+            yield break;
+        }
+        
+        string originalText = gaugeText3.text;
+        string glitchChars = "!@#$%^&*?~|<>{}[]NOXERR??▒?";
+        
+        float elapsed = 0f;
+        
+        Debug.Log("[Percent] 텍스트 글리치 효과 시작");
+        
+        while (elapsed < glitchDuration)
+        {
+            // 90% 확률로 글리치 상태
+            if (Random.value > 0.1f)
+            {
+                string glitchedText = "";
+                
+                for (int i = 0; i < originalText.Length; i++)
+                {
+                    // 70% 확률로 각 글자를 랜덤 특수문자로 변경
+                    if (Random.value > 0.3f)
+                    {
+                        glitchedText += glitchChars[Random.Range(0, glitchChars.Length)];
+                    }
+                    else
+                    {
+                        glitchedText += originalText[i];
+                    }
+                }
+                
+                gaugeText3.text = glitchedText;
+            }
+            else
+            {
+                gaugeText3.text = originalText;
+            }
+            
+            elapsed += 0.02f;
+            yield return new WaitForSeconds(0.02f);
+        }
+        
+        // 마지막 프레임은 랜덤 ERROR 문자로 고정
+        string finalGlitch = "";
+        for (int i = 0; i < originalText.Length; i++)
+        {
+            finalGlitch += glitchChars[Random.Range(0, glitchChars.Length)];
+        }
+        gaugeText3.text = finalGlitch;
+        
+        yield return new WaitForSeconds(0.1f);
+        
+        // 원래 텍스트로 복구
+        gaugeText3.text = originalText;
+        
+        Debug.Log("[Percent] 텍스트 글리치 효과 완료");
     }
 }

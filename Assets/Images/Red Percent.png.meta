@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 41e65f34f058b394bbd10edd25304e38
+guid: 024a571d0efcff0428744377280423f4
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3701114428941837849
-    second: Group 154_0
+      213: -5178794353606579668
+    second: Red Percent_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Group 154_0
+      name: Red Percent_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 8
-        width: 59
-        height: 59
+        x: 0
+        y: 0
+        width: 138
+        height: 30
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 916a62ab6fffc5330800000000000000
-      internalID: 3701114428941837849
+      spriteID: c2a2b7c49f93128b0800000000000000
+      internalID: -5178794353606579668
       vertices: []
       indices: 
       edges: []
@@ -147,8 +147,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Group 154_0: 3701114428941837849
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
