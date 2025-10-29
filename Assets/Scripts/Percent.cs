@@ -28,6 +28,8 @@ public class Percent : MonoBehaviour
             Object.SetActive(true);
             Object2.SetActive(true);
             Object3.SetActive(false);
+
+
         }
             
     }

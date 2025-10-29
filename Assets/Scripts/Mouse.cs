@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 
 public class Mouse : MonoBehaviour
 {
@@ -20,6 +22,8 @@ public class Mouse : MonoBehaviour
 
     private Camera mainCamera;
     private Vector3 targetPosition;
+
+    
 
     void Start()
     {
@@ -43,6 +47,8 @@ public class Mouse : MonoBehaviour
         }
 
         Debug.Log("[Mouse] 커스텀 마우스 커서 초기화 완료");
+
+      
     }
 
     void Update()
@@ -116,4 +122,6 @@ public class Mouse : MonoBehaviour
             Cursor.visible = false;
         }
     }
+
+   
 }
