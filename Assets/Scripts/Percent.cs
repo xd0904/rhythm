@@ -17,7 +17,7 @@ public class Percent : MonoBehaviour
     public GameObject Object2;
     public GameObject Object3;
     public GameObject Object4;
-    public GameObject Object5;
+    
 
     public void OnStartButtonClicked()
     {
@@ -57,6 +57,6 @@ public class Percent : MonoBehaviour
         Debug.Log("게이지가 50%에 도달했습니다!");
 
         Object4.SetActive(true);
-        Object5.SetActive(true);
+        
     }
 }
