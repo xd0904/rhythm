@@ -3290,6 +3290,7 @@ RectTransform:
   - {fileID: 1392511154}
   - {fileID: 404285097}
   - {fileID: 1947663126}
+  - {fileID: 1860646231}
   - {fileID: 1138422032}
   - {fileID: 162484857}
   - {fileID: 1923342999}
@@ -3782,11 +3783,11 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1860646230}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 0, z: -9720}
+  m_LocalScale: {x: 48.300003, y: 48.300003, z: 48.300003}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1947663126}
+  m_Father: {fileID: 1657310632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -3843,7 +3844,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836e5e7ef665ab54993f6ac4496bf50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorObject: {fileID: 0}
+  cursorObject: {fileID: 1860646231}
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
@@ -3891,7 +3892,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 3701114428941837849, guid: 41e65f34f058b394bbd10edd25304e38, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -3899,7 +3900,7 @@ SpriteRenderer:
   m_Size: {x: 0.59, y: 0.59}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &1923342998
@@ -4110,8 +4111,7 @@ RectTransform:
   m_LocalPosition: {x: 0, y: 0, z: -9720}
   m_LocalScale: {x: 48.3, y: 48.3, z: 48.3}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1860646231}
+  m_Children: []
   m_Father: {fileID: 1657310632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -4131,7 +4131,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 836e5e7ef665ab54993f6ac4496bf50d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cursorObject: {fileID: 0}
+  cursorObject: {fileID: 1947663126}
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
@@ -4179,7 +4179,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -357421434760999972, guid: fa3bc70043da6f24ab27ce66b3f9d30a, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4187,7 +4187,7 @@ SpriteRenderer:
   m_Size: {x: 0.59, y: 0.59}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!114 &1947663129
