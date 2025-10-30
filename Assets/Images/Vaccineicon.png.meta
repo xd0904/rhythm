@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Vaccineicon_0: 5102809617659262357
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
