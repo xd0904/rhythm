@@ -126,6 +126,18 @@ public class Percent : MonoBehaviour
             Debug.Log("[Percent] 게임 프로그램 활성화");
         }
         
+        // 빨간 마우스 다시 활성화 (gameProgram에 의해 꺼졌을 수 있음)
+        if (redMouse != null)
+        {
+            redMouse.SetActive(true);
+            Mouse redMouseScript = redMouse.GetComponent<Mouse>();
+            if (redMouseScript != null)
+            {
+                redMouseScript.enabled = false; // 움직임은 계속 비활성화
+            }
+            Debug.Log("[Percent] 빨간 마우스 재활성화 (고정 상태 유지)");
+        }
+        
         //Object4.SetActive(true);
     }
     

@@ -1,21 +1,27 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
+using System.Collections.Generic;
 
 public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
 
-    [Header("오디오 소스")]
-    [Tooltip("모스부호 사운드를 재생할 AudioSource")]
-    public AudioSource morseAudioSource;
+    [Header("Audio Sources")]
+    [SerializeField] AudioSource bgmSource;
+    [SerializeField] AudioSource sfxSource;
+    [SerializeField] AudioSource noteSource;
+    [SerializeField] AudioSource morseAudioSource;
 
-    [Header("볼륨 설정")]
-    [Range(0f, 1f)]
-    [Tooltip("마스터 볼륨")]
-    public float masterVolume = 1f;
+    [Header("Volume Settings")]
+    [Range(0f, 1f)] public float bgmVolume = 0.7f;
+    [Range(0f, 1f)] public float sfxVolume = 0.7f;
+    [Range(0f, 1f)] public float morseVolume = 1f;
 
-    [Range(0f, 1f)]
-    [Tooltip("모스부호 볼륨")]
-    public float morseVolume = 1f;
+    [Header("Musics")]
+    [SerializeField] List<AudioClip> musics;
+
+    double music_start_time;
 
     void Awake()
     {
@@ -31,6 +37,76 @@ public class SoundManager : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (bgmSource != null) bgmSource.volume = bgmVolume;
+        if (sfxSource != null) sfxSource.volume = sfxVolume;
+        if (noteSource != null) noteSource.volume = sfxVolume;
+        if (morseAudioSource != null) morseAudioSource.volume = morseVolume;
+    }
+
+    public void PlayBGM(AudioClip clip)
+    {
+        if (bgmSource == null) return;
+        if (bgmSource.clip == clip) return;
+        bgmSource.clip = clip;
+        bgmSource.loop = true;
+        bgmSource.Play();
+    }
+
+    public void PlaySFX(AudioClip clip)
+    {
+        if (sfxSource != null)
+        {
+            sfxSource.PlayOneShot(clip);
+        }
+    }
+
+    public void ChangeBGM_Vol(Slider slider)
+    {
+        bgmVolume = slider.value;
+    }
+    
+    public void ChangeSFX_Vol(Slider slider)
+    {
+        sfxVolume = slider.value;
+    }
+
+    public void OnMusicStart()
+    {
+        if (bgmSource == null) return;
+        bgmSource.SetScheduledEndTime(AudioSettings.dspTime);
+        // LevelManager가 있는 경우에만 사용
+        // int level = LevelManager.Instance.currentLevel;
+        music_start_time = AudioSettings.dspTime + 1.0f;
+        // bgmSource.clip = musics[level];
+        bgmSource.loop = false;
+        bgmSource.PlayScheduled(music_start_time);
+    }
+
+    public void VolLerpZeroBGM()
+    {
+        StartCoroutine(LerpToZero(1));
+    }
+
+    IEnumerator LerpToZero(float duration)
+    {
+        float elapsed = 0f;
+        float startValue = 0.7f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            bgmVolume = Mathf.Lerp(startValue, 0f, t);
+            yield return null;
+        }
+
+        bgmVolume = 0;
+    }
+
+    // === 모스부호 관련 기능 ===
+    
     /// <summary>
     /// 모스부호 사운드 재생
     /// </summary>
@@ -38,9 +114,8 @@ public class SoundManager : MonoBehaviour
     {
         if (morseAudioSource != null && morseAudioSource.clip != null)
         {
-            morseAudioSource.volume = masterVolume * morseVolume;
             morseAudioSource.Play();
-            Debug.Log($"[SoundManager] 모스부호 사운드 재생 (볼륨: {morseAudioSource.volume:F2})");
+            Debug.Log($"[SoundManager] 모스부호 사운드 재생 (볼륨: {morseVolume:F2})");
         }
         else
         {
@@ -78,45 +153,5 @@ public class SoundManager : MonoBehaviour
             return morseAudioSource.clip.length;
         }
         return 0f;
-    }
-
-    /// <summary>
-    /// 마스터 볼륨 설정
-    /// </summary>
-    public void SetMasterVolume(float volume)
-    {
-        masterVolume = Mathf.Clamp01(volume);
-        UpdateAllVolumes();
-    }
-
-    /// <summary>
-    /// 모스부호 볼륨 설정
-    /// </summary>
-    public void SetMorseVolume(float volume)
-    {
-        morseVolume = Mathf.Clamp01(volume);
-        if (morseAudioSource != null)
-        {
-            morseAudioSource.volume = masterVolume * morseVolume;
-        }
-    }
-
-    /// <summary>
-    /// 모든 AudioSource 볼륨 업데이트
-    /// </summary>
-    private void UpdateAllVolumes()
-    {
-        if (morseAudioSource != null)
-        {
-            morseAudioSource.volume = masterVolume * morseVolume;
-        }
-    }
-
-    /// <summary>
-    /// Inspector에서 값 변경 시 자동으로 볼륨 업데이트
-    /// </summary>
-    void OnValidate()
-    {
-        UpdateAllVolumes();
     }
 }
