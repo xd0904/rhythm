@@ -43,6 +43,12 @@ public class Percent : MonoBehaviour
     [Tooltip("에러창 게임오브젝트")]
     public GameObject errorWindow;
     
+    [Tooltip("게임 프로그램 게임오브젝트")]
+    public GameObject gameProgram;
+    
+    [Tooltip("에러창 후 게임 프로그램 뜨기까지 대기 시간 (초)")]
+    public float gameProgramDelay = 1.5f;
+    
     [Header("글리치 효과 설정")]
     [Tooltip("글리치 효과 지속 시간 (초)")]
     public float glitchDuration = 3f;
@@ -103,15 +109,36 @@ public class Percent : MonoBehaviour
             Debug.Log("[Percent] 에러창 활성화");
         }
         
+        // 에러창 뜨고 1~2초 대기 후 게임 프로그램 띄우기
+        yield return new WaitForSeconds(gameProgramDelay);
+        
+        // 다른 오브젝트들 끄기
+        if (Object != null) Object.SetActive(false);
+        if (Object2 != null) Object2.SetActive(false);
+        if (errorWindow != null) errorWindow.SetActive(false);
+        
+        Debug.Log("[Percent] 다른 창들 비활성화");
+        
+        // 게임 프로그램 켜기
+        if (gameProgram != null)
+        {
+            gameProgram.SetActive(true);
+            Debug.Log("[Percent] 게임 프로그램 활성화");
+        }
+        
         //Object4.SetActive(true);
     }
     
     private void ChangeToRedImages()
     {
-        // 초록색 게이지바 끄고 빨간색 게이지바 켜기
+        // 초록색 게이지바 숨기고 빨간색 게이지바 켜기
         if (gaugeImage != null && redGaugeImage != null)
         {
-            gaugeImage.gameObject.SetActive(false);
+            // GameObject를 끄지 않고 이미지만 투명하게
+            Color transparent = gaugeImage.color;
+            transparent.a = 0f;
+            gaugeImage.color = transparent;
+            
             redGaugeImage.gameObject.SetActive(true);
             redGaugeImage.fillAmount = 0.05f;
             Debug.Log("[Percent] 게이지바 빨간색으로 변경");
