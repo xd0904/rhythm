@@ -18,7 +18,8 @@ public class VaccineIcon : MonoBehaviour
 
     private void Update()
     {
-        if(Object.activeSelf == true)
+        // Object가 null이 아닐 때만 체크
+        if(Object != null && Object.activeSelf == true)
         {
             trueCount = 1;
         }

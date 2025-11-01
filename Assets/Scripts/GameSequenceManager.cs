@@ -454,10 +454,6 @@ public class GameSequenceManager : MonoBehaviour
             rawImage.material = originalMaterial;
         }
 
-        // 복사한 Material과 텍스처 삭제
-        Destroy(glitchInstance);
-        Destroy(screenCapture);
-
         // SpriteRenderer의 Sorting Order 원래대로 복구
         if (spriteRenderer != null)
         {
@@ -476,6 +472,13 @@ public class GameSequenceManager : MonoBehaviour
         }
 
         Debug.Log("[GameSequenceManager] Glitch 효과 종료");
+        
+        // 다음 프레임까지 대기 후 리소스 정리 (Material이 더 이상 사용되지 않도록)
+        yield return null;
+        
+        // 복사한 Material과 텍스처 삭제
+        if (glitchInstance != null) Destroy(glitchInstance);
+        if (screenCapture != null) Destroy(screenCapture);
     }
 
     private void DisableObjects(GameObject[] objects)
