@@ -764,7 +764,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 8160983457324690151, guid: 67dc5b0950e0f204c8d85b75a21c4a65, type: 3}
+  m_Sprite: {fileID: -987095013113216959, guid: c35997baee7acae43875adcdadbb4f49, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -940,6 +940,8 @@ MonoBehaviour:
   gameProgramDelay: 1.5
   glitchDuration: 1
   errorWindowDelay: 1
+  nextSceneName: Game1
+  sceneTransitionDelay: 0
 --- !u!1 &404285096
 GameObject:
   m_ObjectHideFlags: 0
@@ -3069,15 +3071,15 @@ RectTransform:
   m_GameObject: {fileID: 1138422031}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
-  m_LocalScale: {x: 108, y: 108, z: 108}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 99.1, y: 99.1, z: 99.1}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1041843093}
   m_Father: {fileID: 1657310632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 470.6, y: -363.6}
+  m_AnchoredPosition: {x: 508, y: -363.6}
   m_SizeDelta: {x: 8.95, y: 2.76}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1138422033
@@ -4136,9 +4138,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 531e02a757235d643bd9d29355adc791, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bgmSource: {fileID: 0}
+  sfxSource: {fileID: 0}
+  noteSource: {fileID: 0}
   morseAudioSource: {fileID: 1744075995}
-  masterVolume: 1
+  bgmVolume: 0.7
+  sfxVolume: 0.7
   morseVolume: 1
+  musics: []
 --- !u!1 &1749517110
 GameObject:
   m_ObjectHideFlags: 0
@@ -4584,6 +4591,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1947663126}
   - component: {fileID: 1947663128}
+  - component: {fileID: 1947663132}
   - component: {fileID: 1947663127}
   - component: {fileID: 1947663130}
   - component: {fileID: 1947663129}
@@ -4738,6 +4746,20 @@ MonoBehaviour:
   fadeOutSprite: {fileID: 1947663128}
   fadeInSprite: {fileID: 2109627508}
   fadeSpeed: 1
+--- !u!114 &1947663132
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1947663125}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 84fe4bc997b31914dbd91177c5ebc030, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  savedMousePosition: {x: 0, y: 0, z: 0}
+  hasRedMouse: 0
 --- !u!1 &2011618554
 GameObject:
   m_ObjectHideFlags: 0

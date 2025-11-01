@@ -47,11 +47,20 @@ public class SoundManager : MonoBehaviour
 
     public void PlayBGM(AudioClip clip)
     {
-        if (bgmSource == null) return;
+        // bgmSource가 없으면 자동으로 생성
+        if (bgmSource == null)
+        {
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.playOnAwake = false;
+            bgmSource.loop = true;
+            Debug.Log("[SoundManager] BGM AudioSource 자동 생성");
+        }
+        
         if (bgmSource.clip == clip) return;
         bgmSource.clip = clip;
         bgmSource.loop = true;
         bgmSource.Play();
+        Debug.Log($"[SoundManager] BGM 재생: {clip.name}");
     }
 
     public void PlaySFX(AudioClip clip)

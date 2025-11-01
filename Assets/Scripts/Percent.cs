@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections;
 
@@ -55,6 +56,13 @@ public class Percent : MonoBehaviour
     
     [Tooltip("에러창 뜨기까지 대기 시간 (초)")]
     public float errorWindowDelay = 1f;
+    
+    [Header("씬 전환 설정")]
+    [Tooltip("전환할 씬 이름")]
+    public string nextSceneName = "Game1";
+    
+    [Tooltip("게임 프로그램 뜬 후 씬 전환까지 대기 시간 (초)")]
+    public float sceneTransitionDelay = 2f;
 
     public void OnStartButtonClicked()
     {
@@ -137,6 +145,10 @@ public class Percent : MonoBehaviour
             }
             Debug.Log("[Percent] 빨간 마우스 재활성화 (고정 상태 유지)");
         }
+        
+        // 마우스 위치 저장 및 씬 전환
+        yield return new WaitForSeconds(sceneTransitionDelay);
+        SaveMousePositionAndLoadScene();
         
         //Object4.SetActive(true);
     }
@@ -256,5 +268,52 @@ public class Percent : MonoBehaviour
         gaugeText3.text = originalText;
         
         Debug.Log("[Percent] 텍스트 글리치 효과 완료");
+    }
+    
+    /// <summary>
+    /// 마우스 위치를 저장하고 다음 씬으로 전환
+    /// </summary>
+    private void SaveMousePositionAndLoadScene()
+    {
+        // MousePositionData 싱글톤이 없으면 생성
+        if (MousePositionData.Instance == null)
+        {
+            GameObject dataObject = new GameObject("MousePositionData");
+            MousePositionData data = dataObject.AddComponent<MousePositionData>();
+            Debug.Log("[Percent] MousePositionData 새로 생성");
+        }
+        
+        // 약간의 지연을 두고 저장 (Awake 실행 보장)
+        StartCoroutine(SaveAndLoad());
+    }
+    
+    private IEnumerator SaveAndLoad()
+    {
+        // 한 프레임 대기 (MousePositionData.Awake 실행 완료 보장)
+        yield return null;
+        
+        Debug.Log($"[Percent] SaveAndLoad 시작 - MousePositionData.Instance: {(MousePositionData.Instance != null ? "존재" : "NULL")}");
+        
+        // 현재 빨간 마우스의 위치 저장
+        if (redMouse != null && redMouse.activeSelf)
+        {
+            Vector3 position = redMouse.transform.position;
+            MousePositionData.Instance.SaveMousePosition(position, true);
+            Debug.Log($"[Percent] 빨간 마우스 위치 저장: {position}");
+            
+            // 저장 직후 확인
+            Vector3 check = MousePositionData.Instance.GetSavedMousePosition();
+            bool checkRed = MousePositionData.Instance.IsRedMouse();
+            Debug.Log($"[Percent] 저장 직후 확인 - 위치: {check}, 빨간마우스: {checkRed}");
+        }
+        else if (normalMouse != null && normalMouse.activeSelf)
+        {
+            MousePositionData.Instance.SaveMousePosition(normalMouse.transform.position, false);
+            Debug.Log($"[Percent] 정상 마우스 위치 저장: {normalMouse.transform.position}");
+        }
+        
+        // 씬 전환
+        Debug.Log($"[Percent] {nextSceneName} 씬으로 전환합니다");
+        SceneManager.LoadScene(nextSceneName);
     }
 }
