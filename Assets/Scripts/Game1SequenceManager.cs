@@ -13,7 +13,10 @@ public class Game1SequenceManager : MonoBehaviour
     [Header("마우스 설정")]
     [Tooltip("빨간 마우스 GameObject (Game1 씬에서는 일반 마우스 사용 안 함)")]
     public GameObject redMouse;
-    
+
+    [Header("플레이어 등장")]
+    public GameObject Player;
+
     [Header("마우스 애니메이션 설정")]
     [Tooltip("목표 위치 (RectTransform X, Y)")]
     public Vector2 targetPosition = new Vector2(570f, -16f);
@@ -243,6 +246,8 @@ public class Game1SequenceManager : MonoBehaviour
         {
             Debug.LogWarning("[Game1SequenceManager] BGM Clip이 설정되지 않았습니다!");
         }
+
+        Player.SetActive(true);
     }
     
     private void OnDestroy()
