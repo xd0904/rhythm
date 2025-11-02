@@ -17,6 +17,12 @@ public class Game1SequenceManager : MonoBehaviour
     [Header("플레이어 등장")]
     public GameObject Player;
 
+    [Header("빠운싱 등장")]
+    public GameObject Bounce;
+
+    [Header("연출 등장")]
+    public GameObject Control;
+
     [Header("마우스 애니메이션 설정")]
     [Tooltip("목표 위치 (RectTransform X, Y)")]
     public Vector2 targetPosition = new Vector2(570f, -16f);
@@ -248,6 +254,8 @@ public class Game1SequenceManager : MonoBehaviour
         }
 
         Player.SetActive(true);
+        Bounce.SetActive(true);
+        Control.SetActive(true);
     }
     
     private void OnDestroy()
