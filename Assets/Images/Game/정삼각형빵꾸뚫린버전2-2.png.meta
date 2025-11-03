@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c35997baee7acae43875adcdadbb4f49
+guid: 39246043b449835429f7e1a59b86a899
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -987095013113216959
-    second: Gameprogram_0
+      213: -3044212669901790546
+    second: "\uC815\uC0BC\uAC01\uD615\uBE75\uAFB8\uB6AB\uB9B0\uBC84\uC8042-2_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,40 +96,27 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Gameprogram_0
+      name: "\uC815\uC0BC\uAC01\uD615\uBE75\uAFB8\uB6AB\uB9B0\uBC84\uC8042-2_0"
       rect:
         serializedVersion: 2
         x: 0
-        y: 10
-        width: 835
-        height: 649
+        y: 6
+        width: 120
+        height: 138
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 140c3dfb0522d42f0800000000000000
-      internalID: -987095013113216959
+      spriteID: ea2a2c5a4b8c0c5d0800000000000000
+      internalID: -3044212669901790546
       vertices: []
       indices: 
       edges: []
@@ -138,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: db828ead17639bb41935a599ee3920d8
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      Gameprogram_0: -987095013113216959
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

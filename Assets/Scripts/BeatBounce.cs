@@ -55,7 +55,7 @@ public class BeatBounce : MonoBehaviour
     public float waveAmplitude = 1f;  // 위아래 흔들림 높이
     public float moveSpeed = 5f;      // 이동 속도
     public float waveSpeed = 3f;      // 흔들림 속도
-    public float startX = 10f;        // 오른쪽 화면 바깥 시작 위치
+    public float startX = 4f;        // 오른쪽 화면 바깥 시작 위치
     private bool waveSpawned = false; // 한 번만 실행 플래그
 
 
@@ -551,16 +551,16 @@ public class BeatBounce : MonoBehaviour
             yield return new WaitForSeconds(0.1f); // 순차 생성
         }
     }
-
-    // MoveWaveObject를 amplitude와 speed 옵션 추가
     private IEnumerator MoveWaveObject(GameObject waveObj, int row, float waveAmplitude = 2f, float waveSpeed = 1f)
     {
         if (waveObj == null) yield break;
 
         float elapsed = 0f;
         Vector3 startPos = waveObj.transform.position;
-        float moveSpeed = 2f;      // 이동 속도
-        float xLimit = -10f;       // 왼쪽 화면 끝 위치
+        float moveSpeed = 2f;   // 이동 속도
+        float xLimit = -10f;    // 왼쪽 화면 끝 위치, 필요에 따라 조절
+
+        SpriteRenderer sr = waveObj.GetComponent<SpriteRenderer>();
 
         while (waveObj != null && waveObj.transform.position.x > xLimit)
         {
@@ -570,12 +570,14 @@ public class BeatBounce : MonoBehaviour
             float y = startPos.y + Mathf.Sin(elapsed * waveSpeed + row * Mathf.PI / 2f) * waveAmplitude;
 
             waveObj.transform.position = new Vector3(x, y, 0f);
+
             yield return null;
         }
 
         if (waveObj != null)
             Destroy(waveObj);
     }
+
 
 
 }
