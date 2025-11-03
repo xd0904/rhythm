@@ -28,7 +28,7 @@ public class BeatBounce : MonoBehaviour
     public float attackStartTime = 6.3f;  // 공격 시작 시간
     public float attackEndTime = 25.7f;   // 공격 끝 시간
     public int beatsPerAttack = 4;        // 공격당 박자 수 (4박자마다 공격)
-    public SpriteRenderer mouseRenderer;  // 마우스 커서 SpriteRenderer
+    public GameObject mouseObject;        // 마우스 커서 오브젝트 (SpriteRenderer 또는 Image)
     public Color mouseNormalColor = Color.red;
     public Color mouseAttackColor = Color.white;
     
@@ -82,24 +82,25 @@ public class BeatBounce : MonoBehaviour
             // 다이아몬드 바운스 (음악 시작하면 항상 생성)
             SpawnAndGrowDiamond(currentMusicTime);
             
-            // 공격 패턴 (6.3초 ~ 25.7초 사이만)
-            if (currentMusicTime >= attackStartTime && currentMusicTime <= attackEndTime)
+            // 공격 패턴 (6.3초 ~ 25.7초 사이만, 마지막 발사 제외)
+            if (currentMusicTime >= attackStartTime && currentMusicTime < attackEndTime - beatInterval)
             {
-                int beatInCycle = attackBeatCounter % 2; // 2박자 주기
+                // 4/4박자 기준: 1박자 = 발사, 2박자 = 터짐, 3박자 = 발사, 4박자 = 터짐
+                int beatInCycle = attackBeatCounter % 2; // 발사-터짐 2박자 주기
                 
                 if (beatInCycle == 0)
                 {
-                    // 첫 박자 (쿵) - 볼 발사 (날아오는 박자)
+                    // 발사 박자 (쿵) - 항상 마우스에서 볼 발사
                     if (ballPrefab != null && mousePosition != null)
                     {
-                        ShootBall();
+                        ShootBallFromMouse();
                         StartCoroutine(FlashMouseCursor());
                     }
                 }
                 else if (beatInCycle == 1)
                 {
-                    // 두 번째 박자 (짝) - 터지는 박자
-                    // 볼이 중앙 도착하면 자동으로 6방향 터짐
+                    // 터지는 박자 (짝) - 중앙에서 6방향 퍼짐
+                    // 볼이 중앙 도착하면 자동으로 터짐
                 }
                 
                 attackBeatCounter++;
@@ -301,31 +302,66 @@ public class BeatBounce : MonoBehaviour
     /// </summary>
     IEnumerator FlashMouseCursor()
     {
-        if (mouseRenderer == null) yield break;
+        if (mouseObject == null) yield break;
         
-        Color originalColor = mouseRenderer.color;
-        mouseRenderer.color = mouseAttackColor;
+        // SpriteRenderer 또는 Image 컴포넌트 찾기
+        SpriteRenderer spriteRenderer = mouseObject.GetComponent<SpriteRenderer>();
+        UnityEngine.UI.Image image = mouseObject.GetComponent<UnityEngine.UI.Image>();
+        
+        Color originalColor = Color.white;
+        
+        // 원래 색상 가져오기
+        if (spriteRenderer != null)
+        {
+            originalColor = spriteRenderer.color;
+            spriteRenderer.color = mouseAttackColor;
+        }
+        else if (image != null)
+        {
+            originalColor = image.color;
+            image.color = mouseAttackColor;
+        }
+        else
+        {
+            yield break; // 둘 다 없으면 종료
+        }
         
         yield return new WaitForSeconds(0.1f);
         
-        mouseRenderer.color = originalColor;
+        // 원래 색상으로 복구
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.color = originalColor;
+        }
+        else if (image != null)
+        {
+            image.color = originalColor;
+        }
     }
     
     /// <summary>
-    /// 마우스에서 볼 발사 (중앙으로 이동만)
+    /// 마우스 위치에서 볼 발사 (항상 현재 마우스 위치에서)
     /// </summary>
-    private void ShootBall()
+    private void ShootBallFromMouse()
     {
         if (ballPrefab == null || mousePosition == null || centerPoint == null)
         {
             return;
         }
         
-        // 볼 생성 (마우스 위치에서)
+        // 볼 생성 (항상 현재 마우스 위치에서)
         GameObject ball = Instantiate(ballPrefab, mousePosition.position, Quaternion.identity);
         
         // 볼을 중앙으로 이동시키는 코루틴
         StartCoroutine(MoveBallToCenterAndShoot(ball));
+    }
+    
+    /// <summary>
+    /// 마우스에서 볼 발사 (중앙으로 이동만) - 구버전
+    /// </summary>
+    private void ShootBall()
+    {
+        ShootBallFromMouse();
     }
     
     /// <summary>
