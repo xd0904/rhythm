@@ -785,7 +785,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &696100253
 Transform:
   m_ObjectHideFlags: 0
@@ -796,7 +796,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -191, y: 16, z: -9720}
-  m_LocalScale: {x: 37.514275, y: 42.238483, z: 63.49742}
+  m_LocalScale: {x: 38, y: 37, z: 37}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 908137776}
@@ -886,7 +886,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -942,10 +942,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  acceleration: 20
+  deceleration: 30
   minX: -8
   maxX: 8
   minY: -4.5
   maxY: 4.5
+  deathColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
+  colorChangeDuration: 1
+  glitchDuration: 0.3
+  glitchMaterial: {fileID: 2100000, guid: b92e481bc9596404c8d5b4ebd7b66366, type: 2}
+  gameOverSceneName: GameOver
+  bgmAudioSource: {fileID: 0}
+  pitchChangeSpeed: 1.5
+  targetPitch: 0.3
 --- !u!114 &696100258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1578,7 +1588,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -357421434760999972, guid: fa3bc70043da6f24ab27ce66b3f9d30a, type: 3}
+  m_Sprite: {fileID: -808767449149416215, guid: 24e8c625a16921f4da9a7e4b38717f85, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -1621,7 +1631,7 @@ RectTransform:
   m_GameObject: {fileID: 924480919}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 48.300003, y: 48.300003, z: 48.300003}
+  m_LocalScale: {x: 48.300003, y: 73.64259, z: 14.400557}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 632170198}
