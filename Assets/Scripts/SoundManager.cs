@@ -22,6 +22,9 @@ public class SoundManager : MonoBehaviour
     [SerializeField] List<AudioClip> musics;
 
     double music_start_time;
+    
+    // BGM AudioSource를 외부에서 접근할 수 있도록 public 프로퍼티 추가
+    public AudioSource BGMSource => bgmSource;
 
     void Awake()
     {

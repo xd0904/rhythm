@@ -23,6 +23,8 @@ public class BeatBounce : MonoBehaviour
     public Transform centerPoint;         // 게임 창 중앙 (터지는 지점)
     public float ballSpeed = 10f;         // 볼 이동 속도
     public float projectileSpeed = 5f;    // 투사체 발사 속도
+    public float minY = -4f;              // 볼 Y축 최소 랜덤 범위
+    public float maxY = 4f;               // 볼 Y축 최대 랜덤 범위
     
     [Header("공격 패턴 설정")]
     public float attackStartTime = 6.4f;  // 공격 시작 시간 (Beat 16에 맞춤)
@@ -375,11 +377,17 @@ public class BeatBounce : MonoBehaviour
             return;
         }
         
-        // 볼 생성 (항상 현재 마우스 위치에서)
-        GameObject ball = Instantiate(ballPrefab, mousePosition.position, Quaternion.identity);
+        // 볼 생성 위치: 마우스 위치 그대로
+        Vector3 spawnPos = mousePosition.position;
         
-        // 볼을 중앙으로 이동시키는 코루틴
-        StartCoroutine(MoveBallToCenterAndShoot(ball));
+        GameObject ball = Instantiate(ballPrefab, spawnPos, Quaternion.identity);
+        
+        // 터지는 위치의 Y축을 랜덤으로 설정
+        Vector3 randomTargetPos = centerPoint.position;
+        randomTargetPos.y = Random.Range(minY, maxY);
+        
+        // 볼을 랜덤 Y축 위치로 이동시키는 코루틴
+        StartCoroutine(MoveBallToCenterAndShoot(ball, randomTargetPos));
     }
     
     /// <summary>
@@ -401,10 +409,9 @@ public class BeatBounce : MonoBehaviour
     /// <summary>
     /// 볼을 중앙으로 이동 후 6방향 투사체 발사
     /// </summary>
-    private IEnumerator MoveBallToCenterAndShoot(GameObject ball)
+    private IEnumerator MoveBallToCenterAndShoot(GameObject ball, Vector3 targetPos)
     {
         Vector3 startPos = ball.transform.position;
-        Vector3 targetPos = centerPoint.position;
         float distance = Vector3.Distance(startPos, targetPos);
         float duration = distance / ballSpeed;
         
