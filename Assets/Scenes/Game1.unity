@@ -2218,11 +2218,11 @@ MonoBehaviour:
   background: {fileID: 1545155520}
   darkColor: {r: 0, g: 0, b: 0, a: 1}
   fadeDuration: 1
-  wavePrefab: {fileID: 3260387819311678250, guid: fe7ee04ebea332341b14caec94c2819f, type: 3}
-  wavePrefabAlt: {fileID: 2369408131941097147, guid: 1234c5fc1289f344eb4ebb11cd5d189f, type: 3}
+  wavePrefab: {fileID: 4094856357322339278, guid: 54dd779f165859440b2e4e09bbbdef89, type: 3}
+  wavePrefabAlt: {fileID: 3646349266002255094, guid: eda42412b07abd445b1baf8ecc2ab854, type: 3}
   waveParent: {fileID: 198122035}
   waveCount: 80
-  waveSpacing: 0.1
+  waveSpacing: 0.3
   waveAmplitude: 1.5
   moveSpeed: 15
   waveSpeed: 3
