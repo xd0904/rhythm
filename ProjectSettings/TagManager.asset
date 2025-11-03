@@ -41,14 +41,5 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: wave
-    uniqueID: 3191163527
-    locked: 0
-  - name: Player
-    uniqueID: 380455347
-    locked: 0
-  - name: Background
-    uniqueID: 3982363711
-    locked: 0
   m_RenderingLayers:
   - Default

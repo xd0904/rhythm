@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 118774634}
   - component: {fileID: 118774635}
   - component: {fileID: 118774636}
+  - component: {fileID: 118774637}
   m_Layer: 0
   m_Name: GameProgram
   m_TagString: Untagged
@@ -241,18 +242,73 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: -0.0753839, y: 0}
+  m_Offset: {x: -0.02894926, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8.48, y: 6.59}
+    oldSize: {x: 8.35, y: 6.49}
     newSize: {x: 8.48, y: 6.59}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 8.329231, y: 6.59}
+  m_Size: {x: 8.422101, y: 6.59}
   m_EdgeRadius: 0
+--- !u!331 &118774637
+SpriteMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 118774633}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 15d0c3709176029428a0da2f8cecf0b5, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: -987095013113216959, guid: c35997baee7acae43875adcdadbb4f49, type: 3}
+  m_MaskAlphaCutoff: 0.2
+  m_FrontSortingLayerID: 0
+  m_BackSortingLayerID: 0
+  m_FrontSortingLayer: 0
+  m_BackSortingLayer: 0
+  m_FrontSortingOrder: 4
+  m_BackSortingOrder: 2
+  m_IsCustomRangeActive: 1
+  m_SpriteSortPoint: 0
+  m_MaskSource: 0
 --- !u!1 &198122034
 GameObject:
   m_ObjectHideFlags: 0
@@ -278,7 +334,7 @@ Transform:
   m_GameObject: {fileID: 198122034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.6, y: -0.25027695, z: 0.041339684}
+  m_LocalPosition: {x: 6.723, y: 0.457, z: 0.041339684}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -843,7 +899,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 380455347
-  m_SortingLayer: 2
+  m_SortingLayer: 0
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.21176472, g: 0.9960785, b: 0.60784316, a: 1}
@@ -2165,12 +2221,12 @@ MonoBehaviour:
   wavePrefab: {fileID: 3260387819311678250, guid: fe7ee04ebea332341b14caec94c2819f, type: 3}
   wavePrefabAlt: {fileID: 2369408131941097147, guid: 1234c5fc1289f344eb4ebb11cd5d189f, type: 3}
   waveParent: {fileID: 198122035}
-  waveCount: 60
+  waveCount: 80
   waveSpacing: 0.1
   waveAmplitude: 1.5
   moveSpeed: 15
   waveSpeed: 3
-  startX: 10
+  startX: 5
 --- !u!1 &1844002972
 GameObject:
   m_ObjectHideFlags: 0
