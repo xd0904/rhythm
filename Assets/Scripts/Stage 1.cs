@@ -2,24 +2,24 @@ using UnityEngine;
 
 public class Stage1 : MonoBehaviour
 {
-    [Header("¿ÀºêÁ§Æ® ÂüÁ¶")]
+    [Header("ì˜¤ë¸Œì íŠ¸ ì°¸ì¡°")]
     public Transform window;
     public Transform player;
 
-    [Header("¿òÁ÷ÀÓ ¼³Á¤")]
-    public float windowFollowSpeed = 5f; // Ã¢ÀÌ ¸¶¿ì½º¸¦ µû¶ó°¡´Â ¼Óµµ
-    public float playerFollowSpeed = 2f; // ÇÃ·¹ÀÌ¾î°¡ Ã¢À» µû¶ó¿À´Â ¼Óµµ
-    public float windowCatchDuration = 2f; // Ã¢ÀÌ ¸¶¿ì½º¸¦ µû¶ó°¡´Â ½Ã°£
-    public float windowReleaseDuration = 1f; // Ã¢ÀÌ ¸ØÃçÀÖ´Â ½Ã°£
+    [Header("ì›€ì§ì„ ì„¤ì •")]
+    public float windowFollowSpeed = 5f; // ì°½ì´ ë§ˆìš°ìŠ¤ë¥¼ ë”°ë¼ê°€ëŠ” ì†ë„
+    public float playerFollowSpeed = 2f; // í”Œë ˆì´ì–´ê°€ ì°½ì„ ë”°ë¼ì˜¤ëŠ” ì†ë„
+    public float windowCatchDuration = 2f; // ì°½ì´ ë§ˆìš°ìŠ¤ë¥¼ ë”°ë¼ê°€ëŠ” ì‹œê°„
+    public float windowReleaseDuration = 1f; // ì°½ì´ ë©ˆì¶°ìˆëŠ” ì‹œê°„
 
-    [Header("¸¶¿ì½º ½Ã¹Ä·¹ÀÌ¼Ç")]
-    public Vector2[] pathPoints; // ¸¶¿ì½º°¡ ÀÌµ¿ÇÒ ÁÂÇ¥µé
-    public float moveDurationPerPoint = 2f; // °¢ ±¸°£ ÀÌµ¿ ½Ã°£
+    [Header("ë§ˆìš°ìŠ¤ ì‹œë®¬ë ˆì´ì…˜")]
+    public Vector2[] pathPoints; // ë§ˆìš°ìŠ¤ê°€ ì´ë™í•  ì¢Œí‘œë“¤
+    public float moveDurationPerPoint = 2f; // ê° êµ¬ê°„ ì´ë™ ì‹œê°„
 
     private Vector3 simulatedMousePos;
     private int currentTargetIndex = 0;
     private float moveTimer = 0f;
-    private bool windowFollowing = true; // Ã¢ÀÌ Áö±İ ¸¶¿ì½º¸¦ µû¶ó°¡´Â ÁßÀÎÁö
+    private bool windowFollowing = true; // ì°½ì´ ì§€ê¸ˆ ë§ˆìš°ìŠ¤ë¥¼ ë”°ë¼ê°€ëŠ” ì¤‘ì¸ì§€
     private float followTimer = 0f;
 
     void Start()
@@ -30,7 +30,7 @@ public class Stage1 : MonoBehaviour
 
     void Update()
     {
-        // 1?? ½Ã°£¿¡ µû¶ó ¸¶¿ì½º ÀÚµ¿ ÀÌµ¿
+        // 1?? ì‹œê°„ì— ë”°ë¼ ë§ˆìš°ìŠ¤ ìë™ ì´ë™
         if (pathPoints.Length > 1)
         {
             moveTimer += Time.deltaTime;
@@ -44,7 +44,7 @@ public class Stage1 : MonoBehaviour
             }
         }
 
-        // 2?? Ã¢ÀÌ ¸¶¿ì½º¸¦ µû¶ó°¬´Ù°¡ ¸ØÃè´Ù°¡ ¹İº¹
+        // 2?? ì°½ì´ ë§ˆìš°ìŠ¤ë¥¼ ë”°ë¼ê°”ë‹¤ê°€ ë©ˆì·„ë‹¤ê°€ ë°˜ë³µ
         followTimer += Time.deltaTime;
         if (windowFollowing && followTimer >= windowCatchDuration)
         {
@@ -62,7 +62,6 @@ public class Stage1 : MonoBehaviour
             window.position = Vector3.Lerp(window.position, simulatedMousePos, Time.deltaTime * windowFollowSpeed);
         }
 
-        // 3?? ÇÃ·¹ÀÌ¾î°¡ Ã¢À» ÃµÃµÈ÷ µû¶ó¿Àµµ·Ï
-        player.position = Vector3.Lerp(player.position, window.position, Time.deltaTime * playerFollowSpeed);
+        // í”Œë ˆì´ì–´ëŠ” ììœ ë¡­ê²Œ ì´ë™ (Player.csì—ì„œ ì œì–´)
     }
 }

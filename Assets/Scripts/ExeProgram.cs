@@ -9,6 +9,10 @@ public class ExeProgram : MonoBehaviour
     [Tooltip("시작 크기 비율 (0~1)")]
     public float startScale = 0.5f;
 
+    [Header("UI 요소")]
+    [Tooltip("Vaccine 아이콘 오브젝트")]
+    public GameObject VaccineIcon;
+
     private Vector3 targetScale;
     private RectTransform rectTransform;
     private bool isAnimating = false;
@@ -16,6 +20,12 @@ public class ExeProgram : MonoBehaviour
 
     void Awake()
     {
+        // VaccineIcon 비활성화
+        if (VaccineIcon != null)
+        {
+            VaccineIcon.SetActive(false);
+        }
+
         Initialize();
     }
 

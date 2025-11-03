@@ -69,6 +69,25 @@ public class Game1SequenceManager : MonoBehaviour
         
         // 씬 시작 시 이전 씬의 마우스 위치 복원
         Debug.Log($"[Game1SequenceManager] Start() 호출 - MousePositionData.Instance: {(MousePositionData.Instance != null ? "존재" : "NULL")}");
+        
+        // MousePositionData가 없으면 테스트 모드 (Game1 씬에서 직접 시작)
+        if (MousePositionData.Instance == null)
+        {
+            Debug.Log("[Game1SequenceManager] 테스트 모드: MousePositionData 생성 및 기본값 설정");
+            
+            // MousePositionData 생성
+            GameObject dataObject = new GameObject("MousePositionData");
+            dataObject.AddComponent<MousePositionData>();
+            
+            // 기본 빨간 마우스 위치 설정 (화면 중앙 정도)
+            if (redMouse != null)
+            {
+                Vector3 testPosition = new Vector3(0, 0, 0); // 또는 원하는 테스트 위치
+                MousePositionData.Instance.SaveMousePosition(testPosition, true);
+                Debug.Log($"[Game1SequenceManager] 테스트용 마우스 위치 설정: {testPosition}");
+            }
+        }
+        
         RestoreMousePosition();
     }
     
@@ -88,19 +107,26 @@ public class Game1SequenceManager : MonoBehaviour
         
         Debug.Log($"[Game1SequenceManager] 저장된 마우스 위치 복원: {savedPosition}, 빨간마우스: {isRedMouse}");
         
-        // 위치가 (0,0,0)이면 저장된 게 없는 것
+        // 테스트 모드: (0,0,0)이어도 빨간 마우스면 진행
         if (savedPosition == Vector3.zero && !isRedMouse)
         {
             Debug.LogWarning("[Game1SequenceManager] 저장된 마우스 데이터가 없습니다! (0,0,0)");
-            return;
+            // 테스트 모드로 강제 진행
+            isRedMouse = true;
+            Debug.Log("[Game1SequenceManager] 테스트 모드로 강제 진행");
         }
         
         // Game1 씬에서는 빨간 마우스만 사용
-        if (isRedMouse && redMouse != null)
+        if (redMouse != null)
         {
             // 빨간 마우스 활성화
             redMouse.SetActive(true);
-            redMouse.transform.position = savedPosition;
+            
+            // 위치 설정 (테스트 모드면 현재 위치 유지)
+            if (savedPosition != Vector3.zero)
+            {
+                redMouse.transform.position = savedPosition;
+            }
             
             // 빨간 마우스는 움직임 비활성화
             Mouse redMouseScript = redMouse.GetComponent<Mouse>();
@@ -116,7 +142,7 @@ public class Game1SequenceManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("[Game1SequenceManager] 빨간 마우스가 없거나 빨간 마우스 상태가 아닙니다!");
+            Debug.LogWarning("[Game1SequenceManager] 빨간 마우스가 없습니다!");
         }
     }
     
@@ -256,6 +282,14 @@ public class Game1SequenceManager : MonoBehaviour
         Player.SetActive(true);
         Bounce.SetActive(true);
         Control.SetActive(true);
+        
+        // BeatBounce 음악 시작 시간 동기화
+        BeatBounce beatBounce = Bounce.GetComponent<BeatBounce>();
+        if (beatBounce != null)
+        {
+            beatBounce.ResetMusicStartTime();
+            Debug.Log("[Game1SequenceManager] BeatBounce 음악 시간 동기화 완료");
+        }
     }
     
     private void OnDestroy()
