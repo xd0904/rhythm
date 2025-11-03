@@ -996,6 +996,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animationDuration: 0.2
   startScale: 0.5
+  VaccineIcon: {fileID: 462323430}
 --- !u!1 &462323430
 GameObject:
   m_ObjectHideFlags: 0
