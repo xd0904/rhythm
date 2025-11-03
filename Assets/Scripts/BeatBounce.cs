@@ -45,6 +45,23 @@ public class BeatBounce : MonoBehaviour
     private int lastBeatIndex = -1;
     private int attackBeatCounter = 0;    // 공격 박자 카운터
 
+
+    [Header("Wave Settings")]
+    public GameObject wavePrefab;     // 물결 오브젝트 프리팹
+    public GameObject wavePrefabAlt;     // 새로운 물결용 프리팹
+    public Transform waveParent;      // 빈 오브젝트로 정리용 부모
+    public int waveCount = 100;        // 한 줄당 오브젝트 개수
+    public float waveSpacing = 0.05f;    // 오브젝트 간 간격
+    public float waveAmplitude = 1f;  // 위아래 흔들림 높이
+    public float moveSpeed = 5f;      // 이동 속도
+    public float waveSpeed = 3f;      // 흔들림 속도
+    public float startX = 10f;        // 오른쪽 화면 바깥 시작 위치
+    private bool waveSpawned = false; // 한 번만 실행 플래그
+
+
+
+
+
     void Start()
     {
         beatInterval = 60f / bpm;
@@ -109,6 +126,13 @@ public class BeatBounce : MonoBehaviour
             }
             
             Debug.Log($"[BeatBounce] Beat {currentBeatIndex} at {currentMusicTime:F2}s");
+
+            // 25.7초 이상이면 물결 생성 (한 번만)
+            if (!waveSpawned && currentMusicTime >= 25.7f && currentMusicTime <= 44f)
+            {
+                waveSpawned = true;
+                SpawnWave();
+            }
         }
     }
     
@@ -485,5 +509,74 @@ public class BeatBounce : MonoBehaviour
         bpm = newBpm;
         beatInterval = 60f / bpm;
     }
+
+    /// <summary>
+    /// UI 물결 생성 (25.7초 시점)
+    /// </summary>
+    public void SpawnWave()
+    {
+        StartCoroutine(SpawnWaveCoroutine());
+    }
+
+    private IEnumerator SpawnWaveCoroutine()
+    {
+        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null)
+        {
+            Debug.LogWarning("[BeatBounce] Wave Prefab 또는 Parent가 설정되지 않았습니다!");
+            yield break;
+        }
+
+        for (int i = 0; i < waveCount; i++)
+        { 
+            // 기존 위쪽
+            Vector3 topPos = new Vector3(startX + i * waveSpacing, 2f, 0f);
+            GameObject topWave = Instantiate(wavePrefab, topPos, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(topWave, 0, 0.8f, 2f)); // amplitude, speed
+
+            // 기존 아래쪽
+            Vector3 bottomPos = new Vector3(startX + i * waveSpacing, -2f, 0f);
+            GameObject bottomWave = Instantiate(wavePrefab, bottomPos, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(bottomWave, 1, 0.8f, 2f));
+
+            // 새로운 위쪽
+            Vector3 topPos2 = new Vector3(startX + i * waveSpacing, 3f, 0f);
+            GameObject topWave2 = Instantiate(wavePrefabAlt, topPos2, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(topWave2, 0, 1f, 1.5f));
+
+            // 새로운 아래쪽
+            Vector3 bottomPos2 = new Vector3(startX + i * waveSpacing, -3f, 0f);
+            GameObject bottomWave2 = Instantiate(wavePrefabAlt, bottomPos2, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(bottomWave2, 1, 1f, 1.5f));
+
+            yield return new WaitForSeconds(0.1f); // 순차 생성
+        }
+    }
+
+    // MoveWaveObject를 amplitude와 speed 옵션 추가
+    private IEnumerator MoveWaveObject(GameObject waveObj, int row, float waveAmplitude = 2f, float waveSpeed = 1f)
+    {
+        if (waveObj == null) yield break;
+
+        float elapsed = 0f;
+        Vector3 startPos = waveObj.transform.position;
+        float moveSpeed = 2f;      // 이동 속도
+        float xLimit = -10f;       // 왼쪽 화면 끝 위치
+
+        while (waveObj != null && waveObj.transform.position.x > xLimit)
+        {
+            elapsed += Time.deltaTime;
+
+            float x = waveObj.transform.position.x - moveSpeed * Time.deltaTime;
+            float y = startPos.y + Mathf.Sin(elapsed * waveSpeed + row * Mathf.PI / 2f) * waveAmplitude;
+
+            waveObj.transform.position = new Vector3(x, y, 0f);
+            yield return null;
+        }
+
+        if (waveObj != null)
+            Destroy(waveObj);
+    }
+
+
 }
 

@@ -253,6 +253,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 8.329231, y: 6.59}
   m_EdgeRadius: 0
+--- !u!1 &198122034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 198122035}
+  m_Layer: 0
+  m_Name: WaveParent
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &198122035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198122034}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 7.6, y: -0.25027695, z: 0.041339684}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &353205613
 GameObject:
   m_ObjectHideFlags: 0
@@ -811,8 +842,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 380455347
+  m_SortingLayer: 2
   m_SortingOrder: 1
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0.21176472, g: 0.9960785, b: 0.60784316, a: 1}
@@ -2131,6 +2162,15 @@ MonoBehaviour:
   background: {fileID: 1545155520}
   darkColor: {r: 0, g: 0, b: 0, a: 1}
   fadeDuration: 1
+  wavePrefab: {fileID: 3260387819311678250, guid: fe7ee04ebea332341b14caec94c2819f, type: 3}
+  wavePrefabAlt: {fileID: 2369408131941097147, guid: 1234c5fc1289f344eb4ebb11cd5d189f, type: 3}
+  waveParent: {fileID: 198122035}
+  waveCount: 60
+  waveSpacing: 0.1
+  waveAmplitude: 1.5
+  moveSpeed: 15
+  waveSpeed: 3
+  startX: 10
 --- !u!1 &1844002972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2445,3 +2485,4 @@ SceneRoots:
   - {fileID: 1545155523}
   - {fileID: 465735090}
   - {fileID: 981275979}
+  - {fileID: 198122035}
