@@ -12,8 +12,8 @@ public class BeatBounce : MonoBehaviour
     [Header("다이아몬드 색상 변화")]
     public Color startDiamondColor = Color.gray;  // 회색
     public Color endDiamondColor = Color.red;     // 빨간색
-    public float colorChangeStart = 6.3f;         // 색상 변화 시작
-    public float colorChangeEnd = 25.7f;          // 색상 변화 끝
+    public float colorChangeStart = 6.4f;         // 색상 변화 시작 (Beat 16)
+    public float colorChangeEnd = 25.6f;          // 색상 변화 끝 (Beat 64)
     
     [Header("6방향 발사 설정")]
     public GameObject ballPrefab;         // 발사될 볼 (중앙으로 이동)
@@ -25,7 +25,7 @@ public class BeatBounce : MonoBehaviour
     public float projectileSpeed = 5f;    // 투사체 발사 속도
     
     [Header("공격 패턴 설정")]
-    public float attackStartTime = 6.3f;  // 공격 시작 시간
+    public float attackStartTime = 6.4f;  // 공격 시작 시간 (Beat 16에 맞춤)
     public float attackEndTime = 25.7f;   // 공격 끝 시간
     public int beatsPerAttack = 4;        // 공격당 박자 수 (4박자마다 공격)
     public GameObject mouseObject;        // 마우스 커서 오브젝트 (SpriteRenderer 또는 Image)
@@ -48,6 +48,8 @@ public class BeatBounce : MonoBehaviour
     void Start()
     {
         beatInterval = 60f / bpm;
+        
+        Debug.Log($"[BeatBounce] Start - BPM: {bpm}, Beat Interval: {beatInterval:F3}초");
         
         if (spawnPoint == null)
         {
