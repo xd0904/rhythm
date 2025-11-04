@@ -334,7 +334,7 @@ Transform:
   m_GameObject: {fileID: 198122034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.723, y: 0.457, z: 0.041339684}
+  m_LocalPosition: {x: 1.89, y: 3.39, z: 0.041339684}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2264,7 +2264,9 @@ MonoBehaviour:
   darkColor: {r: 0, g: 0, b: 0, a: 1}
   fadeDuration: 1
   wavePrefab: {fileID: 4094856357322339278, guid: 54dd779f165859440b2e4e09bbbdef89, type: 3}
-  wavePrefabAlt: {fileID: 3260387819311678250, guid: e55413bc96a69814b8a4b7b37709f91a, type: 3}
+  wavePrefabAlt: {fileID: 2369408131941097147, guid: eda42412b07abd445b1baf8ecc2ab854, type: 3}
+  bigWavePrefab: {fileID: 3243375885853720917, guid: 2eb040fe1677cfb428e0c7ff21b87922, type: 3}
+  bounceWavePrefab: {fileID: 3963892975576905091, guid: 02b49500329c491468f4bda64f96ba21, type: 3}
   waveParent: {fileID: 198122035}
   waveCount: 80
   waveSpacing: 0.3

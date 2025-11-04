@@ -62,6 +62,8 @@ public class BeatBounce : MonoBehaviour
     [Header("Wave Settings")]
     public GameObject wavePrefab;     // 물결 오브젝트 프리팹
     public GameObject wavePrefabAlt;     // 새로운 물결용 프리팹
+    public GameObject bigWavePrefab;      // 큰 물결용 프리팹
+    public GameObject bounceWavePrefab;   // 위아래로 빠르게 진동하는 물결 프리팹
     public Transform waveParent;      // 빈 오브젝트로 정리용 부모
     public int waveCount = 100;        // 한 줄당 오브젝트 개수
     public float waveSpacing = 0.05f;    // 오브젝트 간 간격
@@ -683,7 +685,7 @@ public class BeatBounce : MonoBehaviour
 
     private IEnumerator SpawnWaveCoroutine()
     {
-        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null)
+        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null || bigWavePrefab == null || bounceWavePrefab == null)
         {
             Debug.LogWarning("[BeatBounce] Wave Prefab 또는 Parent가 설정되지 않았습니다!");
             yield break;
@@ -710,6 +712,29 @@ public class BeatBounce : MonoBehaviour
             Vector3 bottomPos2 = new Vector3(startX + i * waveSpacing, -3f, 0f);
             GameObject bottomWave2 = Instantiate(wavePrefabAlt, bottomPos2, Quaternion.identity, waveParent);
             StartCoroutine(MoveWaveObject(bottomWave2, 1, 1f, 1.5f));
+
+            // 큰 물결 위쪽
+            Vector3 bigTopPos = new Vector3(startX + i * waveSpacing, 4f, 0f);
+            GameObject bigTopWave = Instantiate(bigWavePrefab, bigTopPos, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(bigTopWave, 0, 2f, 0.8f));
+
+            // 큰 물결 아래쪽
+            Vector3 bigBottomPos = new Vector3(startX + i * waveSpacing, -4f, 0f);
+            GameObject bigBottomWave = Instantiate(bigWavePrefab, bigBottomPos, Quaternion.identity, waveParent);
+            StartCoroutine(MoveWaveObject(bigBottomWave, 1, 2f, 0.8f));
+
+            // 위쪽에서 아래로 내려오는 물결
+            Vector3 bounceTopPos = new Vector3(2f, 3f + i * waveSpacing, 0f); // y값이 커질수록 위쪽
+            GameObject bounceTopWave = Instantiate(bounceWavePrefab, bounceTopPos, Quaternion.identity, waveParent);
+            StartCoroutine(VerticalBounceDiagonal(bounceTopWave, 1.5f, 0.8f, 0.5f, 0.7f));
+
+            // 아래쪽에서 위로 올라가는 물결
+            Vector3 bounceBottomPos = new Vector3(2f, -3f - i * waveSpacing, 0f); // y값이 작아질수록 아래쪽
+            GameObject bounceBottomWave = Instantiate(bounceWavePrefab, bounceBottomPos, Quaternion.identity, waveParent);
+            StartCoroutine(VerticalBounceDiagonalUp(bounceBottomWave, 1.5f, 0.8f, 0.5f, 0.7f));
+
+
+
 
             yield return new WaitForSeconds(0.1f); // 순차 생성
         }
@@ -740,6 +765,65 @@ public class BeatBounce : MonoBehaviour
         if (waveObj != null)
             Destroy(waveObj);
     }
+
+    // 위에서 아래로 꽂히면서 왼쪽으로 빠르게 흐르는 물결
+    private IEnumerator VerticalBounceDiagonal(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
+    {
+        Vector3 startPos = wave.transform.position;
+        float timer = 0f;
+
+        while (wave != null)
+        {
+            timer += Time.deltaTime * speed;
+
+            // 좌우로 빠르게 흔들림 (짧은 파형)
+            float offsetX = Mathf.Sin(timer * Mathf.PI * 8f) * amplitude * 0.25f;
+
+            // 아래로 빠르게 떨어지도록 속도 증가
+            float moveY = -timer * moveSpeed * 3f;  // ← 여기 3배 빠르게
+
+            // 전체 왼쪽으로 흐름
+            float moveX = -timer * leftFlowSpeed;
+
+            wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
+
+            // 화면 아래로 완전히 사라지면 제거
+            if (wave.transform.position.y < -7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
+
+            yield return null;
+        }
+    }
+
+    // 아래에서 위로 솟는 물결 (반대 방향)
+    private IEnumerator VerticalBounceDiagonalUp(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
+    {
+        Vector3 startPos = wave.transform.position;
+        float timer = 0f;
+
+        while (wave != null)
+        {
+            timer += Time.deltaTime * speed;
+
+            float offsetX = Mathf.Sin(timer * Mathf.PI * 8f) * amplitude * 0.25f;
+            float moveY = timer * moveSpeed * 3f;   // ← 마찬가지로 더 빠르게 상승
+            float moveX = -timer * leftFlowSpeed;
+
+            wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
+
+            if (wave.transform.position.y > 7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
+
+            yield return null;
+        }
+    }
+
 
 
 
