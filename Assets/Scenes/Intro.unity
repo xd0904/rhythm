@@ -461,6 +461,7 @@ MonoBehaviour:
   borderObject: {fileID: 602363360}
   vaccineIcon: {fileID: 462323430}
   vaccineAlarm: {fileID: 1138422033}
+  percentProgram: {fileID: 677265615}
   glitchMaterial: {fileID: 2100000, guid: b92e481bc9596404c8d5b4ebd7b66366, type: 2}
   glitchDuration: 1
   glitchNoise: 800
@@ -477,6 +478,12 @@ MonoBehaviour:
   - {fileID: 404285096}
   - {fileID: 1392511153}
   - {fileID: 1716700120}
+  objectsToCloseOnReturn:
+  - {fileID: 1716700120}
+  - {fileID: 404285096}
+  programsToCloseOnReturn:
+  - {fileID: 1716700120}
+  - {fileID: 404285096}
   errorPrograms:
   - {fileID: 3611291478839134088, guid: 626d0b8cb45718a43a68e53788aaaf4e, type: 3}
   noTextObject: {fileID: 1392511153}
@@ -4595,7 +4602,6 @@ GameObject:
   - component: {fileID: 1947663132}
   - component: {fileID: 1947663127}
   - component: {fileID: 1947663130}
-  - component: {fileID: 1947663129}
   - component: {fileID: 1947663131}
   m_Layer: 0
   m_Name: Mouse
@@ -4613,8 +4619,8 @@ RectTransform:
   m_GameObject: {fileID: 1947663125}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
-  m_LocalScale: {x: 48.3, y: 48.3, z: 48.3}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 17.72, y: 17.72, z: 17.72}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 1657310632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4683,7 +4689,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: -357421434760999972, guid: fa3bc70043da6f24ab27ce66b3f9d30a, type: 3}
+  m_Sprite: {fileID: -808767449149416215, guid: 24e8c625a16921f4da9a7e4b38717f85, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -4694,36 +4700,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1947663129
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1947663125}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: -357421434760999972, guid: fa3bc70043da6f24ab27ce66b3f9d30a, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1947663130
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5030,7 +5006,6 @@ GameObject:
   - component: {fileID: 2109627508}
   - component: {fileID: 2109627507}
   - component: {fileID: 2109627506}
-  - component: {fileID: 2109627505}
   m_Layer: 0
   m_Name: Mouse (1)
   m_TagString: Untagged
@@ -5047,7 +5022,7 @@ RectTransform:
   m_GameObject: {fileID: 2109627503}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
-  m_LocalScale: {x: 48.3, y: 48.3, z: 48.3}
+  m_LocalScale: {x: 17.72, y: 17.72, z: 17.72}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1657310632}
@@ -5057,36 +5032,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0.59, y: 0.59}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2109627505
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2109627503}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 3701114428941837849, guid: 41e65f34f058b394bbd10edd25304e38, type: 3}
-  m_Type: 0
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &2109627506
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -5155,7 +5100,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 5
-  m_Sprite: {fileID: 3701114428941837849, guid: 41e65f34f058b394bbd10edd25304e38, type: 3}
+  m_Sprite: {fileID: -7745444041845161382, guid: dc6937fe4e48f274486e32a472681242, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

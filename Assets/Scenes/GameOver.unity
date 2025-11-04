@@ -347,6 +347,7 @@ MonoBehaviour:
   shakeIntensity: 30
   rotationIntensity: 10
   scareSound: {fileID: 0}
+  returnDelay: 0
 --- !u!114 &1041078059
 MonoBehaviour:
   m_ObjectHideFlags: 0

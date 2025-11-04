@@ -18,6 +18,13 @@ public class VaccineIcon : MonoBehaviour
 
     private void Update()
     {
+        // GameOver에서 돌아온 경우 즉시 활성화
+        if (GameSequenceManager.ReturnFromGameOver && trueCount == 0)
+        {
+            trueCount = 1;
+            Debug.Log("[VaccineIcon] GameOver 복귀 - 즉시 활성화");
+        }
+        
         // Object가 null이 아닐 때만 체크
         if(Object != null && Object.activeSelf == true)
         {

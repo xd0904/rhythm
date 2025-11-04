@@ -24,14 +24,14 @@ public class Game1SequenceManager : MonoBehaviour
     public GameObject Control;
 
     [Header("마우스 애니메이션 설정")]
-    [Tooltip("목표 위치 (RectTransform X, Y)")]
-    public Vector2 targetPosition = new Vector2(570f, -16f);
+    [Tooltip("목표 위치 (월드 좌표 X, Y)")]
+    public Vector2 targetPosition = new Vector2(7f, 0f);
     
     [Tooltip("이동 시간 (초)")]
     public float moveDuration = 2f;
     
-    [Tooltip("최종 크기 (Width, Height)")]
-    public float finalSize = 5f;
+    [Tooltip("최종 크기 (Scale)")]
+    public float finalSize = 10f;
     
     [Tooltip("크기 변경 시간 (초) - 짧을수록 공포스러움")]
     public float scaleDuration = 0.5f;
@@ -70,24 +70,6 @@ public class Game1SequenceManager : MonoBehaviour
         // 씬 시작 시 이전 씬의 마우스 위치 복원
         Debug.Log($"[Game1SequenceManager] Start() 호출 - MousePositionData.Instance: {(MousePositionData.Instance != null ? "존재" : "NULL")}");
         
-        // MousePositionData가 없으면 테스트 모드 (Game1 씬에서 직접 시작)
-        if (MousePositionData.Instance == null)
-        {
-            Debug.Log("[Game1SequenceManager] 테스트 모드: MousePositionData 생성 및 기본값 설정");
-            
-            // MousePositionData 생성
-            GameObject dataObject = new GameObject("MousePositionData");
-            dataObject.AddComponent<MousePositionData>();
-            
-            // 기본 빨간 마우스 위치 설정 (화면 중앙 정도)
-            if (redMouse != null)
-            {
-                Vector3 testPosition = new Vector3(0, 0, 0); // 또는 원하는 테스트 위치
-                MousePositionData.Instance.SaveMousePosition(testPosition, true);
-                Debug.Log($"[Game1SequenceManager] 테스트용 마우스 위치 설정: {testPosition}");
-            }
-        }
-        
         RestoreMousePosition();
     }
     
@@ -107,25 +89,28 @@ public class Game1SequenceManager : MonoBehaviour
         
         Debug.Log($"[Game1SequenceManager] 저장된 마우스 위치 복원: {savedPosition}, 빨간마우스: {isRedMouse}");
         
-        // 테스트 모드: (0,0,0)이어도 빨간 마우스면 진행
-        if (savedPosition == Vector3.zero && !isRedMouse)
-        {
-            Debug.LogWarning("[Game1SequenceManager] 저장된 마우스 데이터가 없습니다! (0,0,0)");
-            // 테스트 모드로 강제 진행
-            isRedMouse = true;
-            Debug.Log("[Game1SequenceManager] 테스트 모드로 강제 진행");
-        }
-        
-        // Game1 씬에서는 빨간 마우스만 사용
+        // Game1 씬의 빨간 마우스 사용
         if (redMouse != null)
         {
+            Debug.Log($"[Game1SequenceManager] redMouse 발견! 현재 상태: {(redMouse.activeSelf ? "활성화" : "비활성화")}");
+            
             // 빨간 마우스 활성화
             redMouse.SetActive(true);
+            Debug.Log($"[Game1SequenceManager] redMouse.SetActive(true) 호출 완료");
             
-            // 위치 설정 (테스트 모드면 현재 위치 유지)
-            if (savedPosition != Vector3.zero)
+            // Intro 씬에서 저장한 위치로 설정
+            RectTransform rectTransform = redMouse.GetComponent<RectTransform>();
+            if (rectTransform != null)
             {
+                // UI 오브젝트면 anchoredPosition 사용
+                rectTransform.anchoredPosition = savedPosition;
+                Debug.Log($"[Game1SequenceManager] UI 마우스 위치 설정: {savedPosition}");
+            }
+            else
+            {
+                // World 오브젝트면 position 사용
                 redMouse.transform.position = savedPosition;
+                Debug.Log($"[Game1SequenceManager] World 마우스 위치 설정: {savedPosition}");
             }
             
             // 빨간 마우스는 움직임 비활성화
@@ -171,23 +156,38 @@ public class Game1SequenceManager : MonoBehaviour
             yield break;
         }
         
+        // RectTransform인지 확인 (UI 오브젝트)
         RectTransform rectTransform = redMouse.GetComponent<RectTransform>();
-        if (rectTransform == null)
+        bool isUIObject = rectTransform != null;
+        
+        Transform mouseTransform = redMouse.transform;
+        
+        // 시작 위치 저장 (이미 RestoreMousePosition에서 Intro 씬 위치로 설정됨)
+        Vector3 startPos;
+        if (isUIObject)
         {
-            Debug.LogWarning("[Game1SequenceManager] RectTransform을 찾을 수 없습니다!");
-            yield break;
+            startPos = rectTransform.anchoredPosition;
+            Debug.Log($"[Game1SequenceManager] UI 오브젝트 감지 (RectTransform) - 시작 위치: {startPos}");
+        }
+        else
+        {
+            startPos = mouseTransform.position;
+            Debug.Log($"[Game1SequenceManager] World Space 오브젝트 감지 (Transform) - 시작 위치: {startPos}");
         }
         
-        // 시작 위치 및 크기 저장
-        Vector2 startPos = rectTransform.anchoredPosition;
-        Vector2 startSize = rectTransform.sizeDelta;
+        Vector3 startScale = mouseTransform.localScale;
         
-        Debug.Log($"[Game1SequenceManager] 마우스 이동 시작 - {startPos} → {targetPosition}");
+        // 목표 위치 (targetPosition 사용)
+        Vector3 targetWorldPos = new Vector3(targetPosition.x, targetPosition.y, isUIObject ? 0 : startPos.z);
+        
+        Debug.Log($"[Game1SequenceManager] 마우스 이동 시작 - {startPos} → {targetWorldPos}");
         
         // 1단계: 위치 이동 (Ease-out 곡선)
         float elapsed = 0f;
         while (elapsed < moveDuration)
         {
+            if (redMouse == null) yield break;
+            
             elapsed += Time.deltaTime;
             float t = elapsed / moveDuration;
             
@@ -195,54 +195,93 @@ public class Game1SequenceManager : MonoBehaviour
             float smoothT = 1f - Mathf.Pow(1f - t, 3f);
             
             // 위치 보간
-            Vector2 currentPos = Vector2.Lerp(startPos, targetPosition, smoothT);
-            rectTransform.anchoredPosition = currentPos;
+            Vector3 currentPos = Vector3.Lerp(startPos, targetWorldPos, smoothT);
+            
+            if (isUIObject)
+            {
+                rectTransform.anchoredPosition = currentPos;
+            }
+            else
+            {
+                mouseTransform.position = currentPos;
+            }
             
             yield return null;
         }
         
         // 최종 위치 정확히 설정
-        rectTransform.anchoredPosition = targetPosition;
-        Debug.Log($"[Game1SequenceManager] 마우스 이동 완료 - 최종 위치: {targetPosition}");
+        if (redMouse == null) yield break;
         
-        // 2단계: 공포스럽게 크기 키우기
-        Vector2 targetSize = new Vector2(finalSize, finalSize);
+        if (isUIObject)
+        {
+            rectTransform.anchoredPosition = targetWorldPos;
+        }
+        else
+        {
+            mouseTransform.position = targetWorldPos;
+        }
+        
+        Debug.Log($"[Game1SequenceManager] 마우스 이동 완료 - 최종 위치: {targetWorldPos}");
+        
+        // 2단계: 공포스럽게 크기 키우기 (SpriteRenderer는 localScale 사용)
+        Vector3 targetScale = new Vector3(finalSize, finalSize, 1f);
         elapsed = 0f;
         
-        Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 시작 - {startSize} → {targetSize}");
+        Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 시작 - {startScale} → {targetScale}");
         
         // 시작 회전 저장
-        float startRotation = rectTransform.localEulerAngles.z;
+        float startRotation = mouseTransform.localEulerAngles.z;
         
         while (elapsed < scaleDuration)
         {
+            if (redMouse == null) yield break;
+            
             elapsed += Time.deltaTime;
             float t = elapsed / scaleDuration;
             
-            // 지수 함수로 급격하게 커지기 (공포스러움 증가)
-            float exponentialT = Mathf.Pow(t, 0.5f); // 제곱근으로 빠르게 시작
+            // 지수 함수로 더 급격하게 커지기 (공포스러움 증가)
+            float exponentialT = Mathf.Pow(t, 0.3f); // 0.5 → 0.3으로 더 빠르게
             
-            // 크기 보간
-            Vector2 currentSize = Vector2.Lerp(startSize, targetSize, exponentialT);
+            // 크기 보간 (localScale 사용)
+            Vector3 currentScale = Vector3.Lerp(startScale, targetScale, exponentialT);
+            mouseTransform.localScale = currentScale;
             
             // 흔들림 효과 추가 (무작위 offset)
-            float shakeX = Random.Range(-shakeIntensity, shakeIntensity) * (1f - t); // 시간이 지날수록 감소
-            float shakeY = Random.Range(-shakeIntensity, shakeIntensity) * (1f - t);
+            float shakeAmount = isUIObject ? 1f : 0.01f;
+            float shakeX = Random.Range(-shakeIntensity, shakeIntensity) * (1f - t) * shakeAmount;
+            float shakeY = Random.Range(-shakeIntensity, shakeIntensity) * (1f - t) * shakeAmount;
             
-            rectTransform.sizeDelta = currentSize;
-            rectTransform.anchoredPosition = targetPosition + new Vector2(shakeX, shakeY);
+            if (isUIObject)
+            {
+                rectTransform.anchoredPosition = targetWorldPos + new Vector3(shakeX, shakeY, 0);
+            }
+            else
+            {
+                mouseTransform.position = targetWorldPos + new Vector3(shakeX, shakeY, 0);
+            }
             
             // 회전 효과 (좌우로 흔들림)
             float rotation = Mathf.Sin(t * Mathf.PI * 4) * rotationAmount * (1f - t);
-            rectTransform.localEulerAngles = new Vector3(0, 0, startRotation + rotation);
+            mouseTransform.localEulerAngles = new Vector3(0, 0, startRotation + rotation);
             
             yield return null;
         }
         
         // 최종 상태 정확히 설정 (흔들림 제거)
-        rectTransform.sizeDelta = targetSize;
-        rectTransform.anchoredPosition = targetPosition;
-        rectTransform.localEulerAngles = new Vector3(0, 0, startRotation);
+        if (redMouse == null) yield break;
+        
+        mouseTransform.localScale = targetScale;
+        
+        if (isUIObject)
+        {
+            rectTransform.anchoredPosition = targetWorldPos;
+        }
+        else
+        {
+            mouseTransform.position = targetWorldPos;
+        }
+        
+        mouseTransform.localEulerAngles = new Vector3(0, 0, startRotation);
         
         // 마우스 움직임 완전히 비활성화 (다시 확인)
         Mouse redMouseScript = redMouse.GetComponent<Mouse>();
@@ -252,7 +291,7 @@ public class Game1SequenceManager : MonoBehaviour
             Debug.Log("[Game1SequenceManager] 마우스 움직임 스크립트 비활성화 완료");
         }
         
-        Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 완료 - 최종 크기: {targetSize}");
+        Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 완료 - 최종 크기: {targetScale}");
         
         // 애니메이션 완료 후 음악 시작
         StartMusic();

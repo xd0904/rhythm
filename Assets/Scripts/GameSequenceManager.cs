@@ -1,11 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 using System.Collections.Generic;
 
 public class GameSequenceManager : MonoBehaviour
 {
     public static GameSequenceManager Instance { get; private set; }
+    public static bool ReturnFromGameOver = false; // GameOver에서 돌아왔는지 체크
 
     [Header("배경화면 설정")]
     [Tooltip("배경화면 게임오브젝트")]
@@ -14,11 +16,15 @@ public class GameSequenceManager : MonoBehaviour
     [Tooltip("테두리 게임오브젝트")]
     public GameObject borderObject;
     
+    [Header("백신 프로그램 설정")]
     [Tooltip("백신 아이콘")]
     public GameObject vaccineIcon;
     
     [Tooltip("백신 알람 스크립트")]
     public VaccineAlarm vaccineAlarm;
+    
+    [Tooltip("백신 Percent 프로그램 (GameOver 복귀 시 바로 표시)")]
+    public GameObject percentProgram;
 
     [Header("Glitch 효과 설정")]
     [Tooltip("Glitch Material (배경에 적용할 Material)")]
@@ -50,6 +56,12 @@ public class GameSequenceManager : MonoBehaviour
     
     [Tooltip("Error 다 뜬 후 꺼질 오브젝트들")]
     public GameObject[] objectsToCloseAfterErrors;
+    
+    [Tooltip("GameOver에서 돌아왔을 때 꺼질 오브젝트들 (바이러스.exe 아이콘 등)")]
+    public GameObject[] objectsToCloseOnReturn;
+    
+    [Tooltip("GameOver에서 돌아왔을 때 꺼질 프로그램들 (바이러스 창 등)")]
+    public GameObject[] programsToCloseOnReturn;
 
     [Header("Error 프로그램 설정")]
     [Tooltip("랜덤하게 나타날 Error 프로그램들")]
@@ -142,6 +154,104 @@ public class GameSequenceManager : MonoBehaviour
         
         Debug.Log("[GameSequenceManager] 시퀀스 시작!");
         StartCoroutine(ExecuteSequence());
+    }
+    
+    /// <summary>
+    /// GameOver에서 돌아왔을 때 - 배경화면 복구 시점부터 시작
+    /// </summary>
+    public void StartFromBackgroundRestore()
+    {
+        Debug.Log("[GameSequenceManager] 배경화면 복구 시점부터 시작!");
+        
+        // BGM 피치만 복원 (GameOver에서 낮아진 피치만 1.0으로 복구)
+        if (SoundManager.Instance != null && SoundManager.Instance.BGMSource != null)
+        {
+            SoundManager.Instance.BGMSource.pitch = 1.0f;
+            Debug.Log("[GameSequenceManager] BGM 피치 1.0으로 복원 (재생은 Game1에서)");
+        }
+        
+        // 바이러스.exe 아이콘 즉시 삭제
+        if (objectsToCloseOnReturn != null && objectsToCloseOnReturn.Length > 0)
+        {
+            Debug.Log($"[GameSequenceManager] objectsToCloseOnReturn 배열 크기: {objectsToCloseOnReturn.Length}");
+            foreach (GameObject obj in objectsToCloseOnReturn)
+            {
+                if (obj != null)
+                {
+                    obj.SetActive(false);
+                    Debug.Log($"[GameSequenceManager] ✓ {obj.name} 아이콘 즉시 삭제!");
+                }
+                else
+                {
+                    Debug.LogWarning("[GameSequenceManager] ✗ null 오브젝트 발견 (Inspector에서 할당 확인 필요)");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("[GameSequenceManager] ✗✗✗ objectsToCloseOnReturn이 비어있음! Inspector에서 바이러스.exe 아이콘을 할당하세요!");
+        }
+        
+        // 바이러스 프로그램 창 즉시 삭제
+        if (programsToCloseOnReturn != null && programsToCloseOnReturn.Length > 0)
+        {
+            Debug.Log($"[GameSequenceManager] programsToCloseOnReturn 배열 크기: {programsToCloseOnReturn.Length}");
+            foreach (GameObject prog in programsToCloseOnReturn)
+            {
+                if (prog != null)
+                {
+                    prog.SetActive(false);
+                    Debug.Log($"[GameSequenceManager] ✓ {prog.name} 프로그램 즉시 삭제!");
+                }
+                else
+                {
+                    Debug.LogWarning("[GameSequenceManager] ✗ null 프로그램 발견 (Inspector에서 할당 확인 필요)");
+                }
+            }
+        }
+        else
+        {
+            Debug.LogError("[GameSequenceManager] ✗✗✗ programsToCloseOnReturn이 비어있음! Inspector에서 바이러스 프로그램 창을 할당하세요!");
+        }
+        
+        // 배경화면 즉시 복구
+        ChangeBackgroundColor(Color.white);
+        
+        // 백신 아이콘 즉시 활성화
+        if (vaccineIcon != null)
+        {
+            vaccineIcon.SetActive(true);
+            Debug.Log("[GameSequenceManager] 백신 아이콘 활성화");
+        }
+
+        // 백신 알람 즉시 표시
+        if (vaccineAlarm != null && vaccineAlarm.gameObject != null)
+        {
+            vaccineAlarm.gameObject.SetActive(true);
+            vaccineAlarm.TriggerAnimation();
+            Debug.Log("[GameSequenceManager] 백신 알람 즉시 트리거!");
+        }
+        
+        // Game1 씬 미리 로드 시작 (백그라운드)
+        StartCoroutine(PreloadGame1Scene());
+    }
+    
+    /// <summary>
+    /// Game1 씬을 백그라운드에서 미리 로드 (끊김 방지)
+    /// </summary>
+    private System.Collections.IEnumerator PreloadGame1Scene()
+    {
+        Debug.Log("[GameSequenceManager] Game1 씬 백그라운드 로드 시작");
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("Game1");
+        asyncLoad.allowSceneActivation = false; // 아직 전환하지 않음
+        
+        // 90%까지 로드
+        while (!asyncLoad.isDone && asyncLoad.progress < 0.9f)
+        {
+            yield return null;
+        }
+        
+        Debug.Log("[GameSequenceManager] Game1 씬 로드 완료 (대기 중)");
     }
 
     private System.Collections.IEnumerator ExecuteSequence()
@@ -487,10 +597,10 @@ public class GameSequenceManager : MonoBehaviour
 
         foreach (GameObject obj in objects)
         {
-            if (obj != null)
+            if (obj != null && obj.activeSelf)
             {
                 obj.SetActive(false);
-                Debug.Log($"[GameSequenceManager] {obj.name} 비활성화");
+                Debug.Log($"[GameSequenceManager] {obj.name} 즉시 비활성화!");
             }
         }
     }

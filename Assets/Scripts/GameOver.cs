@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameOver : MonoBehaviour
@@ -24,6 +25,10 @@ public class GameOver : MonoBehaviour
     
     [Tooltip("점프스케어 사운드")]
     public AudioClip scareSound;
+    
+    [Header("씬 전환 설정")]
+    [Tooltip("GameOver 후 Intro로 돌아가는 대기 시간")]
+    public float returnDelay = 1.5f;
     
     private Vector3 originalPosition;
     private Vector3 originalScale;
@@ -106,5 +111,13 @@ public class GameOver : MonoBehaviour
         targetImage.localPosition = scaredPosition;
         targetImage.localScale = scaredScale;
         targetImage.localRotation = originalRotation;
+        
+        // 일정 시간 후 Intro 씬으로 돌아가기
+        yield return new WaitForSeconds(returnDelay);
+        
+        // GameOver에서 돌아왔다는 플래그 설정
+        GameSequenceManager.ReturnFromGameOver = true;
+        
+        SceneManager.LoadScene("Intro");
     }
 }

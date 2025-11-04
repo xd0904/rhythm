@@ -22,6 +22,9 @@ public class SoundManager : MonoBehaviour
     [SerializeField] List<AudioClip> musics;
 
     double music_start_time;
+    
+    // BGM AudioSource를 외부에서 접근할 수 있도록 public 프로퍼티 추가
+    public AudioSource BGMSource => bgmSource;
 
     void Awake()
     {
@@ -29,6 +32,14 @@ public class SoundManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            
+            // 부모가 있다면 분리 (DontDestroyOnLoad는 루트 오브젝트만 가능)
+            if (transform.parent != null)
+            {
+                Debug.Log($"[SoundManager] 부모({transform.parent.name})로부터 분리");
+                transform.SetParent(null);
+            }
+            
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -56,7 +67,13 @@ public class SoundManager : MonoBehaviour
             Debug.Log("[SoundManager] BGM AudioSource 자동 생성");
         }
         
-        if (bgmSource.clip == clip) return;
+        // 같은 클립이지만 재생 중이 아니면 다시 재생
+        if (bgmSource.clip == clip && bgmSource.isPlaying)
+        {
+            Debug.Log($"[SoundManager] BGM 이미 재생 중: {clip.name}");
+            return;
+        }
+        
         bgmSource.clip = clip;
         bgmSource.loop = true;
         bgmSource.Play();

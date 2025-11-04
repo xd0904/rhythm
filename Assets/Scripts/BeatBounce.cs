@@ -12,8 +12,12 @@ public class BeatBounce : MonoBehaviour
     [Header("다이아몬드 색상 변화")]
     public Color startDiamondColor = Color.gray;  // 회색
     public Color endDiamondColor = Color.red;     // 빨간색
-    public float colorChangeStart = 6.3f;         // 색상 변화 시작
-    public float colorChangeEnd = 25.7f;          // 색상 변화 끝
+    public float colorChangeStart = 6.4f;         // 색상 변화 시작 (Beat 16)
+    public float colorChangeEnd = 25.6f;          // 색상 변화 끝 (Beat 64)
+    
+    [Header("추가 색상 변화 오브젝트")]
+    public GameObject colorChangeObject1;         // 색상 변화 오브젝트 1
+    public GameObject colorChangeObject2;         // 색상 변화 오브젝트 2
     
     [Header("6방향 발사 설정")]
     public GameObject ballPrefab;         // 발사될 볼 (중앙으로 이동)
@@ -21,11 +25,16 @@ public class BeatBounce : MonoBehaviour
     public GameObject circlePrefab;       // 동그라미 투사체
     public Transform mousePosition;       // 마우스 위치 (시작점)
     public Transform centerPoint;         // 게임 창 중앙 (터지는 지점)
-    public float ballSpeed = 10f;         // 볼 이동 속도
+    public float ballTravelTime = 0.4f;   // 볼 이동 시간 (1박자 = 0.4초)
     public float projectileSpeed = 5f;    // 투사체 발사 속도
+    public float minY = -4f;              // 볼 Y축 최소 랜덤 범위
+    public float maxY = 4f;               // 볼 Y축 최대 랜덤 범위
+    public float mouseMoveDuration = 0.3f; // 마우스 이동 시간 (부드럽게)
+    public float mouseMinX = -10f;        // 마우스 최소 X (화면 왼쪽 밖)
+    public float mouseMaxX = 10f;         // 마우스 최대 X (화면 오른쪽 밖)
     
     [Header("공격 패턴 설정")]
-    public float attackStartTime = 6.3f;  // 공격 시작 시간
+    public float attackStartTime = 6.4f;  // 공격 시작 시간 (Beat 16에 맞춤)
     public float attackEndTime = 25.7f;   // 공격 끝 시간
     public int beatsPerAttack = 4;        // 공격당 박자 수 (4박자마다 공격)
     public GameObject mouseObject;        // 마우스 커서 오브젝트 (SpriteRenderer 또는 Image)
@@ -44,6 +53,10 @@ public class BeatBounce : MonoBehaviour
     private float beatInterval;
     private int lastBeatIndex = -1;
     private int attackBeatCounter = 0;    // 공격 박자 카운터
+    
+    // 코루틴 캐싱
+    private Coroutine colorChangeCoroutine1;
+    private Coroutine colorChangeCoroutine2;
 
 
     [Header("Wave Settings")]
@@ -66,6 +79,8 @@ public class BeatBounce : MonoBehaviour
     {
         beatInterval = 60f / bpm;
         
+        Debug.Log($"[BeatBounce] Start - BPM: {bpm}, Beat Interval: {beatInterval:F3}초");
+        
         if (spawnPoint == null)
         {
             spawnPoint = transform;
@@ -77,6 +92,19 @@ public class BeatBounce : MonoBehaviour
             GameObject center = new GameObject("CenterPoint");
             centerPoint = center.transform;
             centerPoint.position = Vector3.zero;
+        }
+        
+        // 사전 로딩: 색상 변화 준비 (음악 시작 전에 컴포넌트 캐싱)
+        if (colorChangeObject1 != null)
+        {
+            colorChangeObject1.GetComponent<SpriteRenderer>();
+            colorChangeObject1.GetComponent<UnityEngine.UI.Image>();
+        }
+        
+        if (colorChangeObject2 != null)
+        {
+            colorChangeObject2.GetComponent<SpriteRenderer>();
+            colorChangeObject2.GetComponent<UnityEngine.UI.Image>();
         }
     }
 
@@ -142,13 +170,33 @@ public class BeatBounce : MonoBehaviour
         musicStartTime = AudioSettings.dspTime;
         lastBeatIndex = -1;
         
-        // 배경 어두워지기
+        // 배경 어두워지기 (논블로킹)
         if (background != null)
         {
             StartCoroutine(DarkenBackground());
         }
         
+        // 추가 오브젝트 색상 변화 시작 (논블로킹, 지연 시작)
+        if (colorChangeObject1 != null)
+        {
+            colorChangeCoroutine1 = StartCoroutine(ChangeObjectColorDelayed(colorChangeObject1, 0.1f));
+        }
+        
+        if (colorChangeObject2 != null)
+        {
+            colorChangeCoroutine2 = StartCoroutine(ChangeObjectColorDelayed(colorChangeObject2, 0.15f));
+        }
+        
         Debug.Log($"[BeatBounce] 음악 시작 시간 리셋: {musicStartTime}");
+    }
+    
+    /// <summary>
+    /// 지연 후 색상 변화 시작 (부하 분산)
+    /// </summary>
+    private IEnumerator ChangeObjectColorDelayed(GameObject obj, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        yield return StartCoroutine(ChangeObjectColor(obj));
     }
     
     /// <summary>
@@ -203,6 +251,7 @@ public class BeatBounce : MonoBehaviour
     {
         float elapsed = 0f;
         Vector3 targetScale = Vector3.one * maxScale;
+        Vector3 centerPos = spawnPoint.position; // 중심 위치
         
         // SpriteRenderer 찾기
         SpriteRenderer spriteRenderer = diamond.GetComponent<SpriteRenderer>();
@@ -224,6 +273,22 @@ public class BeatBounce : MonoBehaviour
             if (diamond != null)
             {
                 diamond.transform.localScale = Vector3.Lerp(Vector3.zero, targetScale, smoothT);
+                
+                // 중심에서의 거리 계산 (로컬 스케일 기준)
+                float distanceFromCenter = diamond.transform.localScale.x / maxScale;
+                
+                // 거리에 따라 투명도 감소
+                // 40% 크기 = 70% 투명 (0.3 불투명도)
+                // 100% 크기 = 거의 안보임 (0.05 불투명도)
+                float alpha = 1f - (distanceFromCenter * 1.75f); // 40%일때 0.3 (70% 투명)
+                alpha = Mathf.Clamp01(alpha);
+                
+                // 색상에 알파값 적용
+                Color currentColor = baseColor;
+                currentColor.a = alpha;
+                
+                if (spriteRenderer != null) spriteRenderer.color = currentColor;
+                else if (image != null) image.color = currentColor;
             }
             
             yield return null;
@@ -233,6 +298,13 @@ public class BeatBounce : MonoBehaviour
         if (diamond != null)
         {
             diamond.transform.localScale = targetScale;
+            
+            // 최종 투명도 설정
+            Color finalColor = baseColor;
+            finalColor.a = 0.05f; // 최대 크기일 때 거의 안보임
+            
+            if (spriteRenderer != null) spriteRenderer.color = finalColor;
+            else if (image != null) image.color = finalColor;
         }
         
         // 잠시 유지
@@ -322,6 +394,65 @@ public class BeatBounce : MonoBehaviour
     }
     
     /// <summary>
+    /// 오브젝트 색상을 시간에 따라 변화 (다이아몬드와 동일한 방식)
+    /// </summary>
+    private IEnumerator ChangeObjectColor(GameObject obj)
+    {
+        if (obj == null) yield break;
+        
+        // 컴포넌트 캐싱 (한 번만)
+        SpriteRenderer spriteRenderer = obj.GetComponent<SpriteRenderer>();
+        UnityEngine.UI.Image image = obj.GetComponent<UnityEngine.UI.Image>();
+        
+        if (spriteRenderer == null && image == null)
+        {
+            Debug.LogWarning($"[BeatBounce] {obj.name}에 SpriteRenderer 또는 Image가 없습니다!");
+            yield break;
+        }
+        
+        // 초기 색상 설정
+        if (spriteRenderer != null) spriteRenderer.color = startDiamondColor;
+        else if (image != null) image.color = startDiamondColor;
+        
+        // 색상 변화 시작까지 대기
+        double startTime = colorChangeStart;
+        while (GetMusicTime() < startTime)
+        {
+            yield return null;
+        }
+        
+        // 색상 변화 진행 (프레임 스킵 최적화)
+        double endTime = colorChangeEnd;
+        double duration = endTime - startTime;
+        int frameSkip = 0;
+        
+        while (GetMusicTime() < endTime)
+        {
+            frameSkip++;
+            if (frameSkip % 2 != 0) // 2프레임마다 1번만 업데이트
+            {
+                yield return null;
+                continue;
+            }
+            
+            double currentTime = GetMusicTime();
+            float t = (float)((currentTime - startTime) / duration);
+            t = Mathf.Clamp01(t);
+            
+            Color currentColor = Color.Lerp(startDiamondColor, endDiamondColor, t);
+            
+            if (spriteRenderer != null) spriteRenderer.color = currentColor;
+            else if (image != null) image.color = currentColor;
+            
+            yield return null;
+        }
+        
+        // 최종 색상 설정
+        if (spriteRenderer != null) spriteRenderer.color = endDiamondColor;
+        else if (image != null) image.color = endDiamondColor;
+    }
+    
+    /// <summary>
     /// 마우스 커서 깜빡임 효과
     /// </summary>
     IEnumerator FlashMouseCursor()
@@ -373,11 +504,47 @@ public class BeatBounce : MonoBehaviour
             return;
         }
         
-        // 볼 생성 (항상 현재 마우스 위치에서)
-        GameObject ball = Instantiate(ballPrefab, mousePosition.position, Quaternion.identity);
+        // 마우스를 화면 밖 랜덤 위치로 설정
+        Vector3 randomMousePos = new Vector3(
+            Random.Range(mouseMinX, mouseMaxX),  // 화면 양옆 밖에서 랜덤
+            Random.Range(minY, maxY),            // Y축 랜덤
+            mousePosition.position.z
+        );
         
-        // 볼을 중앙으로 이동시키는 코루틴
-        StartCoroutine(MoveBallToCenterAndShoot(ball));
+        // 마우스 부드럽게 이동한 후 볼 발사
+        StartCoroutine(MoveMouseAndShoot(randomMousePos));
+    }
+    
+    IEnumerator MoveMouseAndShoot(Vector3 targetPos)
+    {
+        Vector3 startPos = mousePosition.position;
+        float elapsed = 0f;
+        
+        // 1단계: 마우스 이동 (화면 밖으로)
+        while (elapsed < mouseMoveDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / mouseMoveDuration;
+            
+            // 부드러운 이동 (Ease-out)
+            float smoothT = 1f - Mathf.Pow(1f - t, 3f);
+            mousePosition.position = Vector3.Lerp(startPos, targetPos, smoothT);
+            
+            yield return null;
+        }
+        
+        mousePosition.position = targetPos;
+        
+        // 2단계: 볼 발사 (화면 밖 위치에서)
+        Vector3 spawnPos = mousePosition.position;
+        GameObject ball = Instantiate(ballPrefab, spawnPos, Quaternion.identity);
+        
+        // 터지는 위치의 Y축을 랜덤으로 설정
+        Vector3 randomTargetPos = centerPoint.position;
+        randomTargetPos.y = Random.Range(minY, maxY);
+        
+        // 볼을 랜덤 Y축 위치로 이동시키는 코루틴
+        StartCoroutine(MoveBallToCenterAndShoot(ball, randomTargetPos));
     }
     
     /// <summary>
@@ -399,12 +566,10 @@ public class BeatBounce : MonoBehaviour
     /// <summary>
     /// 볼을 중앙으로 이동 후 6방향 투사체 발사
     /// </summary>
-    private IEnumerator MoveBallToCenterAndShoot(GameObject ball)
+    private IEnumerator MoveBallToCenterAndShoot(GameObject ball, Vector3 targetPos)
     {
         Vector3 startPos = ball.transform.position;
-        Vector3 targetPos = centerPoint.position;
-        float distance = Vector3.Distance(startPos, targetPos);
-        float duration = distance / ballSpeed;
+        float duration = ballTravelTime; // 정확히 1박자(0.4초)
         
         float elapsed = 0f;
         

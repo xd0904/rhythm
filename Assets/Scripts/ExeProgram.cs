@@ -15,7 +15,6 @@ public class ExeProgram : MonoBehaviour
 
     private Vector3 targetScale;
     private RectTransform rectTransform;
-    private bool isAnimating = false;
     private bool initialized = false;
 
     void Awake()
@@ -57,8 +56,6 @@ public class ExeProgram : MonoBehaviour
 
     private System.Collections.IEnumerator OpenAnimation()
     {
-        isAnimating = true;
-        
         // 시작 크기 설정
         Vector3 initialScale = targetScale * startScale;
         
@@ -104,7 +101,5 @@ public class ExeProgram : MonoBehaviour
         {
             transform.localScale = targetScale;
         }
-        
-        isAnimating = false;
     }
 }
