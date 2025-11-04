@@ -62,8 +62,8 @@ public class BeatBounce : MonoBehaviour
     [Header("Wave Settings")]
     public GameObject wavePrefab;     // 물결 오브젝트 프리팹
     public GameObject wavePrefabAlt;     // 새로운 물결용 프리팹
-    public GameObject bigWavePrefab;      // 큰 물결용 프리팹
-    public GameObject bounceWavePrefab;   // 위아래로 빠르게 진동하는 물결 프리팹
+    public GameObject bigWavePrefab;     // 큰 물결 프리팹 (위아래)
+    public GameObject bounceWavePrefab;  // 위아래 튕기는 물결 프리팹
     public Transform waveParent;      // 빈 오브젝트로 정리용 부모
     public int waveCount = 100;        // 한 줄당 오브젝트 개수
     public float waveSpacing = 0.05f;    // 오브젝트 간 간격
@@ -72,6 +72,19 @@ public class BeatBounce : MonoBehaviour
     public float waveSpeed = 3f;      // 흔들림 속도
     public float startX = 4f;        // 오른쪽 화면 바깥 시작 위치
     private bool waveSpawned = false; // 한 번만 실행 플래그
+    
+    [Header("이등변삼각형 패턴 (13.7초 ~ 25.7초)")]
+    public GameObject isoscelesTrianglePrefab;  // 이등변삼각형 프리팹
+    public GameObject gameWindow;               // 게임 창 오브젝트 (마스크 영역)
+    public float trianglePatternStart = 13.7f;  // 패턴 시작 시간
+    public float trianglePatternEnd = 25.7f;    // 패턴 끝 시간
+    public float triangleMoveTime = 0.2f;       // 1/4박자 (마우스→창 안 랜덤 위치)
+    public float triangleFlySpeed = 8f;         // 날아가는 속도
+    public float trailThickness = 0.1f;         // 궤적 선 두께
+    public Color trailColor = Color.red;        // 궤적 선 색상
+    public float trailFadeDistance = 2f;        // 창에서 이 거리만큼 멀어지면 완전 투명
+    public int triangleBeatsPerSpawn = 4;       // 4박자마다 삼각형 생성
+    private int trianglePatternCounter = 0;     // 패턴 카운터
 
 
 
@@ -129,8 +142,18 @@ public class BeatBounce : MonoBehaviour
             // 다이아몬드 바운스 (음악 시작하면 항상 생성)
             SpawnAndGrowDiamond(currentMusicTime);
             
-            // 공격 패턴 (6.3초 ~ 25.7초 사이만, 마지막 발사 제외)
-            if (currentMusicTime >= attackStartTime && currentMusicTime < attackEndTime - beatInterval)
+            // 이등변삼각형 패턴 (13.7초 ~ 25.7초, 4박자마다)
+            if (currentMusicTime >= trianglePatternStart && currentMusicTime < trianglePatternEnd)
+            {
+                if (trianglePatternCounter % triangleBeatsPerSpawn == 0)
+                {
+                    // 4박자마다 이등변삼각형 생성
+                    SpawnBouncingTriangle();
+                }
+                trianglePatternCounter++;
+            }
+            // 공격 패턴 (6.3초 ~ 13.7초, 기존 볼 발사 패턴)
+            else if (currentMusicTime >= attackStartTime && currentMusicTime < trianglePatternStart)
             {
                 // 4/4박자 기준: 1박자 = 발사, 2박자 = 터짐, 3박자 = 발사, 4박자 = 터짐
                 int beatInCycle = attackBeatCounter % 2; // 발사-터짐 2박자 주기
@@ -685,7 +708,7 @@ public class BeatBounce : MonoBehaviour
 
     private IEnumerator SpawnWaveCoroutine()
     {
-        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null || bigWavePrefab == null || bounceWavePrefab == null)
+        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null)
         {
             Debug.LogWarning("[BeatBounce] Wave Prefab 또는 Parent가 설정되지 않았습니다!");
             yield break;
@@ -740,9 +763,6 @@ public class BeatBounce : MonoBehaviour
                 3, 1, 0.4f, 5f,
                 1.5f, 0.8f, 0.6f, 1.0f));
 
-
-
-
             yield return new WaitForSeconds(0.1f); // 순차 생성
         }
     }
@@ -794,6 +814,12 @@ public class BeatBounce : MonoBehaviour
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
+            if (wave.transform.position.y < -7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
+
             yield return null;
         }
 
@@ -810,17 +836,17 @@ public class BeatBounce : MonoBehaviour
         while (wave != null && timer < 1.5f)
         {
             timer += Time.deltaTime * speed;
-
-            // 좌우 흔들림
             float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
-
-            // 위로 이동 (짧은 물결)
             float moveY = timer * moveSpeed * 6f;
-
-            // 왼쪽 흐름
             float moveX = -timer * leftFlowSpeed * 1.8f;
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
+
+            if (wave.transform.position.y > 7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
 
             yield return null;
         }
@@ -829,6 +855,226 @@ public class BeatBounce : MonoBehaviour
             Destroy(wave);
     }
 
+    /// <summary>
+    /// 이등변삼각형 생성 및 튕기기 (13.7초 ~ 25.7초 패턴)
+    /// </summary>
+    private void SpawnBouncingTriangle()
+    {
+        if (isoscelesTrianglePrefab == null || mousePosition == null)
+        {
+            Debug.LogWarning("[BeatBounce] 이등변삼각형 프리팹 또는 마우스가 없습니다!");
+            return;
+        }
+
+        // 창 안 랜덤 위치 계산 (게임 창 경계)
+        Bounds windowBounds = GetWindowBounds();
+        Vector3 randomWindowPos = new Vector3(
+            Random.Range(windowBounds.min.x, windowBounds.max.x),
+            Random.Range(windowBounds.min.y, windowBounds.max.y),
+            0
+        );
+
+        // 랜덤 방향 벡터 (정규화)
+        Vector2 randomDirection = new Vector2(
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f)
+        ).normalized;
+
+        // 이등변삼각형 생성
+        GameObject triangle = Instantiate(isoscelesTrianglePrefab, mousePosition.position, Quaternion.identity);
+        
+        // SpriteRenderer 설정 (원본 유지, sortingOrder = 3으로 마스크 적용)
+        SpriteRenderer sr = triangle.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = 3; // 마스크가 적용되도록
+        }
+        
+        // TrailRenderer 추가
+        TrailRenderer trail = triangle.GetComponent<TrailRenderer>();
+        if (trail == null)
+        {
+            trail = triangle.AddComponent<TrailRenderer>();
+        }
+        trail.time = 2f; // 궤적 유지 시간
+        trail.startWidth = trailThickness;
+        trail.endWidth = trailThickness * 0.5f;
+        trail.material = new Material(Shader.Find("Sprites/Default"));
+        trail.startColor = trailColor;
+        trail.endColor = new Color(trailColor.r, trailColor.g, trailColor.b, 0f);
+        trail.sortingOrder = -1; // 창보다 아래 (창 밖에서만 보이도록)
+
+        // 삼각형 애니메이션 시작
+        StartCoroutine(BouncingTriangleSequence(triangle, randomWindowPos, randomDirection, trail));
+        
+        Debug.Log($"[BeatBounce] 이등변삼각형 생성: {mousePosition.position} → {randomWindowPos}, 방향: {randomDirection}");
+    }
+    /// <summary>
+    /// 이등변삼각형 애니메이션 시퀀스
+    /// </summary>
+    private IEnumerator BouncingTriangleSequence(GameObject triangle, Vector3 targetPos, Vector2 direction, TrailRenderer trail)
+    {
+        if (triangle == null) yield break;
+
+        Vector3 startPos = triangle.transform.position;
+        
+        // 1단계: 마우스 → 창 안 랜덤 위치 (1/4박자 = beatInterval / 4)
+        float moveTime = beatInterval / 4f;
+        float elapsed = 0f;
+
+        while (elapsed < moveTime)
+        {
+            if (triangle == null) yield break;
+            
+            elapsed += Time.deltaTime;
+            float t = elapsed / moveTime;
+            triangle.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            
+            // 방향 회전 (삼각형이 이동 방향을 향하도록)
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
+            
+            yield return null;
+        }
+
+        // 2단계: 2/4박자 대기 후 날아가기
+        yield return new WaitForSeconds(beatInterval / 2f);
+        
+        // 3단계: 랜덤 방향으로 쭉 날아가기 (화면 경계에서 반사)
+        Vector2 velocity = direction * triangleFlySpeed;
+        Vector3 currentPos = targetPos;
+
+        float maxTime = trianglePatternEnd - trianglePatternStart; // 최대 생존 시간
+        elapsed = 0f;
+
+        while (elapsed < maxTime && triangle != null)
+        {
+            elapsed += Time.deltaTime;
+            
+            // 위치 업데이트
+            currentPos += (Vector3)(velocity * Time.deltaTime);
+            
+            // 화면 경계 체크 및 반사 (입사각 = 반사각)
+            Bounds screenBounds = GetScreenBounds();
+            
+            // X축 반사
+            if (currentPos.x <= screenBounds.min.x || currentPos.x >= screenBounds.max.x)
+            {
+                velocity.x = -velocity.x;
+                currentPos.x = Mathf.Clamp(currentPos.x, screenBounds.min.x, screenBounds.max.x);
+            }
+            
+            // Y축 반사
+            if (currentPos.y <= screenBounds.min.y || currentPos.y >= screenBounds.max.y)
+            {
+                velocity.y = -velocity.y;
+                currentPos.y = Mathf.Clamp(currentPos.y, screenBounds.min.y, screenBounds.max.y);
+            }
+            
+            triangle.transform.position = currentPos;
+            
+            // 방향 회전
+            float angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90f;
+            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
+            
+            // 궤적 투명도 업데이트 (창에서 멀수록 투명)
+            UpdateTrailTransparency(triangle, trail);
+            
+            yield return null;
+        }
+
+        // 삭제
+        if (triangle != null)
+        {
+            Destroy(triangle);
+        }
+    }
+
+    /// <summary>
+    /// 궤적 투명도 업데이트 (창에서 멀수록 투명)
+    /// </summary>
+    private void UpdateTrailTransparency(GameObject triangle, TrailRenderer trail)
+    {
+        if (triangle == null || trail == null) return;
+
+        Bounds windowBounds = GetWindowBounds();
+        Vector3 pos = triangle.transform.position;
+        bool isInsideWindow = windowBounds.Contains(pos);
+
+        // 창 밖일 때만 거리에 따라 투명도 조정
+        if (!isInsideWindow)
+        {
+            float distance = Vector3.Distance(pos, windowBounds.ClosestPoint(pos));
+            float alpha = 1f - Mathf.Clamp01(distance / trailFadeDistance);
+            
+            Color startColor = trailColor;
+            startColor.a = alpha;
+            trail.startColor = startColor;
+            
+            Color endColor = trailColor;
+            endColor.a = 0f;
+            trail.endColor = endColor;
+        }
+        else
+        {
+            // 창 안: 완전 불투명
+            trail.startColor = trailColor;
+            Color endColor = trailColor;
+            endColor.a = 0f;
+            trail.endColor = endColor;
+        }
+    }
+
+    /// <summary>
+    /// 게임 창 경계 반환
+    /// </summary>
+    private Bounds GetWindowBounds()
+    {
+        if (gameWindow != null)
+        {
+            // gameWindow의 Collider2D 또는 RectTransform에서 경계 가져오기
+            Collider2D col = gameWindow.GetComponent<Collider2D>();
+            if (col != null)
+            {
+                return col.bounds;
+            }
+            
+            // RectTransform인 경우 (UI)
+            RectTransform rect = gameWindow.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                Vector3[] corners = new Vector3[4];
+                rect.GetWorldCorners(corners);
+                Bounds bounds = new Bounds(corners[0], Vector3.zero);
+                foreach (Vector3 corner in corners)
+                {
+                    bounds.Encapsulate(corner);
+                }
+                return bounds;
+            }
+        }
+
+        // 기본값 (대략적인 창 크기)
+        return new Bounds(Vector3.zero, new Vector3(6f, 4f, 0f));
+    }
+
+    /// <summary>
+    /// 화면 경계 반환 (전체 화면)
+    /// </summary>
+    private Bounds GetScreenBounds()
+    {
+        // Camera 기준 화면 경계
+        Camera cam = Camera.main;
+        if (cam != null)
+        {
+            float height = cam.orthographicSize * 2f;
+            float width = height * cam.aspect;
+            return new Bounds(Vector3.zero, new Vector3(width, height, 0f));
+        }
+
+        // 기본값
+        return new Bounds(Vector3.zero, new Vector3(20f, 12f, 0f));
+    }
 
     // ✅ 위에서 아래로 짧은 버스트 여러 줄이 연속으로 쏟아지는 버전
     private IEnumerator VerticalBounceDiagonalBurstSeriesDown(
@@ -883,4 +1129,5 @@ public class BeatBounce : MonoBehaviour
 
 
 }
+
 
