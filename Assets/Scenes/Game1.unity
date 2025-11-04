@@ -2265,6 +2265,8 @@ MonoBehaviour:
   fadeDuration: 1
   wavePrefab: {fileID: 4094856357322339278, guid: 54dd779f165859440b2e4e09bbbdef89, type: 3}
   wavePrefabAlt: {fileID: 2369408131941097147, guid: eda42412b07abd445b1baf8ecc2ab854, type: 3}
+  bigWavePrefab: {fileID: 3243375885853720917, guid: 2eb040fe1677cfb428e0c7ff21b87922, type: 3}
+  bounceWavePrefab: {fileID: 3963892975576905091, guid: 02b49500329c491468f4bda64f96ba21, type: 3}
   waveParent: {fileID: 198122035}
   waveCount: 80
   waveSpacing: 0.3
