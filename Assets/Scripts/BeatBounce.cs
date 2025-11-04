@@ -723,15 +723,22 @@ public class BeatBounce : MonoBehaviour
             GameObject bigBottomWave = Instantiate(bigWavePrefab, bigBottomPos, Quaternion.identity, waveParent);
             StartCoroutine(MoveWaveObject(bigBottomWave, 1, 2f, 0.8f));
 
-            // 위쪽에서 아래로 내려오는 물결
-            Vector3 bounceTopPos = new Vector3(2f, 3f + i * waveSpacing, 0f); // y값이 커질수록 위쪽
-            GameObject bounceTopWave = Instantiate(bounceWavePrefab, bounceTopPos, Quaternion.identity, waveParent);
-            StartCoroutine(VerticalBounceDiagonal(bounceTopWave, 1.5f, 0.8f, 0.5f, 0.7f));
+            // 위에서 아래로 짧은 물결 여러 줄 쏟아짐
+            Vector3 bounceTopPos = new Vector3(2f, 5f, 0f);
+            StartCoroutine(VerticalBounceDiagonalBurstSeriesDown(
+                bounceTopPos, bounceWavePrefab, waveParent,
+                3,     // seriesCount → 총 4줄
+                1,     // burstCount → 한 줄당 3개의 오브젝트
+                0.4f,  // waveSpacing → 세로 간격
+                5f,  // burstInterval → 줄 간 간격 (툭툭 떨어지는 템포)
+                1.5f, 0.8f, 0.6f, 1.0f)); // 움직임 세기들
 
-            // 아래쪽에서 위로 올라가는 물결
-            Vector3 bounceBottomPos = new Vector3(2f, -3f - i * waveSpacing, 0f); // y값이 작아질수록 아래쪽
-            GameObject bounceBottomWave = Instantiate(bounceWavePrefab, bounceBottomPos, Quaternion.identity, waveParent);
-            StartCoroutine(VerticalBounceDiagonalUp(bounceBottomWave, 1.5f, 0.8f, 0.5f, 0.7f));
+            // 아래에서 위로 여러 줄 솟아오르는 버전
+            Vector3 bounceBottomPos = new Vector3(2f, -5f, 0f);
+            StartCoroutine(VerticalBounceDiagonalBurstSeriesUp(
+                bounceBottomPos, bounceWavePrefab, waveParent,
+                3, 1, 0.4f, 5f,
+                1.5f, 0.8f, 0.6f, 1.0f));
 
 
 
@@ -766,63 +773,111 @@ public class BeatBounce : MonoBehaviour
             Destroy(waveObj);
     }
 
-    // 위에서 아래로 꽂히면서 왼쪽으로 빠르게 흐르는 물결
+    // 위에서 아래로 쏟아지는 대각선 물결
     private IEnumerator VerticalBounceDiagonal(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
     {
         Vector3 startPos = wave.transform.position;
         float timer = 0f;
 
-        while (wave != null)
+        while (wave != null && timer < 1.5f)
         {
             timer += Time.deltaTime * speed;
 
-            // 좌우로 빠르게 흔들림 (짧은 파형)
-            float offsetX = Mathf.Sin(timer * Mathf.PI * 8f) * amplitude * 0.25f;
+            // 좌우 흔들림 (물결 잔상 느낌)
+            float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
 
-            // 아래로 빠르게 떨어지도록 속도 증가
-            float moveY = -timer * moveSpeed * 3f;  // ← 여기 3배 빠르게
+            // 제한된 y 이동 (짧은 물결)
+            float moveY = -timer * moveSpeed * 6f;
 
-            // 전체 왼쪽으로 흐름
-            float moveX = -timer * leftFlowSpeed;
+            // 왼쪽 흐름
+            float moveX = -timer * leftFlowSpeed * 1.8f;
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
-            // 화면 아래로 완전히 사라지면 제거
-            if (wave.transform.position.y < -7f)
-            {
-                Destroy(wave);
-                yield break;
-            }
-
             yield return null;
         }
+
+        if (wave != null)
+            Destroy(wave);
     }
 
-    // 아래에서 위로 솟는 물결 (반대 방향)
+    // 아래에서 위로 솟아오르는 대각선 물결
     private IEnumerator VerticalBounceDiagonalUp(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
     {
         Vector3 startPos = wave.transform.position;
         float timer = 0f;
 
-        while (wave != null)
+        while (wave != null && timer < 1.5f)
         {
             timer += Time.deltaTime * speed;
 
-            float offsetX = Mathf.Sin(timer * Mathf.PI * 8f) * amplitude * 0.25f;
-            float moveY = timer * moveSpeed * 3f;   // ← 마찬가지로 더 빠르게 상승
-            float moveX = -timer * leftFlowSpeed;
+            // 좌우 흔들림
+            float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
+
+            // 위로 이동 (짧은 물결)
+            float moveY = timer * moveSpeed * 6f;
+
+            // 왼쪽 흐름
+            float moveX = -timer * leftFlowSpeed * 1.8f;
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
-            if (wave.transform.position.y > 7f)
-            {
-                Destroy(wave);
-                yield break;
-            }
-
             yield return null;
         }
+
+        if (wave != null)
+            Destroy(wave);
     }
+
+
+    // ✅ 위에서 아래로 짧은 버스트 여러 줄이 연속으로 쏟아지는 버전
+    private IEnumerator VerticalBounceDiagonalBurstSeriesDown(
+        Vector3 spawnPos, GameObject wavePrefab, Transform waveParent,
+        int seriesCount, int burstCount, float waveSpacing,
+        float burstInterval, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
+    {
+        for (int s = 0; s < seriesCount; s++)
+        {
+            // 짧은 버스트 한 줄 쏟아지기
+            for (int i = 0; i < burstCount; i++)
+            {
+                Vector3 offsetPos = new Vector3(spawnPos.x, spawnPos.y - i * waveSpacing, spawnPos.z);
+
+                GameObject wave = Instantiate(wavePrefab, offsetPos, Quaternion.identity, waveParent);
+                StartCoroutine(VerticalBounceDiagonal(wave, amplitude, speed, moveSpeed, leftFlowSpeed));
+
+                yield return new WaitForSeconds(0.05f); // 같은 줄 내 간격 (고정)
+            }
+
+            // 한 줄 쏟고 잠깐 멈춘 뒤 다음 줄
+            yield return new WaitForSeconds(burstInterval);
+        }
+    }
+
+
+    // ✅ 아래에서 위로 짧은 버스트 여러 줄이 연속으로 솟아오르는 버전
+    private IEnumerator VerticalBounceDiagonalBurstSeriesUp(
+        Vector3 spawnPos, GameObject wavePrefab, Transform waveParent,
+        int seriesCount, int burstCount, float waveSpacing,
+        float burstInterval, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
+    {
+        for (int s = 0; s < seriesCount; s++)
+        {
+            // 짧은 버스트 한 줄 올라가기
+            for (int i = 0; i < burstCount; i++)
+            {
+                Vector3 offsetPos = new Vector3(spawnPos.x, spawnPos.y + i * waveSpacing, spawnPos.z);
+
+                GameObject wave = Instantiate(wavePrefab, offsetPos, Quaternion.identity, waveParent);
+                StartCoroutine(VerticalBounceDiagonalUp(wave, amplitude, speed, moveSpeed, leftFlowSpeed));
+
+                yield return new WaitForSeconds(0.05f);
+            }
+
+            yield return new WaitForSeconds(burstInterval);
+        }
+    }
+
 
 
 
