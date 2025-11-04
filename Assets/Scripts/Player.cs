@@ -13,6 +13,9 @@ public class Player : MonoBehaviour
     public float dashDuration = 0.2f; // 대쉬 지속 시간
     public float dashCooldown = 0.5f; // 대쉬 쿨타임
     
+    [Header("개발자 설정")]
+    public bool godMode = false; // 무적 모드 (F1 토글)
+    
     [Header("경계 설정")]
     public float minX = -8f;  // 왼쪽 경계
     public float maxX = 8f;   // 오른쪽 경계
@@ -24,7 +27,7 @@ public class Player : MonoBehaviour
     public float colorChangeDuration = 0.5f; // 색 변화 시간
     public float glitchDuration = 0.3f; // 글리치 효과 시간
     public Material glitchMaterial; // 글리치 셰이더 머티리얼
-    public string gameOverSceneName = "GameOver"; // 게임오버 씬 이름
+    public string gameOverSceneName = "GameOver"; // GameOver 씬 이름
     public float pitchChangeSpeed = 1.5f; // 피치 변화 속도
     public float targetPitch = 0.3f; // 목표 피치 (낮고 기분 나쁜 소리)
 
@@ -67,6 +70,19 @@ public class Player : MonoBehaviour
         // 죽었으면 입력 무시
         if (isDead) return;
         
+        // F1 키로 무적 모드 토글
+        if (Input.GetKeyDown(KeyCode.F1))
+        {
+            godMode = !godMode;
+            Debug.Log($"[Player] 무적 모드: {(godMode ? "ON" : "OFF")}");
+            
+            // 무적 모드 시각적 피드백 (색상 변경)
+            if (spriteRenderer != null)
+            {
+                spriteRenderer.color = godMode ? Color.cyan : originalColor;
+            }
+        }
+        
         // 쿨타임 감소
         if (dashCooldownLeft > 0)
         {
@@ -88,6 +104,13 @@ public class Player : MonoBehaviour
 
     void FixedUpdate()
     {
+        // 죽었으면 물리 업데이트 무시
+        if (isDead)
+        {
+            rb.linearVelocity = Vector2.zero;
+            return;
+        }
+        
         Vector3 pos = transform.position;
         
         // 대쉬 중일 때
@@ -162,6 +185,13 @@ public class Player : MonoBehaviour
         // 이미 죽었으면 무시
         if (isDead) return;
         
+        // 무적 모드면 무시
+        if (godMode)
+        {
+            Debug.Log("[Player] 무적 모드 - 충돌 무시");
+            return;
+        }
+        
         // 탄막 태그 체크
         if (other.CompareTag("Triangle") || 
             other.CompareTag("Circle") || 
@@ -178,10 +208,14 @@ public class Player : MonoBehaviour
         
         Debug.Log("[Player] Die() 호출됨");
         
-        // 입력 막기
+        // 즉시 멈추기
         moveInput = Vector2.zero;
         currentVelocity = Vector2.zero;
         rb.linearVelocity = Vector2.zero;
+        
+        // 대쉬 중단
+        isDashing = false;
+        dashTimeLeft = 0f;
         
         // SoundManager에서 BGM AudioSource 가져오기
         AudioSource bgmAudioSource = GetBGMAudioSource();

@@ -461,6 +461,7 @@ MonoBehaviour:
   borderObject: {fileID: 602363360}
   vaccineIcon: {fileID: 462323430}
   vaccineAlarm: {fileID: 1138422033}
+  percentProgram: {fileID: 677265615}
   glitchMaterial: {fileID: 2100000, guid: b92e481bc9596404c8d5b4ebd7b66366, type: 2}
   glitchDuration: 1
   glitchNoise: 800
@@ -477,6 +478,12 @@ MonoBehaviour:
   - {fileID: 404285096}
   - {fileID: 1392511153}
   - {fileID: 1716700120}
+  objectsToCloseOnReturn:
+  - {fileID: 1716700120}
+  - {fileID: 404285096}
+  programsToCloseOnReturn:
+  - {fileID: 1716700120}
+  - {fileID: 404285096}
   errorPrograms:
   - {fileID: 3611291478839134088, guid: 626d0b8cb45718a43a68e53788aaaf4e, type: 3}
   noTextObject: {fileID: 1392511153}

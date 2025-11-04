@@ -22,7 +22,6 @@ public class MousePositionData : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
             
             // static 값을 public 변수에 동기화 (Inspector 확인용)
             savedMousePosition = _savedMousePosition;

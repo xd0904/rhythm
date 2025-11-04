@@ -52,7 +52,33 @@ public class ExitButton : MonoBehaviour
             legacyText = textObject.GetComponent<Text>();
             typingEffect = textObject.GetComponent<TypingEffect>();
             
-            // 첫 번째 메시지 표시
+            // GameOver에서 돌아왔으면 즉시 처리
+            if (GameSequenceManager.ReturnFromGameOver)
+            {
+                Debug.Log("[ExitButton] GameOver에서 돌아옴 - 즉시 처리");
+                GameSequenceManager.ReturnFromGameOver = false; // 플래그 리셋
+                
+                // 버튼과 텍스트 즉시 숨기기
+                isSequenceRunning = true;
+                if (normalButton != null) normalButton.SetActive(false);
+                if (hoveredButton != null) hoveredButton.SetActive(false);
+                if (activeButton != null) activeButton.SetActive(false);
+                if (textObject != null) textObject.SetActive(false);
+                
+                // Collider 비활성화
+                Collider2D collider = GetComponent<Collider2D>();
+                if (collider != null) collider.enabled = false;
+                
+                // GameSequenceManager에 즉시 통보
+                if (GameSequenceManager.Instance != null)
+                {
+                    GameSequenceManager.Instance.StartFromBackgroundRestore();
+                }
+                
+                return;
+            }
+            
+            // 첫 번째 메시지 표시 (정상 시작)
             if (clickMessages != null && clickMessages.Length > 0)
             {
                 if (typingEffect != null)

@@ -32,6 +32,14 @@ public class SoundManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            
+            // 부모가 있다면 분리 (DontDestroyOnLoad는 루트 오브젝트만 가능)
+            if (transform.parent != null)
+            {
+                Debug.Log($"[SoundManager] 부모({transform.parent.name})로부터 분리");
+                transform.SetParent(null);
+            }
+            
             DontDestroyOnLoad(gameObject);
         }
         else

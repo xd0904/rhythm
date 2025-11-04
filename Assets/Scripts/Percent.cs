@@ -294,10 +294,44 @@ public class Percent : MonoBehaviour
         
         Debug.Log($"[Percent] SaveAndLoad 시작 - MousePositionData.Instance: {(MousePositionData.Instance != null ? "존재" : "NULL")}");
         
-        // 현재 빨간 마우스의 위치 저장
+        // 현재 빨간 마우스의 위치만 저장 (마우스 자체는 Game1 씬의 것 사용)
         if (redMouse != null && redMouse.activeSelf)
         {
-            Vector3 position = redMouse.transform.position;
+            Vector3 position;
+            
+            // RectTransform이면 anchoredPosition 사용, 아니면 position 사용
+            RectTransform rectTransform = redMouse.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                position = rectTransform.anchoredPosition;
+                Debug.Log($"[Percent] UI 마우스 위치 저장: {position}");
+            }
+            else
+            {
+                // World 좌표를 Screen 좌표로 변환한 후 UI 좌표로 변환
+                Camera mainCamera = Camera.main;
+                if (mainCamera != null)
+                {
+                    Vector3 screenPos = mainCamera.WorldToScreenPoint(redMouse.transform.position);
+                    
+                    // Screen 좌표를 Canvas의 anchoredPosition으로 변환
+                    // Canvas 중심 기준 좌표로 변환 (1920x1080 기준)
+                    float canvasWidth = 1920f;
+                    float canvasHeight = 1080f;
+                    position = new Vector3(
+                        screenPos.x - canvasWidth / 2f,
+                        screenPos.y - canvasHeight / 2f,
+                        0
+                    );
+                    Debug.Log($"[Percent] World→UI 좌표 변환: {redMouse.transform.position} → Screen:{screenPos} → UI:{position}");
+                }
+                else
+                {
+                    position = redMouse.transform.position;
+                    Debug.LogWarning("[Percent] 카메라를 찾을 수 없어 World 좌표 그대로 사용");
+                }
+            }
+            
             MousePositionData.Instance.SaveMousePosition(position, true);
             Debug.Log($"[Percent] 빨간 마우스 위치 저장: {position}");
             
