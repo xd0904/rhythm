@@ -251,6 +251,7 @@ public class BeatBounce : MonoBehaviour
     {
         float elapsed = 0f;
         Vector3 targetScale = Vector3.one * maxScale;
+        Vector3 centerPos = spawnPoint.position; // 중심 위치
         
         // SpriteRenderer 찾기
         SpriteRenderer spriteRenderer = diamond.GetComponent<SpriteRenderer>();
@@ -272,6 +273,22 @@ public class BeatBounce : MonoBehaviour
             if (diamond != null)
             {
                 diamond.transform.localScale = Vector3.Lerp(Vector3.zero, targetScale, smoothT);
+                
+                // 중심에서의 거리 계산 (로컬 스케일 기준)
+                float distanceFromCenter = diamond.transform.localScale.x / maxScale;
+                
+                // 거리에 따라 투명도 감소
+                // 40% 크기 = 70% 투명 (0.3 불투명도)
+                // 100% 크기 = 거의 안보임 (0.05 불투명도)
+                float alpha = 1f - (distanceFromCenter * 1.75f); // 40%일때 0.3 (70% 투명)
+                alpha = Mathf.Clamp01(alpha);
+                
+                // 색상에 알파값 적용
+                Color currentColor = baseColor;
+                currentColor.a = alpha;
+                
+                if (spriteRenderer != null) spriteRenderer.color = currentColor;
+                else if (image != null) image.color = currentColor;
             }
             
             yield return null;
@@ -281,6 +298,13 @@ public class BeatBounce : MonoBehaviour
         if (diamond != null)
         {
             diamond.transform.localScale = targetScale;
+            
+            // 최종 투명도 설정
+            Color finalColor = baseColor;
+            finalColor.a = 0.05f; // 최대 크기일 때 거의 안보임
+            
+            if (spriteRenderer != null) spriteRenderer.color = finalColor;
+            else if (image != null) image.color = finalColor;
         }
         
         // 잠시 유지

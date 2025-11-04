@@ -163,6 +163,13 @@ public class GameSequenceManager : MonoBehaviour
     {
         Debug.Log("[GameSequenceManager] 배경화면 복구 시점부터 시작!");
         
+        // BGM 피치만 복원 (GameOver에서 낮아진 피치만 1.0으로 복구)
+        if (SoundManager.Instance != null && SoundManager.Instance.BGMSource != null)
+        {
+            SoundManager.Instance.BGMSource.pitch = 1.0f;
+            Debug.Log("[GameSequenceManager] BGM 피치 1.0으로 복원 (재생은 Game1에서)");
+        }
+        
         // 바이러스.exe 아이콘 즉시 삭제
         if (objectsToCloseOnReturn != null && objectsToCloseOnReturn.Length > 0)
         {

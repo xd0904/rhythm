@@ -67,7 +67,13 @@ public class SoundManager : MonoBehaviour
             Debug.Log("[SoundManager] BGM AudioSource 자동 생성");
         }
         
-        if (bgmSource.clip == clip) return;
+        // 같은 클립이지만 재생 중이 아니면 다시 재생
+        if (bgmSource.clip == clip && bgmSource.isPlaying)
+        {
+            Debug.Log($"[SoundManager] BGM 이미 재생 중: {clip.name}");
+            return;
+        }
+        
         bgmSource.clip = clip;
         bgmSource.loop = true;
         bgmSource.Play();
