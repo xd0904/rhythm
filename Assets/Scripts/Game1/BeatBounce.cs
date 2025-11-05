@@ -3,6 +3,9 @@ using System.Collections;
 
 public class BeatBounce : MonoBehaviour
 {
+    // 싱글톤 인스턴스
+    public static BeatBounce Instance { get; private set; }
+    
     [Header("기존 바운스 설정")]
     public GameObject diamondPrefab;      // 다이아몬드 프리팹
     public Transform spawnPoint;          // 생성 위치
@@ -52,7 +55,7 @@ public class BeatBounce : MonoBehaviour
     public Color darkColor = new Color(0.2f, 0.2f, 0.2f); // 어두운 색
     public float fadeDuration = 1f;       // 어두워지는 시간
 
-    private double musicStartTime;
+    private double musicStartTime = 0; // 0으로 초기화 (음악 시작 전)
     private float beatInterval;
     private int lastBeatIndex = -1;
     private int attackBeatCounter = 0;    // 공격 박자 카운터
@@ -89,9 +92,20 @@ public class BeatBounce : MonoBehaviour
     public int triangleBeatsPerSpawn = 4;       // 4박자마다 삼각형 생성
     private int trianglePatternCounter = 0;     // 패턴 카운터
 
-
-
-
+    void Awake()
+    {
+        // 싱글톤 설정
+        if (Instance == null)
+        {
+            Instance = this;
+            Debug.Log("[BeatBounce] 싱글톤 인스턴스 생성");
+        }
+        else
+        {
+            Debug.LogWarning("[BeatBounce] 중복된 인스턴스 발견! 제거됨");
+            Destroy(gameObject);
+        }
+    }
 
     void Start()
     {
@@ -1026,6 +1040,12 @@ public class BeatBounce : MonoBehaviour
     
     public double GetMusicTime()
     {
+        // 음악이 시작되지 않았으면 음수 반환 (ResetMusicStartTime 호출 전)
+        if (musicStartTime == 0)
+        {
+            return -1.0;
+        }
+        
         return AudioSettings.dspTime - musicStartTime;
     }
     

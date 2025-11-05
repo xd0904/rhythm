@@ -42,20 +42,40 @@ public class ScreenFlipController : MonoBehaviour
         {
             mainCamera = Camera.main;
         }
+        
+        // 타이밍 강제 설정 (Inspector 값 무시)
+        autoFlipTime = 44f;
+        mouseMoveStartTime = 42f;
+        mouseMoveDuration = 1.5f;
+        
+        Debug.Log($"[ScreenFlip] 타이밍 설정: 마우스 이동={mouseMoveStartTime}초, 플립={autoFlipTime}초");
     }
 
     void Update()
     {
-        // 42초에 마우스를 오른쪽으로 이동
-        if (!mouseMoveTriggered && Time.time >= mouseMoveStartTime)
+        if (BeatBounce.Instance == null) return; // BeatBounce 없으면 대기
+        
+        double musicTime = BeatBounce.Instance.GetMusicTime();
+        
+        // 음악이 아직 시작 안 했으면 대기 (음수 또는 0)
+        if (musicTime <= 0)
         {
+            // Debug.Log($"[ScreenFlip] 음악 대기 중... musicTime: {musicTime}");
+            return;
+        }
+        
+        // 42초에 마우스를 오른쪽으로 이동
+        if (!mouseMoveTriggered && musicTime >= mouseMoveStartTime)
+        {
+            Debug.Log($"[ScreenFlip] 마우스 이동 트리거! musicTime: {musicTime}, 목표: {mouseMoveStartTime}");
             mouseMoveTriggered = true;
             StartCoroutine(MoveMouseToRight());
         }
         
         // 44초에 자동 플립
-        if (!autoFlipTriggered && Time.time >= autoFlipTime)
+        if (!autoFlipTriggered && musicTime >= autoFlipTime)
         {
+            Debug.Log($"[ScreenFlip] 플립 트리거! musicTime: {musicTime}, 목표: {autoFlipTime}");
             autoFlipTriggered = true;
             StartCoroutine(FlipScreen());
             return;
