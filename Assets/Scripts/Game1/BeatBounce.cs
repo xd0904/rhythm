@@ -1040,13 +1040,13 @@ public class BeatBounce : MonoBehaviour
     
     public double GetMusicTime()
     {
-        // 음악이 시작되지 않았으면 음수 반환 (ResetMusicStartTime 호출 전)
-        if (musicStartTime == 0)
+        // ⭐ musicStartTime이 0보다 커야 (즉, ResetMusicStartTime()이 호출되어야) 유효한 시간을 반환합니다.
+        if (musicStartTime > 0)
         {
-            return -1.0;
+            return AudioSettings.dspTime - musicStartTime;
         }
-        
-        return AudioSettings.dspTime - musicStartTime;
+        // 음악 시작 전에는 0.0을 반환합니다.
+        return 0.0;
     }
     
     public void SetBPM(float newBpm)
@@ -1103,22 +1103,7 @@ public class BeatBounce : MonoBehaviour
             GameObject bigBottomWave = Instantiate(bigWavePrefab, bigBottomPos, Quaternion.identity, waveParent);
             StartCoroutine(MoveWaveObject(bigBottomWave, 1, 2f, 0.8f));
 
-            // 위에서 아래로 짧은 물결 여러 줄 쏟아짐
-            Vector3 bounceTopPos = new Vector3(2f, 5f, 0f);
-            StartCoroutine(VerticalBounceDiagonalBurstSeriesDown(
-                bounceTopPos, bounceWavePrefab, waveParent,
-                3,     // seriesCount → 총 4줄
-                1,     // burstCount → 한 줄당 3개의 오브젝트
-                0.4f,  // waveSpacing → 세로 간격
-                5f,  // burstInterval → 줄 간 간격 (툭툭 떨어지는 템포)
-                1.5f, 0.8f, 0.6f, 1.0f)); // 움직임 세기들
-
-            // 아래에서 위로 여러 줄 솟아오르는 버전
-            Vector3 bounceBottomPos = new Vector3(2f, -5f, 0f);
-            StartCoroutine(VerticalBounceDiagonalBurstSeriesUp(
-                bounceBottomPos, bounceWavePrefab, waveParent,
-                3, 1, 0.4f, 5f,
-                1.5f, 0.8f, 0.6f, 1.0f));
+         
 
             yield return new WaitForSeconds(0.1f); // 순차 생성
         }
@@ -1171,11 +1156,13 @@ public class BeatBounce : MonoBehaviour
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
-            if (wave.transform.position.y < -7f)
+            // 아래쪽 화면 밖으로 충분히 나갔을 때 파괴하도록 수정 (⭐수정: -7f → -10f)
+            if (wave.transform.position.y < -10f)
             {
                 Destroy(wave);
                 yield break;
             }
+
 
             yield return null;
         }
@@ -1199,7 +1186,7 @@ public class BeatBounce : MonoBehaviour
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
-            if (wave.transform.position.y > 7f)
+            if (wave.transform.position.y > 10f)
             {
                 Destroy(wave);
                 yield break;
@@ -1394,57 +1381,6 @@ public class BeatBounce : MonoBehaviour
         // 기본값
         return new Bounds(Vector3.zero, new Vector3(20f, 12f, 0f));
     }
-
-    // ✅ 위에서 아래로 짧은 버스트 여러 줄이 연속으로 쏟아지는 버전
-    private IEnumerator VerticalBounceDiagonalBurstSeriesDown(
-        Vector3 spawnPos, GameObject wavePrefab, Transform waveParent,
-        int seriesCount, int burstCount, float waveSpacing,
-        float burstInterval, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
-    {
-        for (int s = 0; s < seriesCount; s++)
-        {
-            // 짧은 버스트 한 줄 쏟아지기
-            for (int i = 0; i < burstCount; i++)
-            {
-                Vector3 offsetPos = new Vector3(spawnPos.x, spawnPos.y - i * waveSpacing, spawnPos.z);
-
-                GameObject wave = Instantiate(wavePrefab, offsetPos, Quaternion.identity, waveParent);
-                StartCoroutine(VerticalBounceDiagonal(wave, amplitude, speed, moveSpeed, leftFlowSpeed));
-
-                yield return new WaitForSeconds(0.05f); // 같은 줄 내 간격 (고정)
-            }
-
-            // 한 줄 쏟고 잠깐 멈춘 뒤 다음 줄
-            yield return new WaitForSeconds(burstInterval);
-        }
-    }
-
-
-    // ✅ 아래에서 위로 짧은 버스트 여러 줄이 연속으로 솟아오르는 버전
-    private IEnumerator VerticalBounceDiagonalBurstSeriesUp(
-        Vector3 spawnPos, GameObject wavePrefab, Transform waveParent,
-        int seriesCount, int burstCount, float waveSpacing,
-        float burstInterval, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
-    {
-        for (int s = 0; s < seriesCount; s++)
-        {
-            // 짧은 버스트 한 줄 올라가기
-            for (int i = 0; i < burstCount; i++)
-            {
-                Vector3 offsetPos = new Vector3(spawnPos.x, spawnPos.y + i * waveSpacing, spawnPos.z);
-
-                GameObject wave = Instantiate(wavePrefab, offsetPos, Quaternion.identity, waveParent);
-                StartCoroutine(VerticalBounceDiagonalUp(wave, amplitude, speed, moveSpeed, leftFlowSpeed));
-
-                yield return new WaitForSeconds(0.05f);
-            }
-
-            yield return new WaitForSeconds(burstInterval);
-        }
-    }
-
-
-
 
 
 }
