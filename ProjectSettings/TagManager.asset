@@ -8,6 +8,8 @@ TagManager:
   - Triangle
   - Circle
   - Wave
+  - BounceWave
+  - TwoTriangle
   layers:
   - Default
   - TransparentFX

@@ -16,6 +16,9 @@ public class Player : MonoBehaviour
     [Header("개발자 설정")]
     public bool godMode = false; // 무적 모드 (F1 토글)
     
+    [Header("충돌 태그 설정")]
+    public string[] dangerousTags = { "Triangle", "Circle", "Wave", "WaveAlt" }; // 플레이어를 죽이는 태그 리스트
+    
     [Header("경계 설정")]
     public float minX = -8f;  // 왼쪽 경계
     public float maxX = 8f;   // 오른쪽 경계
@@ -24,12 +27,19 @@ public class Player : MonoBehaviour
     
     [Header("죽음 설정")]
     public Color deathColor = Color.red; // 죽을 때 색상
+    public float slowMotionDuration = 0.8f; // 슬로우모션 시간
+    public float minTimeScale = 0.1f; // 최소 시간 배율 (거의 정지)
     public float colorChangeDuration = 0.5f; // 색 변화 시간
     public float glitchDuration = 0.3f; // 글리치 효과 시간
     public Material glitchMaterial; // 글리치 셰이더 머티리얼
     public string gameOverSceneName = "GameOver"; // GameOver 씬 이름
     public float pitchChangeSpeed = 1.5f; // 피치 변화 속도
     public float targetPitch = 0.3f; // 목표 피치 (낮고 기분 나쁜 소리)
+    public float screenShakeIntensity = 0.3f; // 화면 흔들림 강도
+    public float screenShakeDuration = 0.2f; // 화면 흔들림 시간
+    public float flashDuration = 0.1f; // 화면 플래시 시간
+    public int deathPulseCount = 3; // 빨간색 펄스 횟수
+    public float pulseSpeed = 0.15f; // 펄스 속도
 
     private Rigidbody2D rb;
     private Vector2 moveInput;
@@ -192,13 +202,14 @@ public class Player : MonoBehaviour
             return;
         }
         
-        // 탄막 태그 체크
-        if (other.CompareTag("Triangle") || 
-            other.CompareTag("Circle") || 
-            other.CompareTag("Wave") || 
-            other.CompareTag("WaveAlt"))
+        // 위험한 태그 리스트 체크
+        foreach (string dangerousTag in dangerousTags)
         {
-            Die();
+            if (other.CompareTag(dangerousTag))
+            {
+                Die();
+                return;
+            }
         }
     }
     
@@ -264,7 +275,7 @@ public class Player : MonoBehaviour
         {
             if (bgmAudioSource == null) yield break;
             
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime; // 시간 정지 중에도 동작
             float t = elapsed / colorChangeDuration;
             
             // 피치 점점 낮아짐 (강제 적용)
@@ -287,21 +298,110 @@ public class Player : MonoBehaviour
     
     IEnumerator DeathSequence()
     {
-        // 1단계: 색상이 빨간색으로 변함 (피치는 이미 LowerPitch에서 처리 중)
-        float elapsed = 0f;
+        Camera mainCam = Camera.main;
+        Vector3 originalCamPos = mainCam != null ? mainCam.transform.position : Vector3.zero;
         
-        while (elapsed < colorChangeDuration)
+        // 1단계: 화면 플래시 (하얗게 번쩍)
+        GameObject flashObj = new GameObject("DeathFlash");
+        SpriteRenderer flashRenderer = flashObj.AddComponent<SpriteRenderer>();
+        flashRenderer.sprite = Sprite.Create(
+            Texture2D.whiteTexture, 
+            new Rect(0, 0, 1, 1), 
+            new Vector2(0.5f, 0.5f)
+        );
+        flashRenderer.color = Color.white;
+        flashRenderer.sortingOrder = 9999;
+        flashObj.transform.position = transform.position;
+        flashObj.transform.localScale = new Vector3(100f, 100f, 1f);
+        
+        float flashElapsed = 0f;
+        while (flashElapsed < flashDuration)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / colorChangeDuration;
+            flashElapsed += Time.unscaledDeltaTime;
+            float alpha = 1f - (flashElapsed / flashDuration);
+            flashRenderer.color = new Color(1f, 1f, 1f, alpha);
+            yield return null;
+        }
+        Destroy(flashObj);
+        
+        // 2단계: 시간 천천히 느려지기 + 화면 흔들림
+        float slowElapsed = 0f;
+        float shakeElapsed = 0f;
+        
+        while (slowElapsed < slowMotionDuration)
+        {
+            slowElapsed += Time.unscaledDeltaTime;
+            shakeElapsed += Time.unscaledDeltaTime;
             
-            // 색상 변화만 처리
-            spriteRenderer.color = Color.Lerp(originalColor, deathColor, t);
+            float t = slowElapsed / slowMotionDuration;
+            
+            // 시간이 점점 느려짐 (1.0 → minTimeScale)
+            Time.timeScale = Mathf.Lerp(1f, minTimeScale, t);
+            
+            // 화면 흔들림 (처음에만)
+            if (mainCam != null && shakeElapsed < screenShakeDuration)
+            {
+                float shakeAmount = screenShakeIntensity * (1f - shakeElapsed / screenShakeDuration);
+                mainCam.transform.position = originalCamPos + new Vector3(
+                    Random.Range(-shakeAmount, shakeAmount),
+                    Random.Range(-shakeAmount, shakeAmount),
+                    0f
+                );
+            }
+            else if (mainCam != null)
+            {
+                // 흔들림 끝나면 위치 복원
+                mainCam.transform.position = originalCamPos;
+            }
             
             yield return null;
         }
         
-        // 2단계: 글리치 셰이더 적용하고 음악 끄기
+        // 완전 정지
+        Time.timeScale = 0f;
+        
+        // 카메라 위치 복원
+        if (mainCam != null)
+        {
+            mainCam.transform.position = originalCamPos;
+        }
+        
+        // 3단계: 플레이어 빨간색 펄스 (시간 정지 상태에서)
+        for (int i = 0; i < deathPulseCount; i++)
+        {
+            // 빨간색으로 빠르게
+            float pulseIn = 0f;
+            while (pulseIn < pulseSpeed)
+            {
+                pulseIn += Time.unscaledDeltaTime;
+                float t = pulseIn / pulseSpeed;
+                
+                // 원래 색 → 강렬한 빨간색
+                Color targetColor = Color.Lerp(deathColor, Color.white, 0.3f); // 약간 밝은 빨강
+                spriteRenderer.color = Color.Lerp(originalColor, targetColor, t);
+                
+                yield return null;
+            }
+            
+            // 조금 어두운 빨간색으로
+            float pulseOut = 0f;
+            while (pulseOut < pulseSpeed)
+            {
+                pulseOut += Time.unscaledDeltaTime;
+                float t = pulseOut / pulseSpeed;
+                
+                // 밝은 빨강 → 어두운 빨강
+                Color brightRed = Color.Lerp(deathColor, Color.white, 0.3f);
+                Color darkRed = deathColor * 0.7f;
+                spriteRenderer.color = Color.Lerp(brightRed, darkRed, t);
+                
+                yield return null;
+            }
+        }
+        
+        // 4단계: 최종 빨간색 + 글리치 효과 적용
+        spriteRenderer.color = deathColor;
+        
         if (glitchMaterial != null)
         {
             spriteRenderer.material = glitchMaterial;
@@ -314,9 +414,16 @@ public class Player : MonoBehaviour
             bgmAudioSource.Stop();
         }
         
-        yield return new WaitForSeconds(glitchDuration);
+        // 글리치 효과 유지 (시간은 계속 정지 상태)
+        float glitchElapsed = 0f;
+        while (glitchElapsed < glitchDuration)
+        {
+            glitchElapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
         
-        // 3단계: GameOver 씬으로 이동
+        // 5단계: 시간 복원 후 GameOver 씬으로 이동
+        Time.timeScale = 1f;
         SceneManager.LoadScene(gameOverSceneName);
     }
 }

@@ -1004,6 +1004,13 @@ MonoBehaviour:
   dashDuration: 0.2
   dashCooldown: 0.5
   godMode: 0
+  dangerousTags:
+  - Triangle
+  - Circle
+  - Wave
+  - WaveAlt
+  - BounceWave
+  - TwoTriangle
   minX: -8
   maxX: 8
   minY: -4.5
