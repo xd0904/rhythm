@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7576024380605475033}
   m_Layer: 0
   m_Name: "\uC774\uB4F1\uBCC0\uC0BC\uAC01\uD615"
-  m_TagString: TwoTriangle
+  m_TagString: IsoscelesTriangle
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -9,9 +9,12 @@ public class Player : MonoBehaviour
     public float deceleration = 15f; // 감속도 (약간 미끄러짐)
     
     [Header("대쉬 설정")]
-    public float dashSpeed = 15f; // 대쉬 속도
-    public float dashDuration = 0.2f; // 대쉬 지속 시간
+    public float dashDistance = 3f; // 순간이동 거리
     public float dashCooldown = 0.5f; // 대쉬 쿨타임
+    public int dashAfterimageCount = 3; // 잔상 개수 (줄임)
+    public float afterimageDuration = 0.2f; // 잔상 지속 시간 (짧게)
+    public Color dashStartColor = new Color(0f, 1f, 1f, 0.3f); // 시작 위치 색상 (더 투명)
+    public Color dashEndColor = new Color(1f, 0f, 1f, 0.3f); // 끝 위치 색상 (더 투명)
     
     [Header("개발자 설정")]
     public bool godMode = false; // 무적 모드 (F1 토글)
@@ -48,10 +51,7 @@ public class Player : MonoBehaviour
     private Material originalMaterial;
     private Color originalColor;
     private bool isDead = false;
-    private bool isDashing = false;
-    private float dashTimeLeft = 0f;
     private float dashCooldownLeft = 0f;
-    private Vector2 dashDirection;
 
     void Start()
     {
@@ -105,10 +105,10 @@ public class Player : MonoBehaviour
 
         moveInput = new Vector2(moveX, moveY).normalized; // 대각선 이동 시 속도 보정
         
-        // 스페이스바로 대쉬
-        if (Input.GetKeyDown(KeyCode.Space) && !isDashing && dashCooldownLeft <= 0 && moveInput.magnitude > 0.1f)
+        // 스페이스바로 순간이동 대쉬
+        if (Input.GetKeyDown(KeyCode.Space) && dashCooldownLeft <= 0 && moveInput.magnitude > 0.1f)
         {
-            StartDash();
+            PerformDash();
         }
     }
 
@@ -122,31 +122,6 @@ public class Player : MonoBehaviour
         }
         
         Vector3 pos = transform.position;
-        
-        // 대쉬 중일 때
-        if (isDashing)
-        {
-            dashTimeLeft -= Time.fixedDeltaTime;
-            
-            if (dashTimeLeft <= 0)
-            {
-                // 대쉬 종료
-                isDashing = false;
-                dashCooldownLeft = dashCooldown;
-            }
-            else
-            {
-                // 대쉬 속도로 이동
-                rb.linearVelocity = dashDirection * dashSpeed;
-                
-                // 위치 제한
-                pos.x = Mathf.Clamp(pos.x, minX, maxX);
-                pos.y = Mathf.Clamp(pos.y, minY, maxY);
-                transform.position = pos;
-                
-                return; // 대쉬 중에는 일반 이동 처리 안 함
-            }
-        }
         
         // 일반 이동
         // 목표 속도 계산
@@ -183,11 +158,149 @@ public class Player : MonoBehaviour
         }
     }
     
-    void StartDash()
+    void PerformDash()
     {
-        isDashing = true;
-        dashTimeLeft = dashDuration;
-        dashDirection = moveInput.normalized;
+        // 순간이동: 현재 위치에서 이동 방향으로 dashDistance만큼 순간 이동
+        Vector3 currentPos = transform.position;
+        Vector3 dashDirection = new Vector3(moveInput.x, moveInput.y, 0f).normalized;
+        Vector3 targetPos = currentPos + dashDirection * dashDistance;
+        
+        // 경계 내로 제한
+        targetPos.x = Mathf.Clamp(targetPos.x, minX, maxX);
+        targetPos.y = Mathf.Clamp(targetPos.y, minY, maxY);
+        
+        // 순간이동 애니메이션 시작
+        StartCoroutine(DashAnimation(currentPos, targetPos));
+        
+        // 쿨타임 시작
+        dashCooldownLeft = dashCooldown;
+        
+        Debug.Log($"[Player] 대쉬! {currentPos} → {targetPos}");
+    }
+    
+    IEnumerator DashAnimation(Vector3 startPos, Vector3 endPos)
+    {
+        Vector3 originalScale = transform.localScale;
+        
+        // 1. 시작 위치에 파티클 효과 + 플레이어 스케일 줄이기 (사라지는 효과)
+        float disappearDuration = 0.08f;
+        float elapsed = 0f;
+        
+        while (elapsed < disappearDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / disappearDuration;
+            
+            // 플레이어가 점점 작아지면서 사라짐 (1.0 → 0)
+            transform.localScale = Vector3.Lerp(originalScale, Vector3.zero, t);
+            
+            yield return null;
+        }
+        
+        transform.localScale = Vector3.zero; // 완전히 사라짐
+        
+        // 시작 위치에 파티클 폭발
+        for (int i = 0; i < 8; i++)
+        {
+            GameObject particle = new GameObject($"DashParticle_{i}");
+            SpriteRenderer particleSR = particle.AddComponent<SpriteRenderer>();
+            
+            // 아주 작은 사각형 (2x2)
+            Texture2D particleTex = new Texture2D(2, 2);
+            Color[] pixels = new Color[4];
+            for (int p = 0; p < 4; p++) pixels[p] = Color.white;
+            particleTex.SetPixels(pixels);
+            particleTex.Apply();
+            
+            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f), 10f);
+            particleSR.color = dashStartColor;
+            particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
+            
+            particle.transform.position = startPos;
+            
+            // 랜덤 방향으로 튕기기
+            Vector2 randomDir = Random.insideUnitCircle.normalized;
+            StartCoroutine(AnimateParticle(particle, randomDir));
+        }
+        
+        // 2. 순간이동 실행 (완전히 사라진 상태에서)
+        transform.position = endPos;
+        
+        // 3. 도착 위치에 파티클 먼저 생성
+        for (int i = 0; i < 8; i++)
+        {
+            GameObject particle = new GameObject($"ArrivalParticle_{i}");
+            SpriteRenderer particleSR = particle.AddComponent<SpriteRenderer>();
+            
+            // 아주 작은 사각형 (2x2)
+            Texture2D particleTex = new Texture2D(2, 2);
+            Color[] pixels = new Color[4];
+            for (int p = 0; p < 4; p++) pixels[p] = Color.white;
+            particleTex.SetPixels(pixels);
+            particleTex.Apply();
+            
+            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f), 10f);
+            particleSR.color = dashEndColor;
+            particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
+            
+            particle.transform.position = endPos;
+            
+            Vector2 randomDir = Random.insideUnitCircle.normalized;
+            StartCoroutine(AnimateParticle(particle, randomDir));
+        }
+        
+        // 4. 플레이어 스케일 크게하면서 나타남 (텔레포트 효과)
+        float appearDuration = 0.1f;
+        elapsed = 0f;
+        
+        while (elapsed < appearDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / appearDuration;
+            
+            // 0에서 원래 크기로 커지면서 나타남
+            transform.localScale = Vector3.Lerp(Vector3.zero, originalScale, t);
+            
+            yield return null;
+        }
+        
+        transform.localScale = originalScale; // 원래 크기로 복원
+    }
+    
+    IEnumerator AnimateParticle(GameObject particle, Vector2 direction)
+    {
+        if (particle == null) yield break;
+        
+        SpriteRenderer sr = particle.GetComponent<SpriteRenderer>();
+        Vector3 startPos = particle.transform.position;
+        float speed = 2f;
+        float lifetime = 0.3f;
+        float elapsed = 0f;
+        Color startColor = sr.color;
+        
+        while (elapsed < lifetime)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / lifetime;
+            
+            // 이동
+            particle.transform.position = startPos + (Vector3)(direction * speed * elapsed);
+            
+            // 페이드아웃
+            Color currentColor = startColor;
+            currentColor.a = Mathf.Lerp(startColor.a, 0f, t);
+            sr.color = currentColor;
+            
+            yield return null;
+        }
+        
+        Destroy(particle);
+    }
+    
+    IEnumerator FadeOutAfterimage(GameObject afterimage, float duration)
+    {
+        // 사용 안 함 (잔상 제거됨)
+        yield break;
     }
     
     void OnTriggerEnter2D(Collider2D other)
@@ -223,10 +336,6 @@ public class Player : MonoBehaviour
         moveInput = Vector2.zero;
         currentVelocity = Vector2.zero;
         rb.linearVelocity = Vector2.zero;
-        
-        // 대쉬 중단
-        isDashing = false;
-        dashTimeLeft = 0f;
         
         // SoundManager에서 BGM AudioSource 가져오기
         AudioSource bgmAudioSource = GetBGMAudioSource();

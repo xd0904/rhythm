@@ -1016,12 +1016,19 @@ MonoBehaviour:
   minY: -4.5
   maxY: 4.5
   deathColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
+  slowMotionDuration: 0.8
+  minTimeScale: 0.1
   colorChangeDuration: 1
   glitchDuration: 0.3
   glitchMaterial: {fileID: 2100000, guid: b92e481bc9596404c8d5b4ebd7b66366, type: 2}
   gameOverSceneName: GameOver
   pitchChangeSpeed: 1.5
   targetPitch: 0.3
+  screenShakeIntensity: 0.3
+  screenShakeDuration: 0.2
+  flashDuration: 0.1
+  deathPulseCount: 3
+  pulseSpeed: 0.15
 --- !u!114 &696100258
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2118,7 +2125,7 @@ GameObject:
   - component: {fileID: 1667219189}
   - component: {fileID: 1667219190}
   m_Layer: 0
-  m_Name: Polygon 76
+  m_Name: Shadow2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2246,8 +2253,11 @@ MonoBehaviour:
   endDiamondColor: {r: 0.5294118, g: 0.15686275, b: 0.16078432, a: 1}
   colorChangeStart: 6.3
   colorChangeEnd: 25.7
-  colorChangeObject1: {fileID: 1844002972}
-  colorChangeObject2: {fileID: 1667219188}
+  topShadow: {fileID: 1667219188}
+  bottomShadow: {fileID: 1844002972}
+  shadowMaxY: 278
+  shadowMaxScale: 100
+  shadowGrowDuration: 0.5
   ballPrefab: {fileID: 7800281388023438301, guid: 6ee127863aa29c74e990aa764fd0c482, type: 3}
   trianglePrefab: {fileID: 2185253594872928465, guid: cce2b97d5594af447bc5911b00b2f092, type: 3}
   circlePrefab: {fileID: 8920298402112707381, guid: 6998a848ec671934d9194dedcfbcbcbf, type: 3}
@@ -2302,7 +2312,7 @@ GameObject:
   - component: {fileID: 1844002973}
   - component: {fileID: 1844002974}
   m_Layer: 0
-  m_Name: Polygon 75
+  m_Name: Shadow1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
