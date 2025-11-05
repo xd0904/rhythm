@@ -1316,7 +1316,7 @@ MonoBehaviour:
   scaleDuration: 1
   shakeIntensity: 10
   rotationAmount: 15
-  bgmClip: {fileID: 8300000, guid: bf2cde3f9de81b4418477e1c80711f65, type: 3}
+  bgmClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
 --- !u!4 &856689019
 Transform:
   m_ObjectHideFlags: 0
@@ -2816,8 +2816,8 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: bf2cde3f9de81b4418477e1c80711f65, type: 3}
-  m_Resource: {fileID: 8300000, guid: bf2cde3f9de81b4418477e1c80711f65, type: 3}
+  m_audioClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  m_Resource: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
   m_Pitch: 1

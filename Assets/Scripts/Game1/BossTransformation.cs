@@ -18,11 +18,11 @@ public class BossTransformation : MonoBehaviour
     private Sprite originalMouseSprite; // 원래 마우스 이미지
     
     [Header("오브 설정")]
-    public int orbCount = 30; // 생성할 작은 오브 개수
+    public int orbCount = 80; // 생성할 작은 오브 개수 (44~55초, 11초 동안)
     public float orbSpawnRadius = 8f; // 생성 반경
     public Color orbColor = new Color(1f, 0.8f, 0.2f, 0.9f); // 금색
     public float orbSize = 0.3f; // 오브 크기
-    public float orbSpeed = 2f; // 오브가 마우스로 이동하는 속도
+    public float orbSpeed = 1.2f; // 오브가 마우스로 이동하는 속도 (느리게)
     public float collectRadius = 0.5f; // 마우스가 오브를 먹는 반경
     
     [Header("마우스 성장")]
@@ -36,6 +36,18 @@ public class BossTransformation : MonoBehaviour
 
     void Start()
     {
+        // 타이밍 강제 설정 (Inspector 값 무시)
+        transformStartTime = 44f;
+        transformCompleteTime = 55f;
+        transformEndTime = 57f;
+        
+        // 오브 설정 강제 (Inspector 값 무시)
+        orbCount = 80;
+        orbSpeed = 1.2f;
+        
+        Debug.Log($"[BossTransformation] 타이밍 설정: 시작={transformStartTime}초, 완료={transformCompleteTime}초, 종료={transformEndTime}초");
+        Debug.Log($"[BossTransformation] 오브 설정: 개수={orbCount}개, 속도={orbSpeed}");
+        
         if (mouseCursor != null)
         {
             originalMouseScale = mouseCursor.localScale;
@@ -65,9 +77,21 @@ public class BossTransformation : MonoBehaviour
 
     void Update()
     {
-        // 44초에 변신 시작
-        if (!transformationStarted && Time.time >= transformStartTime)
+        if (BeatBounce.Instance == null) return; // BeatBounce 없으면 대기
+        
+        double musicTime = BeatBounce.Instance.GetMusicTime();
+        
+        // 음악이 아직 시작 안 했으면 대기 (음수 또는 0)
+        if (musicTime <= 0)
         {
+            // Debug.Log($"[BossTransformation] 음악 대기 중... musicTime: {musicTime}");
+            return;
+        }
+        
+        // 44초에 변신 시작
+        if (!transformationStarted && musicTime >= transformStartTime)
+        {
+            Debug.Log($"[BossTransformation] 변신 트리거! musicTime: {musicTime}, 목표: {transformStartTime}");
             transformationStarted = true;
             StartCoroutine(TransformationSequence());
         }
@@ -92,7 +116,7 @@ public class BossTransformation : MonoBehaviour
         }
         
         // 모든 오브를 먹을 때까지 또는 55초까지 대기
-        while (orbsCollected < orbCount && Time.time < transformCompleteTime)
+        while (orbsCollected < orbCount && BeatBounce.Instance.GetMusicTime() < transformCompleteTime)
         {
             yield return null;
         }
@@ -101,10 +125,9 @@ public class BossTransformation : MonoBehaviour
         yield return StartCoroutine(CompleteTransformation());
         
         // 57초까지 유지
-        float remainingTime = transformEndTime - Time.time;
-        if (remainingTime > 0)
+        while (BeatBounce.Instance.GetMusicTime() < transformEndTime)
         {
-            yield return new WaitForSeconds(remainingTime);
+            yield return null;
         }
         
         Debug.Log("[BossTransformation] 변신 씬 종료");
@@ -236,6 +259,182 @@ public class BossTransformation : MonoBehaviour
         {
             Debug.LogWarning("[BossTransformation] 보스 스프라이트가 할당되지 않았습니다!");
         }
+        
+        // 보스 등장 임팩트 애니메이션 (2초)
+        yield return StartCoroutine(BossAppearanceImpact());
+    }
+    
+    IEnumerator BossAppearanceImpact()
+    {
+        if (mouseCursor == null) yield break;
+        
+        Debug.Log("[BossTransformation] 보스 등장 임팩트 시작!");
+        
+        Vector3 originalScale = mouseCursor.localScale;
+        float elapsed = 0f;
+        
+        // 1. 커졌다가 작아지는 임팩트 (0.5초)
+        float scaleUpDuration = 0.3f;
+        float scaleDownDuration = 0.2f;
+        
+        // 커지는 애니메이션
+        elapsed = 0f;
+        while (elapsed < scaleUpDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / scaleUpDuration;
+            float scale = Mathf.Lerp(1f, 1.5f, t);
+            mouseCursor.localScale = originalScale * scale;
+            yield return null;
+        }
+        
+        // 작아지는 애니메이션 (반동)
+        elapsed = 0f;
+        while (elapsed < scaleDownDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / scaleDownDuration;
+            float scale = Mathf.Lerp(1.5f, 1.1f, t);
+            mouseCursor.localScale = originalScale * scale;
+            yield return null;
+        }
+        
+        // 2. 충격파 링 3개 생성 (0.5초 간격)
+        StartCoroutine(CreateShockwaveRing(mouseCursor.position, 0f));
+        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(CreateShockwaveRing(mouseCursor.position, 0.1f));
+        yield return new WaitForSeconds(0.2f);
+        StartCoroutine(CreateShockwaveRing(mouseCursor.position, 0.2f));
+        
+        // 3. 화면 흔들림 (1초)
+        if (Camera.main != null)
+        {
+            StartCoroutine(ScreenShake(1f, 0.3f));
+        }
+        
+        // 4. 보스 주변에 파티클 지속 생성 (0.5초)
+        float particleDuration = 0.5f;
+        elapsed = 0f;
+        int particleCount = 0;
+        while (elapsed < particleDuration)
+        {
+            elapsed += Time.deltaTime;
+            
+            // 0.05초마다 파티클 생성
+            if (Time.frameCount % 3 == 0 && particleCount < 30)
+            {
+                float randomAngle = Random.Range(0f, 360f);
+                CreateFlashParticle(mouseCursor.position, randomAngle);
+                particleCount++;
+            }
+            
+            yield return null;
+        }
+        
+        // 5. 원래 크기로 복귀 (부드럽게)
+        elapsed = 0f;
+        float returnDuration = 0.5f;
+        Vector3 currentScale = mouseCursor.localScale;
+        while (elapsed < returnDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / returnDuration;
+            mouseCursor.localScale = Vector3.Lerp(currentScale, originalScale, t);
+            yield return null;
+        }
+        
+        mouseCursor.localScale = originalScale;
+        Debug.Log("[BossTransformation] 보스 등장 임팩트 완료!");
+    }
+    
+    IEnumerator CreateShockwaveRing(Vector3 center, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        
+        GameObject ring = new GameObject("ShockwaveRing");
+        SpriteRenderer sr = ring.AddComponent<SpriteRenderer>();
+        
+        // 링 텍스처 생성 (원형)
+        Texture2D ringTexture = new Texture2D(64, 64);
+        Color ringColor = new Color(1f, 0.5f, 0.2f, 0.8f); // 주황색
+        
+        for (int y = 0; y < 64; y++)
+        {
+            for (int x = 0; x < 64; x++)
+            {
+                float dx = x - 32f;
+                float dy = y - 32f;
+                float distance = Mathf.Sqrt(dx * dx + dy * dy);
+                
+                // 링 모양 (도넛)
+                if (distance > 28f && distance < 32f)
+                {
+                    ringTexture.SetPixel(x, y, ringColor);
+                }
+                else
+                {
+                    ringTexture.SetPixel(x, y, Color.clear);
+                }
+            }
+        }
+        ringTexture.Apply();
+        
+        Sprite ringSprite = Sprite.Create(ringTexture, new Rect(0, 0, 64, 64), new Vector2(0.5f, 0.5f), 10f);
+        sr.sprite = ringSprite;
+        sr.sortingOrder = 500;
+        
+        ring.transform.position = center;
+        ring.transform.localScale = Vector3.one * 0.5f;
+        
+        // 링 확장 애니메이션
+        float duration = 1.5f;
+        float elapsed = 0f;
+        
+        while (elapsed < duration && ring != null)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            
+            // 크기 확대
+            ring.transform.localScale = Vector3.one * Mathf.Lerp(0.5f, 4f, t);
+            
+            // 페이드아웃
+            Color color = sr.color;
+            color.a = Mathf.Lerp(0.8f, 0f, t);
+            sr.color = color;
+            
+            yield return null;
+        }
+        
+        if (ring != null)
+        {
+            Destroy(ring);
+        }
+    }
+    
+    IEnumerator ScreenShake(float duration, float magnitude)
+    {
+        Camera cam = Camera.main;
+        if (cam == null) yield break;
+        
+        Vector3 originalPos = cam.transform.position;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = 1f - (elapsed / duration); // 점점 약해짐
+            
+            float x = Random.Range(-1f, 1f) * magnitude * t;
+            float y = Random.Range(-1f, 1f) * magnitude * t;
+            
+            cam.transform.position = originalPos + new Vector3(x, y, 0f);
+            
+            yield return null;
+        }
+        
+        // 원래 위치로 복귀
+        cam.transform.position = originalPos;
     }
 
     IEnumerator TransformationFlash()
