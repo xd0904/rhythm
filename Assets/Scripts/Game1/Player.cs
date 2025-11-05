@@ -205,14 +205,12 @@ public class Player : MonoBehaviour
             GameObject particle = new GameObject($"DashParticle_{i}");
             SpriteRenderer particleSR = particle.AddComponent<SpriteRenderer>();
             
-            // 아주 작은 사각형 (2x2)
-            Texture2D particleTex = new Texture2D(2, 2);
-            Color[] pixels = new Color[4];
-            for (int p = 0; p < 4; p++) pixels[p] = Color.white;
-            particleTex.SetPixels(pixels);
+            // 매우 작은 사각형 (1x1)
+            Texture2D particleTex = new Texture2D(1, 1);
+            particleTex.SetPixel(0, 0, Color.white);
             particleTex.Apply();
             
-            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f), 10f);
+            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 20f);
             particleSR.color = dashStartColor;
             particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
             
@@ -232,14 +230,12 @@ public class Player : MonoBehaviour
             GameObject particle = new GameObject($"ArrivalParticle_{i}");
             SpriteRenderer particleSR = particle.AddComponent<SpriteRenderer>();
             
-            // 아주 작은 사각형 (2x2)
-            Texture2D particleTex = new Texture2D(2, 2);
-            Color[] pixels = new Color[4];
-            for (int p = 0; p < 4; p++) pixels[p] = Color.white;
-            particleTex.SetPixels(pixels);
+            // 매우 작은 사각형 (1x1)
+            Texture2D particleTex = new Texture2D(1, 1);
+            particleTex.SetPixel(0, 0, Color.white);
             particleTex.Apply();
             
-            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 2, 2), new Vector2(0.5f, 0.5f), 10f);
+            particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 20f);
             particleSR.color = dashEndColor;
             particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
             
@@ -284,7 +280,13 @@ public class Player : MonoBehaviour
             float t = elapsed / lifetime;
             
             // 이동
-            particle.transform.position = startPos + (Vector3)(direction * speed * elapsed);
+            Vector3 newPos = startPos + (Vector3)(direction * speed * elapsed);
+            
+            // 경계 제한 (플레이어와 동일)
+            newPos.x = Mathf.Clamp(newPos.x, minX, maxX);
+            newPos.y = Mathf.Clamp(newPos.y, minY, maxY);
+            
+            particle.transform.position = newPos;
             
             // 페이드아웃
             Color currentColor = startColor;
