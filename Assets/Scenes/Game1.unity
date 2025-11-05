@@ -355,6 +355,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 198122035}
+  - component: {fileID: 198122036}
   m_Layer: 0
   m_Name: WaveParent
   m_TagString: Untagged
@@ -371,12 +372,39 @@ Transform:
   m_GameObject: {fileID: 198122034}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.89, y: 3.39, z: 0.041339684}
+  m_LocalPosition: {x: 1.27, y: 3.43, z: 0.041339684}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &198122036
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 198122034}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a897bb0a46fe2040984858772374a04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beatBounce: {fileID: 1740529744}
+  bounceWavePrefab: {fileID: 3963892975576905091, guid: 02b49500329c491468f4bda64f96ba21, type: 3}
+  waveParent: {fileID: 198122035}
+  seriesCount: 2
+  burstCount: 20
+  waveSpacing: 0.4
+  burstInterval: 1
+  seriesCooldown: 1
+  waveLifetime: 5
+  moveSpeed: 0.2
+  leftFlowSpeed: 0.4
+  amplitude: 0.1
+  destroyBoundaryY: 10
+  startSyncTime: 28
+  endSyncTime: 44
 --- !u!1 &353205613
 GameObject:
   m_ObjectHideFlags: 0
@@ -2378,7 +2406,7 @@ MonoBehaviour:
   bigWavePrefab: {fileID: 3243375885853720917, guid: 2eb040fe1677cfb428e0c7ff21b87922, type: 3}
   bounceWavePrefab: {fileID: 3963892975576905091, guid: 02b49500329c491468f4bda64f96ba21, type: 3}
   waveParent: {fileID: 198122035}
-  waveCount: 80
+  waveCount: 50
   waveSpacing: 0.3
   waveAmplitude: 1.5
   moveSpeed: 15
