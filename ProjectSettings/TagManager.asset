@@ -10,6 +10,7 @@ TagManager:
   - Wave
   - BounceWave
   - TwoTriangle
+  - IsoscelesTriangle
   layers:
   - Default
   - TransparentFX
