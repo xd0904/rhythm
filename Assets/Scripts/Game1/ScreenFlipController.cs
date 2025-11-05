@@ -20,11 +20,16 @@ public class ScreenFlipController : MonoBehaviour
     public Color dragLineColor = new Color(0.3f, 0.8f, 1f, 0.8f); // 청록색
     public float dragLineWidth = 5f;
     
+    [Header("마우스 이동")]
+    public float mouseMoveStartTime = 42f; // 마우스 이동 시작 시간 (44초 2초 전)
+    public float mouseMoveDuration = 1.5f; // 마우스 이동 시간
+    
     private bool isFlipped = false;
     private bool isFlipping = false;
     private Vector3 dragStartPos;
     private bool isDragging = false;
     private bool autoFlipTriggered = false;
+    private bool mouseMoveTriggered = false;
     
     // 드래그 시각 효과용
     private GameObject dragLineObject;
@@ -41,6 +46,13 @@ public class ScreenFlipController : MonoBehaviour
 
     void Update()
     {
+        // 42초에 마우스를 오른쪽으로 이동
+        if (!mouseMoveTriggered && Time.time >= mouseMoveStartTime)
+        {
+            mouseMoveTriggered = true;
+            StartCoroutine(MoveMouseToRight());
+        }
+        
         // 44초에 자동 플립
         if (!autoFlipTriggered && Time.time >= autoFlipTime)
         {
@@ -96,6 +108,43 @@ public class ScreenFlipController : MonoBehaviour
         }
     }
     
+    IEnumerator MoveMouseToRight()
+    {
+        if (mouseCursor == null)
+        {
+            Debug.LogWarning("[ScreenFlip] 마우스 커서가 할당되지 않았습니다!");
+            yield break;
+        }
+        
+        Vector3 startPos = mouseCursor.position;
+        
+        // 화면 오른쪽 끝 위치 계산 (약간 안쪽으로)
+        Vector3 screenRightPos = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width * 0.95f, Screen.height * 0.5f, 10f));
+        screenRightPos.z = startPos.z; // Z 위치는 유지
+        
+        float elapsed = 0f;
+        
+        Debug.Log($"[ScreenFlip] 마우스를 오른쪽으로 이동 시작: {startPos} → {screenRightPos}");
+        
+        while (elapsed < mouseMoveDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / mouseMoveDuration;
+            
+            // Ease-in-out 곡선으로 부드럽게 이동
+            float smoothT = Mathf.SmoothStep(0f, 1f, t);
+            
+            mouseCursor.position = Vector3.Lerp(startPos, screenRightPos, smoothT);
+            
+            yield return null;
+        }
+        
+        // 최종 위치 확정
+        mouseCursor.position = screenRightPos;
+        
+        Debug.Log($"[ScreenFlip] 마우스 이동 완료! 위치: {mouseCursor.position}");
+    }
+
     void CreateDragLine()
     {
         // 드래그 라인 오브젝트 생성

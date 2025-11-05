@@ -2090,6 +2090,8 @@ MonoBehaviour:
   mouseCursor: {fileID: 924480924}
   dragLineColor: {r: 0.3, g: 0.8, b: 1, a: 0.8}
   dragLineWidth: 5
+  mouseMoveStartTime: 42
+  mouseMoveDuration: 1.5
 --- !u!4 &1438955275
 Transform:
   m_ObjectHideFlags: 0
@@ -2392,6 +2394,63 @@ MonoBehaviour:
   trailColor: {r: 1, g: 0, b: 0, a: 1}
   trailFadeDistance: 2
   triangleBeatsPerSpawn: 4
+--- !u!1 &1841797413
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1841797415}
+  - component: {fileID: 1841797414}
+  m_Layer: 0
+  m_Name: BossTransformationManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1841797414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841797413}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0073dec09554ae34f97c4e8444c096cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  transformStartTime: 44
+  transformCompleteTime: 55
+  transformEndTime: 57
+  mouseCursor: {fileID: 924480924}
+  mouseRenderer: {fileID: 924480926}
+  bossSprite: {fileID: 9101181774743214751, guid: 34641adc183d90947a4d6c1b60cc0ebd, type: 3}
+  orbCount: 30
+  orbSpawnRadius: 8
+  orbColor: {r: 0.83921576, g: 0.17254902, b: 0.17254902, a: 1}
+  orbSize: 0.3
+  orbSpeed: 2
+  collectRadius: 0.5
+  mouseMaxScale: 8
+--- !u!4 &1841797415
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1841797413}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.695415, y: 2.1928508, z: 1.9103199}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1844002972
 GameObject:
   m_ObjectHideFlags: 0
@@ -2838,3 +2897,4 @@ SceneRoots:
   - {fileID: 198122035}
   - {fileID: 2085585817}
   - {fileID: 1438955275}
+  - {fileID: 1841797415}
