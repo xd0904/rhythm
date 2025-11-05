@@ -15,9 +15,12 @@ public class BeatBounce : MonoBehaviour
     public float colorChangeStart = 6.4f;         // 색상 변화 시작 (Beat 16)
     public float colorChangeEnd = 25.6f;          // 색상 변화 끝 (Beat 64)
     
-    [Header("추가 색상 변화 오브젝트")]
-    public GameObject colorChangeObject1;         // 색상 변화 오브젝트 1
-    public GameObject colorChangeObject2;         // 색상 변화 오브젝트 2
+    [Header("그림자 설정")]
+    public GameObject topShadow;         // 위 그림자
+    public GameObject bottomShadow;      // 아래 그림자
+    public float shadowMaxY = 278f;      // 그림자 최대 Y 이동 거리
+    public float shadowMaxScale = 100f;  // 그림자 최대 스케일
+    public float shadowGrowDuration = 0.5f; // 그림자 커지는 시간
     
     [Header("6방향 발사 설정")]
     public GameObject ballPrefab;         // 발사될 볼 (중앙으로 이동)
@@ -62,8 +65,8 @@ public class BeatBounce : MonoBehaviour
     [Header("Wave Settings")]
     public GameObject wavePrefab;     // 물결 오브젝트 프리팹
     public GameObject wavePrefabAlt;     // 새로운 물결용 프리팹
-    public GameObject bigWavePrefab;      // 큰 물결용 프리팹
-    public GameObject bounceWavePrefab;   // 위아래로 빠르게 진동하는 물결 프리팹
+    public GameObject bigWavePrefab;     // 큰 물결 프리팹 (위아래)
+    public GameObject bounceWavePrefab;  // 위아래 튕기는 물결 프리팹
     public Transform waveParent;      // 빈 오브젝트로 정리용 부모
     public int waveCount = 100;        // 한 줄당 오브젝트 개수
     public float waveSpacing = 0.05f;    // 오브젝트 간 간격
@@ -72,6 +75,19 @@ public class BeatBounce : MonoBehaviour
     public float waveSpeed = 3f;      // 흔들림 속도
     public float startX = 4f;        // 오른쪽 화면 바깥 시작 위치
     private bool waveSpawned = false; // 한 번만 실행 플래그
+    
+    [Header("이등변삼각형 패턴 (13.7초 ~ 25.7초)")]
+    public GameObject isoscelesTrianglePrefab;  // 이등변삼각형 프리팹
+    public GameObject gameWindow;               // 게임 창 오브젝트 (마스크 영역)
+    public float trianglePatternStart = 13.7f;  // 패턴 시작 시간
+    public float trianglePatternEnd = 25.7f;    // 패턴 끝 시간
+    public float triangleMoveTime = 0.2f;       // 1/4박자 (마우스→창 안 랜덤 위치)
+    public float triangleFlySpeed = 8f;         // 날아가는 속도
+    public float trailThickness = 0.1f;         // 궤적 선 두께
+    public Color trailColor = Color.red;        // 궤적 선 색상
+    public float trailFadeDistance = 2f;        // 창에서 이 거리만큼 멀어지면 완전 투명
+    public int triangleBeatsPerSpawn = 4;       // 4박자마다 삼각형 생성
+    private int trianglePatternCounter = 0;     // 패턴 카운터
 
 
 
@@ -97,16 +113,42 @@ public class BeatBounce : MonoBehaviour
         }
         
         // 사전 로딩: 색상 변화 준비 (음악 시작 전에 컴포넌트 캐싱)
-        if (colorChangeObject1 != null)
+        if (topShadow != null)
         {
-            colorChangeObject1.GetComponent<SpriteRenderer>();
-            colorChangeObject1.GetComponent<UnityEngine.UI.Image>();
+            topShadow.GetComponent<SpriteRenderer>();
+            topShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            // 그림자 초기 투명 설정
+            SpriteRenderer topSR = topShadow.GetComponent<SpriteRenderer>();
+            UnityEngine.UI.Image topImg = topShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            Color transparentColor = startDiamondColor;
+            transparentColor.a = 0f;
+            
+            if (topSR != null) topSR.color = transparentColor;
+            else if (topImg != null) topImg.color = transparentColor;
+            
+            topShadow.transform.localScale = Vector3.one * shadowMaxScale; // 100으로 시작
+            topShadow.transform.localPosition = new Vector3(topShadow.transform.localPosition.x, shadowMaxY, topShadow.transform.localPosition.z); // Y=278
         }
         
-        if (colorChangeObject2 != null)
+        if (bottomShadow != null)
         {
-            colorChangeObject2.GetComponent<SpriteRenderer>();
-            colorChangeObject2.GetComponent<UnityEngine.UI.Image>();
+            bottomShadow.GetComponent<SpriteRenderer>();
+            bottomShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            // 그림자 초기 투명 설정
+            SpriteRenderer bottomSR = bottomShadow.GetComponent<SpriteRenderer>();
+            UnityEngine.UI.Image bottomImg = bottomShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            Color transparentColor = startDiamondColor;
+            transparentColor.a = 0f;
+            
+            if (bottomSR != null) bottomSR.color = transparentColor;
+            else if (bottomImg != null) bottomImg.color = transparentColor;
+            
+            bottomShadow.transform.localScale = Vector3.one * shadowMaxScale; // 100으로 시작
+            bottomShadow.transform.localPosition = new Vector3(bottomShadow.transform.localPosition.x, -shadowMaxY, bottomShadow.transform.localPosition.z); // Y=-278
         }
     }
 
@@ -126,11 +168,55 @@ public class BeatBounce : MonoBehaviour
         {
             lastBeatIndex = currentBeatIndex;
             
-            // 다이아몬드 바운스 (음악 시작하면 항상 생성)
-            SpawnAndGrowDiamond(currentMusicTime);
+            // 다이아몬드 바운스 (13.7초 이전까지만 생성)
+            if (currentMusicTime < trianglePatternStart)
+            {
+                SpawnAndGrowDiamond(currentMusicTime);
+            }
             
-            // 공격 패턴 (6.3초 ~ 25.7초 사이만, 마지막 발사 제외)
-            if (currentMusicTime >= attackStartTime && currentMusicTime < attackEndTime - beatInterval)
+            // 그림자 다이아몬드 패턴 (13.7초 ~ 25.7초만)
+            if (currentMusicTime >= trianglePatternStart && currentMusicTime < trianglePatternEnd)
+            {
+                if (topShadow != null)
+                {
+                    StartCoroutine(GrowShadow(topShadow, true)); // 위쪽
+                }
+                if (bottomShadow != null)
+                {
+                    StartCoroutine(GrowShadow(bottomShadow, false)); // 아래쪽
+                }
+            }
+            // 25.7초 이후면 그림자 페이드아웃 및 모든 삼각형 제거
+            else if (currentMusicTime >= trianglePatternEnd)
+            {
+                if (topShadow != null || bottomShadow != null)
+                {
+                    StartCoroutine(FadeOutShadows());
+                    
+                    // 모든 이등변삼각형 즉시 제거
+                    GameObject[] triangles = GameObject.FindGameObjectsWithTag("IsoscelesTriangle");
+                    foreach (GameObject triangle in triangles)
+                    {
+                        Destroy(triangle);
+                    }
+                    
+                    topShadow = null; // 한 번만 실행되도록
+                    bottomShadow = null;
+                }
+            }
+            
+            // 이등변삼각형 패턴 (13.7초 ~ 25.7초, 4박자마다)
+            if (currentMusicTime >= trianglePatternStart && currentMusicTime < trianglePatternEnd)
+            {
+                if (trianglePatternCounter % triangleBeatsPerSpawn == 0)
+                {
+                    // 4박자마다 이등변삼각형 생성
+                    SpawnBouncingTriangle();
+                }
+                trianglePatternCounter++;
+            }
+            // 공격 패턴 (6.3초 ~ 13.7초, 기존 볼 발사 패턴)
+            else if (currentMusicTime >= attackStartTime && currentMusicTime < trianglePatternStart)
             {
                 // 4/4박자 기준: 1박자 = 발사, 2박자 = 터짐, 3박자 = 발사, 4박자 = 터짐
                 int beatInCycle = attackBeatCounter % 2; // 발사-터짐 2박자 주기
@@ -172,21 +258,27 @@ public class BeatBounce : MonoBehaviour
         musicStartTime = AudioSettings.dspTime;
         lastBeatIndex = -1;
         
-        // 배경 어두워지기 (논블로킹)
+        // 배경 어두워지기 (그림자는 나중에)
         if (background != null)
         {
             StartCoroutine(DarkenBackground());
         }
         
-        // 추가 오브젝트 색상 변화 시작 (논블로킹, 지연 시작)
-        if (colorChangeObject1 != null)
+        // 그림자는 6.4초까지 서서히 페이드인
+        if (topShadow != null || bottomShadow != null)
         {
-            colorChangeCoroutine1 = StartCoroutine(ChangeObjectColorDelayed(colorChangeObject1, 0.1f));
+            StartCoroutine(FadeInShadowsDelayed());
         }
         
-        if (colorChangeObject2 != null)
+        // 그림자 색상 변화 시작 (논블로킹, 지연 시작)
+        if (topShadow != null)
         {
-            colorChangeCoroutine2 = StartCoroutine(ChangeObjectColorDelayed(colorChangeObject2, 0.15f));
+            colorChangeCoroutine1 = StartCoroutine(ChangeObjectColorDelayed(topShadow, 0.1f));
+        }
+        
+        if (bottomShadow != null)
+        {
+            colorChangeCoroutine2 = StartCoroutine(ChangeObjectColorDelayed(bottomShadow, 0.15f));
         }
         
         Debug.Log($"[BeatBounce] 음악 시작 시간 리셋: {musicStartTime}");
@@ -361,18 +453,19 @@ public class BeatBounce : MonoBehaviour
     }
     
     /// <summary>
-    /// 배경 어두워지는 효과
+    /// 배경 어두워지는 효과 (그림자 제외)
     /// </summary>
     private IEnumerator DarkenBackground()
     {
         if (background == null) yield break;
         
-        SpriteRenderer spriteRenderer = background.GetComponent<SpriteRenderer>();
-        UnityEngine.UI.Image image = background.GetComponent<UnityEngine.UI.Image>();
+        SpriteRenderer bgSpriteRenderer = background.GetComponent<SpriteRenderer>();
+        UnityEngine.UI.Image bgImage = background.GetComponent<UnityEngine.UI.Image>();
         
-        Color startColor = Color.white;
-        if (spriteRenderer != null) startColor = spriteRenderer.color;
-        else if (image != null) startColor = image.color;
+        // 시작 색상
+        Color bgStartColor = Color.white;
+        if (bgSpriteRenderer != null) bgStartColor = bgSpriteRenderer.color;
+        else if (bgImage != null) bgStartColor = bgImage.color;
         
         float elapsed = 0f;
         
@@ -381,18 +474,285 @@ public class BeatBounce : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / fadeDuration;
             
-            Color currentColor = Color.Lerp(startColor, darkColor, t);
-            
-            if (spriteRenderer != null) spriteRenderer.color = currentColor;
-            else if (image != null) image.color = currentColor;
+            // 배경 어두워지기
+            Color currentBgColor = Color.Lerp(bgStartColor, darkColor, t);
+            if (bgSpriteRenderer != null) bgSpriteRenderer.color = currentBgColor;
+            else if (bgImage != null) bgImage.color = currentBgColor;
             
             yield return null;
         }
         
-        if (spriteRenderer != null) spriteRenderer.color = darkColor;
-        else if (image != null) image.color = darkColor;
+        // 최종 색상 설정
+        if (bgSpriteRenderer != null) bgSpriteRenderer.color = darkColor;
+        else if (bgImage != null) bgImage.color = darkColor;
         
         Debug.Log("[BeatBounce] 배경 어두워짐 완료");
+    }
+    
+    /// <summary>
+    /// 그림자 페이드인 (0초 ~ 6.4초)
+    /// </summary>
+    private IEnumerator FadeInShadowsDelayed()
+    {
+        if (topShadow == null && bottomShadow == null) yield break;
+        
+        // 그림자 컴포넌트 가져오기
+        SpriteRenderer topShadowSR = null;
+        UnityEngine.UI.Image topShadowImg = null;
+        SpriteRenderer bottomShadowSR = null;
+        UnityEngine.UI.Image bottomShadowImg = null;
+        
+        if (topShadow != null)
+        {
+            topShadowSR = topShadow.GetComponent<SpriteRenderer>();
+            topShadowImg = topShadow.GetComponent<UnityEngine.UI.Image>();
+        }
+        
+        if (bottomShadow != null)
+        {
+            bottomShadowSR = bottomShadow.GetComponent<SpriteRenderer>();
+            bottomShadowImg = bottomShadow.GetComponent<UnityEngine.UI.Image>();
+        }
+        
+        // 그림자 시작 색상 (투명)
+        Color topShadowStartColor = startDiamondColor;
+        Color bottomShadowStartColor = startDiamondColor;
+        topShadowStartColor.a = 0f;
+        bottomShadowStartColor.a = 0f;
+        
+        // 그림자 목표 색상 (불투명)
+        Color topShadowTargetColor = startDiamondColor;
+        Color bottomShadowTargetColor = startDiamondColor;
+        topShadowTargetColor.a = 1f;
+        bottomShadowTargetColor.a = 1f;
+        
+        // 그림자 초기 설정 (투명, 스케일 0, 위치 초기화)
+        if (topShadowSR != null) topShadowSR.color = topShadowStartColor;
+        else if (topShadowImg != null) topShadowImg.color = topShadowStartColor;
+        
+        if (bottomShadowSR != null) bottomShadowSR.color = bottomShadowStartColor;
+        else if (bottomShadowImg != null) bottomShadowImg.color = bottomShadowStartColor;
+        
+        // 그림자 초기 스케일 및 위치 설정 (100 크기, Y=±278에서 시작)
+        if (topShadow != null)
+        {
+            topShadow.transform.localScale = Vector3.one * shadowMaxScale; // 100으로 시작
+            topShadow.transform.localPosition = new Vector3(topShadow.transform.localPosition.x, shadowMaxY, topShadow.transform.localPosition.z); // Y=278
+        }
+        if (bottomShadow != null)
+        {
+            bottomShadow.transform.localScale = Vector3.one * shadowMaxScale; // 100으로 시작
+            bottomShadow.transform.localPosition = new Vector3(bottomShadow.transform.localPosition.x, -shadowMaxY, bottomShadow.transform.localPosition.z); // Y=-278
+        }
+        
+        // 6.4초까지 기다리면서 페이드인
+        float targetTime = colorChangeStart; // 6.4초
+        float startTime = 0f;
+        float duration = targetTime - startTime;
+        
+        while (GetMusicTime() < targetTime)
+        {
+            double currentTime = GetMusicTime();
+            float t = Mathf.Clamp01((float)(currentTime - startTime) / duration);
+            
+            // 그림자 페이드인
+            Color currentTopColor = Color.Lerp(topShadowStartColor, topShadowTargetColor, t);
+            Color currentBottomColor = Color.Lerp(bottomShadowStartColor, bottomShadowTargetColor, t);
+            
+            if (topShadowSR != null) topShadowSR.color = currentTopColor;
+            else if (topShadowImg != null) topShadowImg.color = currentTopColor;
+            
+            if (bottomShadowSR != null) bottomShadowSR.color = currentBottomColor;
+            else if (bottomShadowImg != null) bottomShadowImg.color = currentBottomColor;
+            
+            yield return null;
+        }
+        
+        // 최종 색상 설정
+        if (topShadowSR != null) topShadowSR.color = topShadowTargetColor;
+        else if (topShadowImg != null) topShadowImg.color = topShadowTargetColor;
+        
+        if (bottomShadowSR != null) bottomShadowSR.color = bottomShadowTargetColor;
+        else if (bottomShadowImg != null) bottomShadowImg.color = bottomShadowTargetColor;
+        
+        Debug.Log("[BeatBounce] 그림자 페이드인 완료 (0초~6.4초)");
+    }
+    
+    /// <summary>
+    /// 그림자 페이드아웃 (25.7초 이후)
+    /// </summary>
+    private IEnumerator FadeOutShadows()
+    {
+        if (topShadow == null && bottomShadow == null) yield break;
+        
+        SpriteRenderer topShadowSR = null;
+        UnityEngine.UI.Image topShadowImg = null;
+        SpriteRenderer bottomShadowSR = null;
+        UnityEngine.UI.Image bottomShadowImg = null;
+        
+        Color topStartColor = Color.white;
+        Color bottomStartColor = Color.white;
+        
+        if (topShadow != null)
+        {
+            topShadowSR = topShadow.GetComponent<SpriteRenderer>();
+            topShadowImg = topShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            if (topShadowSR != null) topStartColor = topShadowSR.color;
+            else if (topShadowImg != null) topStartColor = topShadowImg.color;
+        }
+        
+        if (bottomShadow != null)
+        {
+            bottomShadowSR = bottomShadow.GetComponent<SpriteRenderer>();
+            bottomShadowImg = bottomShadow.GetComponent<UnityEngine.UI.Image>();
+            
+            if (bottomShadowSR != null) bottomStartColor = bottomShadowSR.color;
+            else if (bottomShadowImg != null) bottomStartColor = bottomShadowImg.color;
+        }
+        
+        float elapsed = 0f;
+        float fadeDuration = 1f;
+        
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / fadeDuration;
+            
+            // 투명하게
+            if (topShadow != null)
+            {
+                Color topColor = topStartColor;
+                topColor.a = Mathf.Lerp(topStartColor.a, 0f, t);
+                
+                if (topShadowSR != null) topShadowSR.color = topColor;
+                else if (topShadowImg != null) topShadowImg.color = topColor;
+            }
+            
+            if (bottomShadow != null)
+            {
+                Color bottomColor = bottomStartColor;
+                bottomColor.a = Mathf.Lerp(bottomStartColor.a, 0f, t);
+                
+                if (bottomShadowSR != null) bottomShadowSR.color = bottomColor;
+                else if (bottomShadowImg != null) bottomShadowImg.color = bottomColor;
+            }
+            
+            yield return null;
+        }
+        
+        // 완전 투명
+        if (topShadow != null)
+        {
+            Color topColor = topStartColor;
+            topColor.a = 0f;
+            if (topShadowSR != null) topShadowSR.color = topColor;
+            else if (topShadowImg != null) topShadowImg.color = topColor;
+            
+            // 그림자 비활성화
+            topShadow.SetActive(false);
+        }
+        
+        if (bottomShadow != null)
+        {
+            Color bottomColor = bottomStartColor;
+            bottomColor.a = 0f;
+            if (bottomShadowSR != null) bottomShadowSR.color = bottomColor;
+            else if (bottomShadowImg != null) bottomShadowImg.color = bottomColor;
+            
+            // 그림자 비활성화
+            bottomShadow.SetActive(false);
+        }
+        
+        Debug.Log("[BeatBounce] 그림자 페이드아웃 완료 (비활성화됨)");
+    }
+    
+    /// <summary>
+    /// 그림자 커지고 움직이는 애니메이션 (작아졌다가 커지기)
+    /// </summary>
+    private IEnumerator GrowShadow(GameObject shadow, bool isTop)
+    {
+        if (shadow == null) yield break;
+        
+        // 현재 색상 가져오기 (빨간색으로 변한 상태)
+        SpriteRenderer shadowSR = shadow.GetComponent<SpriteRenderer>();
+        UnityEngine.UI.Image shadowImg = shadow.GetComponent<UnityEngine.UI.Image>();
+        
+        Color currentColor = endDiamondColor; // 빨간색
+        if (shadowSR != null) currentColor = shadowSR.color;
+        else if (shadowImg != null) currentColor = shadowImg.color;
+        
+        Vector3 startPos = shadow.transform.localPosition;
+        Vector3 targetPos = startPos;
+        
+        // 위쪽이면 Y를 0→278, 아래쪽이면 Y를 0→-278
+        targetPos.y = isTop ? shadowMaxY : -shadowMaxY;
+        
+        Vector3 startScale = Vector3.one * shadowMaxScale; // 100부터 시작
+        Vector3 targetScale = Vector3.zero; // 0으로 작아지기
+        
+        float elapsed = 0f;
+        
+        // 100에서 0으로 작아지고 움직이기
+        while (elapsed < shadowGrowDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / shadowGrowDuration;
+            
+            // Ease-out 곡선
+            float smoothT = 1f - Mathf.Pow(1f - t, 2f);
+            
+            if (shadow != null)
+            {
+                shadow.transform.localScale = Vector3.Lerp(startScale, targetScale, smoothT);
+                shadow.transform.localPosition = new Vector3(
+                    startPos.x,
+                    Mathf.Lerp(0, targetPos.y, smoothT),
+                    startPos.z
+                );
+            }
+            
+            yield return null;
+        }
+        
+        // 최소 크기/위치 도달
+        if (shadow != null)
+        {
+            shadow.transform.localScale = targetScale;
+            shadow.transform.localPosition = targetPos;
+        }
+        
+        // 잠시 유지
+        yield return new WaitForSeconds(0.1f);
+        
+        // 다시 100으로 커지면서 돌아가기
+        elapsed = 0f;
+        while (elapsed < shadowGrowDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / shadowGrowDuration;
+            
+            float smoothT = 1f - Mathf.Pow(1f - t, 2f);
+            
+            if (shadow != null)
+            {
+                shadow.transform.localScale = Vector3.Lerp(targetScale, startScale, smoothT);
+                shadow.transform.localPosition = new Vector3(
+                    startPos.x,
+                    Mathf.Lerp(targetPos.y, 0, smoothT),
+                    startPos.z
+                );
+            }
+            
+            yield return null;
+        }
+        
+        // 최종 위치/스케일 복원
+        if (shadow != null)
+        {
+            shadow.transform.localScale = startScale;
+            shadow.transform.localPosition = new Vector3(startPos.x, 0, startPos.z);
+        }
     }
     
     /// <summary>
@@ -685,7 +1045,7 @@ public class BeatBounce : MonoBehaviour
 
     private IEnumerator SpawnWaveCoroutine()
     {
-        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null || bigWavePrefab == null || bounceWavePrefab == null)
+        if (wavePrefab == null || waveParent == null || wavePrefabAlt == null)
         {
             Debug.LogWarning("[BeatBounce] Wave Prefab 또는 Parent가 설정되지 않았습니다!");
             yield break;
@@ -740,9 +1100,6 @@ public class BeatBounce : MonoBehaviour
                 3, 1, 0.4f, 5f,
                 1.5f, 0.8f, 0.6f, 1.0f));
 
-
-
-
             yield return new WaitForSeconds(0.1f); // 순차 생성
         }
     }
@@ -794,6 +1151,12 @@ public class BeatBounce : MonoBehaviour
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
 
+            if (wave.transform.position.y < -7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
+
             yield return null;
         }
 
@@ -810,17 +1173,17 @@ public class BeatBounce : MonoBehaviour
         while (wave != null && timer < 1.5f)
         {
             timer += Time.deltaTime * speed;
-
-            // 좌우 흔들림
             float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
-
-            // 위로 이동 (짧은 물결)
             float moveY = timer * moveSpeed * 6f;
-
-            // 왼쪽 흐름
             float moveX = -timer * leftFlowSpeed * 1.8f;
 
             wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
+
+            if (wave.transform.position.y > 7f)
+            {
+                Destroy(wave);
+                yield break;
+            }
 
             yield return null;
         }
@@ -829,6 +1192,188 @@ public class BeatBounce : MonoBehaviour
             Destroy(wave);
     }
 
+    /// <summary>
+    /// 이등변삼각형 생성 및 튕기기 (13.7초 ~ 25.7초 패턴)
+    /// </summary>
+    private void SpawnBouncingTriangle()
+    {
+        if (isoscelesTrianglePrefab == null || mousePosition == null)
+        {
+            Debug.LogWarning("[BeatBounce] 이등변삼각형 프리팹 또는 마우스가 없습니다!");
+            return;
+        }
+
+        // 창 안 랜덤 위치 계산 (게임 창 경계)
+        Bounds windowBounds = GetWindowBounds();
+        Vector3 randomWindowPos = new Vector3(
+            Random.Range(windowBounds.min.x, windowBounds.max.x),
+            Random.Range(windowBounds.min.y, windowBounds.max.y),
+            0
+        );
+
+        // 랜덤 방향 벡터 (정규화)
+        Vector2 randomDirection = new Vector2(
+            Random.Range(-1f, 1f),
+            Random.Range(-1f, 1f)
+        ).normalized;
+
+        // 이등변삼각형 생성
+        GameObject triangle = Instantiate(isoscelesTrianglePrefab, mousePosition.position, Quaternion.identity);
+        
+        // SpriteRenderer 설정 (원본 유지, sortingOrder = 3으로 마스크 적용)
+        SpriteRenderer sr = triangle.GetComponent<SpriteRenderer>();
+        if (sr != null)
+        {
+            sr.sortingOrder = 3; // 마스크가 적용되도록
+        }
+        
+        // TrailRenderer 추가
+        TrailRenderer trail = triangle.GetComponent<TrailRenderer>();
+        if (trail == null)
+        {
+            trail = triangle.AddComponent<TrailRenderer>();
+        }
+        trail.time = 2f; // 궤적 유지 시간
+        trail.startWidth = trailThickness;
+        trail.endWidth = trailThickness * 0.5f;
+        trail.material = new Material(Shader.Find("Sprites/Default"));
+        trail.startColor = trailColor;
+        trail.endColor = new Color(trailColor.r, trailColor.g, trailColor.b, 0f);
+        trail.sortingOrder = -1; // 창보다 아래 (창 밖에서만 보이도록)
+
+        // 삼각형 애니메이션 시작
+        StartCoroutine(BouncingTriangleSequence(triangle, randomWindowPos, randomDirection, trail));
+        
+        Debug.Log($"[BeatBounce] 이등변삼각형 생성: {mousePosition.position} → {randomWindowPos}, 방향: {randomDirection}");
+    }
+    /// <summary>
+    /// 이등변삼각형 애니메이션 시퀀스
+    /// </summary>
+    private IEnumerator BouncingTriangleSequence(GameObject triangle, Vector3 targetPos, Vector2 direction, TrailRenderer trail)
+    {
+        if (triangle == null) yield break;
+
+        Vector3 startPos = triangle.transform.position;
+        
+        // 1단계: 마우스 → 창 안 랜덤 위치 (1/4박자 = beatInterval / 4)
+        float moveTime = beatInterval / 4f;
+        float elapsed = 0f;
+
+        while (elapsed < moveTime)
+        {
+            if (triangle == null) yield break;
+            
+            elapsed += Time.deltaTime;
+            float t = elapsed / moveTime;
+            triangle.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            
+            // 방향 회전 (삼각형이 이동 방향을 향하도록)
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
+            
+            yield return null;
+        }
+
+        // 2단계: 2/4박자 대기 후 날아가기
+        yield return new WaitForSeconds(beatInterval / 2f);
+        
+        // 3단계: 랜덤 방향으로 쭉 날아가기 (화면 경계에서 반사)
+        Vector2 velocity = direction * triangleFlySpeed;
+        Vector3 currentPos = targetPos;
+
+        float maxTime = trianglePatternEnd - trianglePatternStart; // 최대 생존 시간
+        elapsed = 0f;
+
+        while (elapsed < maxTime && triangle != null)
+        {
+            elapsed += Time.deltaTime;
+            
+            // 위치 업데이트
+            currentPos += (Vector3)(velocity * Time.deltaTime);
+            
+            // 화면 경계 체크 및 반사 (입사각 = 반사각)
+            Bounds screenBounds = GetScreenBounds();
+            
+            // X축 반사
+            if (currentPos.x <= screenBounds.min.x || currentPos.x >= screenBounds.max.x)
+            {
+                velocity.x = -velocity.x;
+                currentPos.x = Mathf.Clamp(currentPos.x, screenBounds.min.x, screenBounds.max.x);
+            }
+            
+            // Y축 반사
+            if (currentPos.y <= screenBounds.min.y || currentPos.y >= screenBounds.max.y)
+            {
+                velocity.y = -velocity.y;
+                currentPos.y = Mathf.Clamp(currentPos.y, screenBounds.min.y, screenBounds.max.y);
+            }
+            
+            triangle.transform.position = currentPos;
+            
+            // 방향 회전
+            float angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90f;
+            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
+            
+            yield return null;
+        }
+
+        // 삭제
+        if (triangle != null)
+        {
+            Destroy(triangle);
+        }
+    }
+
+    /// <summary>
+    /// 게임 창 경계 반환
+    /// </summary>
+    private Bounds GetWindowBounds()
+    {
+        if (gameWindow != null)
+        {
+            // gameWindow의 Collider2D 또는 RectTransform에서 경계 가져오기
+            Collider2D col = gameWindow.GetComponent<Collider2D>();
+            if (col != null)
+            {
+                return col.bounds;
+            }
+            
+            // RectTransform인 경우 (UI)
+            RectTransform rect = gameWindow.GetComponent<RectTransform>();
+            if (rect != null)
+            {
+                Vector3[] corners = new Vector3[4];
+                rect.GetWorldCorners(corners);
+                Bounds bounds = new Bounds(corners[0], Vector3.zero);
+                foreach (Vector3 corner in corners)
+                {
+                    bounds.Encapsulate(corner);
+                }
+                return bounds;
+            }
+        }
+
+        // 기본값 (대략적인 창 크기)
+        return new Bounds(Vector3.zero, new Vector3(6f, 4f, 0f));
+    }
+
+    /// <summary>
+    /// 화면 경계 반환 (전체 화면)
+    /// </summary>
+    private Bounds GetScreenBounds()
+    {
+        // Camera 기준 화면 경계
+        Camera cam = Camera.main;
+        if (cam != null)
+        {
+            float height = cam.orthographicSize * 2f;
+            float width = height * cam.aspect;
+            return new Bounds(Vector3.zero, new Vector3(width, height, 0f));
+        }
+
+        // 기본값
+        return new Bounds(Vector3.zero, new Vector3(20f, 12f, 0f));
+    }
 
     // ✅ 위에서 아래로 짧은 버스트 여러 줄이 연속으로 쏟아지는 버전
     private IEnumerator VerticalBounceDiagonalBurstSeriesDown(
@@ -883,4 +1428,5 @@ public class BeatBounce : MonoBehaviour
 
 
 }
+
 

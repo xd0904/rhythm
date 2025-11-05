@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 5ec3ecd5e158c904584005db7756934c
+guid: 34641adc183d90947a4d6c1b60cc0ebd
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9028898955805777263
-    second: Group 219_0
+      213: 9101181774743214751
+    second: BossChange_0
+  - first:
+      213: -743464374115230548
+    second: BossChange_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +116,45 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Group 219_0
+      name: BossChange_0
       rect:
         serializedVersion: 2
-        x: 10
-        y: 34
-        width: 209
-        height: 364
+        x: 0
+        y: 0
+        width: 189
+        height: 218
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 1922d42ac38e2b280800000000000000
-      internalID: -9028898955805777263
+      spriteID: f9a14df9a94ed4e70800000000000000
+      internalID: 9101181774743214751
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: BossChange_1
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 189
+        height: 188
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cac14bd371faea5f0800000000000000
+      internalID: -743464374115230548
       vertices: []
       indices: 
       edges: []
@@ -138,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 2287214475000124cb70f488c5ae29d0
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Group 219_0: -9028898955805777263
+      BossChange_0: 9101181774743214751
+      BossChange_1: -743464374115230548
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
