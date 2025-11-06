@@ -362,11 +362,35 @@ public class BossBulletPattern : MonoBehaviour
             yield break;
         }
         
+        // 플레이어 위치에서 -45도 각도로 보스 위치 계산 (오른쪽 아래)
+        float angleMinus45 = -45f * Mathf.Deg2Rad;
+        float distance = 8f; // 플레이어로부터의 거리
+        Vector3 bossAttackPosition = player.position + new Vector3(
+            Mathf.Cos(angleMinus45) * distance,  // x (오른쪽)
+            Mathf.Sin(angleMinus45) * distance,  // y (아래)
+            0f
+        );
+        
+        // 화면 경계 확인 (화면 안에 있도록)
+        float screenLeft = mainCamera.ScreenToWorldPoint(new Vector3(0, 0, 10f)).x;
+        float screenRight = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, 0, 10f)).x;
+        float screenBottom = mainCamera.ScreenToWorldPoint(new Vector3(0, 0, 10f)).y;
+        float screenTop = mainCamera.ScreenToWorldPoint(new Vector3(0, Screen.height, 10f)).y;
+        
+        // 보스 위치를 화면 안으로 제한 (약간의 여유 공간)
+        float margin = 2f;
+        bossAttackPosition.x = Mathf.Clamp(bossAttackPosition.x, screenLeft + margin, screenRight - margin);
+        bossAttackPosition.y = Mathf.Clamp(bossAttackPosition.y, screenBottom + margin, screenTop - margin);
+        bossAttackPosition.z = mouseCursor.position.z; // Z값은 원래 마우스 커서의 Z값 유지!
+        
+        // 마우스 커서를 공격 위치로 이동
+        mouseCursor.position = bossAttackPosition;
+        
         // 원래 위치와 크기로 리셋
         bossMouse.localPosition = bossMouseOriginalLocalPosition;
         bossMouse.localScale = bossMouseOriginalScale;
         
-        Debug.Log($"[BossBulletPattern] 공격 시작 전 상태 - 크기: {bossMouse.localScale}, 위치: {bossMouse.localPosition}");
+        Debug.Log($"[BossBulletPattern] 보스 위치: {bossAttackPosition}, 플레이어: {player.position}");
         
         // 1단계: 마우스 커지기 (2초)
         float elapsed = 0f;
@@ -390,12 +414,11 @@ public class BossBulletPattern : MonoBehaviour
         bossMouse.localScale = targetScale;
         Debug.Log($"[BossBulletPattern] 마우스 커짐 완료! 크기: {bossMouse.localScale}");
         
-        // 2단계: 플레이어 쪽으로 발사
+        // 2단계: -45도 각도로 발사 (왼쪽 위로)
         Vector3 startPos = bossMouse.position;
-        Vector3 targetPos = player.position;
-        Vector3 direction = (targetPos - startPos).normalized;
+        Vector3 direction = new Vector3(-Mathf.Cos(angleMinus45), -Mathf.Sin(angleMinus45), 0f).normalized; // 왼쪽 위로
         
-        Debug.Log($"[BossBulletPattern] 마우스 발사! {startPos} → {targetPos}");
+        Debug.Log($"[BossBulletPattern] 마우스 45도 발사! 시작: {startPos}, 방향: {direction}");
         
         // 부모에서 분리 (독립적으로 날아가도록)
         Transform originalParent = bossMouse.parent;
