@@ -880,12 +880,12 @@ public class BeatBounce : MonoBehaviour
             return;
         }
         
-        // 마우스를 화면 밖 랜덤 위치로 설정
-        Vector3 randomMousePos = new Vector3(
-            Random.Range(mouseMinX, mouseMaxX),  // 화면 양옆 밖에서 랜덤
-            Random.Range(minY, maxY),            // Y축 랜덤
-            mousePosition.position.z
-        );
+        // 화면 경계 및 게임 창 경계 가져오기
+        Bounds screenBounds = GetScreenBounds();
+        Bounds windowBounds = GetWindowBounds();
+        
+        // 마우스를 게임창 밖 랜덤 위치로 설정
+        Vector3 randomMousePos = GetRandomPositionOutsideWindow(screenBounds, windowBounds);
         
         // 마우스 부드럽게 이동한 후 볼 발사
         StartCoroutine(MoveMouseAndShoot(randomMousePos));
