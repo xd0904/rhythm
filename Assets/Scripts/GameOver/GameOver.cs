@@ -112,12 +112,13 @@ public class GameOver : MonoBehaviour
         targetImage.localScale = scaredScale;
         targetImage.localRotation = originalRotation;
         
-        // 일정 시간 후 Intro 씬으로 돌아가기
+        // 일정 시간 후 Game1 씬으로 돌아가기 (44초부터 시작)
         yield return new WaitForSeconds(returnDelay);
         
-        // GameOver에서 돌아왔다는 플래그 설정
-        GameSequenceManager.ReturnFromGameOver = true;
+        // Game1의 44초(마우스 커지는 부분)부터 시작하도록 플래그 설정
+        PlayerPrefs.SetFloat("StartTime", 44f);
+        PlayerPrefs.Save();
         
-        SceneManager.LoadScene("Intro");
+        SceneManager.LoadScene("Game1");
     }
 }
