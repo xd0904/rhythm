@@ -2085,6 +2085,58 @@ RectTransform:
   m_AnchoredPosition: {x: 0.00020984467, y: 0.100809366}
   m_SizeDelta: {x: 1.2, y: 1.2}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!1 &1173599379
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1173599380}
+  - component: {fileID: 1173599381}
+  m_Layer: 0
+  m_Name: "\uD0C4\uB9C9 \uBC1C\uC0AC\uAE30"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1173599380
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173599379}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2.5350442, y: 2.1225278, z: 0.009847447}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1173599381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1173599379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda0d6b3f33ece945be32468676727d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beatBounce: {fileID: 1740529744}
+  missilePrefab: {fileID: 8631546433748357033, guid: 3af84c37b5a17e24b8c65d1b4beba90c, type: 3}
+  missileCount: 4
+  spawnDelay: 0.2
+  fireDelay: 0.5
+  missileSpeed: 8
+  spreadAngle: 90
+  spawnRadius: 0.5
 --- !u!1 &1438955273
 GameObject:
   m_ObjectHideFlags: 0
@@ -2926,3 +2978,4 @@ SceneRoots:
   - {fileID: 1545155523}
   - {fileID: 465735090}
   - {fileID: 981275979}
+  - {fileID: 1173599380}

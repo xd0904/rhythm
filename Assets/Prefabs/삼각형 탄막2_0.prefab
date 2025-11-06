@@ -103,16 +103,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b4c9742bec510643a8175dd0a257e7c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 5
-  destroyBoundary: 12
-  homingDuration: 0.3
-  reflectDuration: 0.5
-  explosionEffectPrefab: {fileID: 0}
-  idleColor: {r: 1, g: 1, b: 1, a: 1}
-  launchColor: {r: 1, g: 0, b: 0, a: 1}
-  flashIntensity: 2
-  colorFadeSpeed: 5
-  initialOffset: {x: 0, y: 0, z: 0}
+  missileSpeed: 0
+  IsReadyToFire: 0
+  lifeTime: 3
 --- !u!60 &-8447196354987098161
 PolygonCollider2D:
   m_ObjectHideFlags: 0
