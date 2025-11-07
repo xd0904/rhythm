@@ -1,99 +1,57 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
 public class GuidedMissile : MonoBehaviour
 {
-    public float moveSpeed = 5f;
-    public float destroyBoundary = 12f; // 화면 밖 경계
-    public float homingDuration = 0.3f; // 유도 유지 시간
 
-    // 외부에서 설정될 초기 오프셋 (회전 계산에만 사용)
-    [HideInInspector] public Vector3 initialOffset;
+    // Launcher 스크립트에서 설정해줄 변수들
+    [HideInInspector] public float missileSpeed;
+    [HideInInspector] public bool IsReadyToFire = false;
 
-    private Vector3 targetDirection;
-    private GameObject playerTarget;
-    private float startTime;
-    private bool isLaunched = false; // 이동 대기 플래그
+    [Header("소멸 설정")]
+    public float lifeTime = 3f; // 발사 후 3초 뒤에 사라짐
 
-    private Vector3 spawnPosition; // ⭐ 탄막의 고정 위치
+    private Vector3 initialDirection;
 
-    void Start()
+    void Awake()
     {
-        // 1. 플레이어 오브젝트를 찾습니다.
-        playerTarget = GameObject.FindGameObjectWithTag("Player");
+        // Awake에서 초기 방향을 저장. (Instantiate될 때의 방향)
+        // 이 방향으로 계속 직진하게 됩니다.
+        initialDirection = transform.up;
 
-        // ⭐ 2. 현재 탄막이 생성된 월드 위치를 spawnPosition에 저장합니다.
-        spawnPosition = transform.position;
-    }
-
-    // ⭐ PatternController에서 호출될 공격 시작 함수
-    public void Launch()
-    {
-        isLaunched = true;
-        startTime = Time.time; // 발사 시간 기록
-
-        // 공격 명령을 받은 시점의 플레이어 위치를 향해 방향 설정
-        if (playerTarget != null)
-        {
-            targetDirection = (playerTarget.transform.position - transform.position).normalized;
-        }
-        else
-        {
-            targetDirection = Vector3.down;
-        }
+        // Start()가 아닌 Awake()에서 설정하므로, Instanstiate 직후 바로 설정 가능
+        // 하지만 발사는 IsReadyToFire = true 가 된 후에 이루어집니다.
     }
 
     void Update()
     {
-        if (playerTarget == null) return;
-
-        if (!isLaunched)
+        // IsReadyToFire가 true일 때만 이동
+        if (IsReadyToFire)
         {
-            // =============================================
-            // ⭐ 대기 상태: 위치 고정 및 플레이어 바라보기
-            // =============================================
-
-            // ⭐ 위치를 생성 당시의 위치(spawnPosition)로 강제 고정
-            transform.position = spawnPosition;
-
-            // 플레이어를 바라보도록 회전
-            Vector3 dir = playerTarget.transform.position - transform.position;
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90));
-
-            return; // 발사되지 않았으면 여기서 Update 종료
-        }
-
-        // =============================================
-        // ⭐ 발사 (Launched) 로직 (isLaunched == true일 때만 실행)
-        // =============================================
-
-        // 1. 유도 (Homing) 로직: 유도 시간 동안 방향 갱신
-        if (Time.time < startTime + homingDuration)
-        {
-            targetDirection = (playerTarget.transform.position - transform.position).normalized;
-
-            float angle = Mathf.Atan2(targetDirection.y, targetDirection.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle - 90));
-        }
-
-        // 2. 이동 로직
-        transform.position += targetDirection * moveSpeed * Time.deltaTime;
-
-        // 3. 화면 밖 파괴 로직
-        if (Mathf.Abs(transform.position.x) > destroyBoundary ||
-            Mathf.Abs(transform.position.y) > destroyBoundary)
-        {
-            Destroy(gameObject);
+            // 초기 방향으로 직진 이동
+            transform.position += initialDirection * missileSpeed * Time.deltaTime;
         }
     }
 
-    // 4. 충돌 파괴 로직 (플레이어 피격)
-    private void OnTriggerEnter2D(Collider2D other)
+    // 발사 명령이 내려지면(IsReadyToFire = true) 이 코루틴을 시작합니다.
+    public void LaunchMissile()
     {
-        if (other.CompareTag("Player"))
-        {
-            // ⭐ (여기서 플레이어 피격 처리 로직을 호출)
-            Destroy(gameObject);
-        }
+        // 미사일 발사 허용
+        IsReadyToFire = true;
+        // 수명 코루틴 시작
+        StartCoroutine(DestroyAfterTime(lifeTime));
     }
+
+    // 수명 관리를 위한 코루틴
+    IEnumerator DestroyAfterTime(float delay)
+    {
+        // 설정된 시간만큼 대기
+        yield return new WaitForSeconds(delay);
+
+        // 오브젝트 소멸
+        Destroy(gameObject);
+    }
+
+
 }
