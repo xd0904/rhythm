@@ -11,11 +11,8 @@ public class BossTransformation : MonoBehaviour
     
     [Header("대상 오브젝트")]
     public Transform mouseCursor; // 마우스 커서 (보스로 변신!)
-    public SpriteRenderer mouseRenderer; // 마우스 스프라이트
-    
-    [Header("변신 스프라이트")]
-    public Sprite bossSprite; // 보스 이미지
-    private Sprite originalMouseSprite; // 원래 마우스 이미지
+    public GameObject normalMouse; // Mouse (1) - 일반 마우스
+    public GameObject bossHead; // BossHead - 보스 모드
     
     [Header("오브 설정")]
     public int orbCount = 80; // 생성할 작은 오브 개수 (44~55초, 11초 동안)
@@ -53,26 +50,24 @@ public class BossTransformation : MonoBehaviour
             originalMouseScale = mouseCursor.localScale;
         }
         
-        if (mouseRenderer != null)
-        {
-            originalMouseSprite = mouseRenderer.sprite;
-        }
-        
         // 마우스 자동 찾기
         if (mouseCursor == null)
         {
-            GameObject mouseObj = GameObject.Find("MouseCursor");
+            GameObject mouseObj = GameObject.Find("Mouse");
             if (mouseObj != null)
             {
                 mouseCursor = mouseObj.transform;
-                mouseRenderer = mouseObj.GetComponent<SpriteRenderer>();
                 originalMouseScale = mouseCursor.localScale;
-                if (mouseRenderer != null)
-                {
-                    originalMouseSprite = mouseRenderer.sprite;
-                }
+                
+                // 자식 오브젝트 찾기
+                normalMouse = mouseObj.transform.Find("Mouse (1)")?.gameObject;
+                bossHead = mouseObj.transform.Find("BossHead")?.gameObject;
             }
         }
+        
+        // 초기 상태: 일반 마우스 ON, 보스 OFF
+        if (normalMouse != null) normalMouse.SetActive(true);
+        if (bossHead != null) bossHead.SetActive(false);
     }
 
     void Update()
@@ -248,16 +243,36 @@ public class BossTransformation : MonoBehaviour
         // 변신 폭발 효과
         yield return StartCoroutine(TransformationFlash());
         
-        // 마우스를 보스 이미지로 변경
-        if (mouseRenderer != null && bossSprite != null)
+        // 일반 마우스 OFF, 보스 ON
+        if (normalMouse != null)
         {
-            mouseRenderer.sprite = bossSprite;
+            normalMouse.SetActive(false);
+            Debug.Log("[BossTransformation] Mouse (1) 비활성화");
+        }
+        
+        if (bossHead != null)
+        {
+            bossHead.SetActive(true);
+            
+            // BossHead 위치를 현재 마우스 위치로 설정 (오른쪽 끝)
+            if (normalMouse != null)
+            {
+                // normalMouse와 같은 위치에 배치
+                bossHead.transform.position = normalMouse.transform.position;
+                bossHead.transform.rotation = normalMouse.transform.rotation;
+            }
+            else
+            {
+                // normalMouse가 없으면 부모 위치 사용
+                bossHead.transform.localPosition = Vector3.zero;
+            }
+            
             isTransformed = true;
-            Debug.Log("[BossTransformation] 마우스가 보스로 변신 완료!");
+            Debug.Log($"[BossTransformation] BossHead 활성화 - 위치: {bossHead.transform.position}");
         }
         else
         {
-            Debug.LogWarning("[BossTransformation] 보스 스프라이트가 할당되지 않았습니다!");
+            Debug.LogWarning("[BossTransformation] BossHead가 할당되지 않았습니다!");
         }
         
         // 보스 등장 임팩트 애니메이션 (2초)
@@ -536,18 +551,24 @@ public class BossTransformation : MonoBehaviour
     
     public void RevertTransformation()
     {
-        if (mouseRenderer != null && originalMouseSprite != null)
+        // 보스 OFF, 일반 마우스 ON
+        if (bossHead != null)
         {
-            mouseRenderer.sprite = originalMouseSprite;
-            
-            if (mouseCursor != null)
-            {
-                mouseCursor.localScale = originalMouseScale;
-            }
-            
-            isTransformed = false;
-            Debug.Log("[BossTransformation] 원래 마우스로 복귀");
+            bossHead.SetActive(false);
         }
+        
+        if (normalMouse != null)
+        {
+            normalMouse.SetActive(true);
+        }
+        
+        if (mouseCursor != null)
+        {
+            mouseCursor.localScale = originalMouseScale;
+        }
+        
+        isTransformed = false;
+        Debug.Log("[BossTransformation] 원래 마우스로 복귀");
     }
 }
 

@@ -880,12 +880,12 @@ public class BeatBounce : MonoBehaviour
             return;
         }
         
-        // 마우스를 화면 밖 랜덤 위치로 설정
-        Vector3 randomMousePos = new Vector3(
-            Random.Range(mouseMinX, mouseMaxX),  // 화면 양옆 밖에서 랜덤
-            Random.Range(minY, maxY),            // Y축 랜덤
-            mousePosition.position.z
-        );
+        // 화면 경계 및 게임 창 경계 가져오기
+        Bounds screenBounds = GetScreenBounds();
+        Bounds windowBounds = GetWindowBounds();
+        
+        // 마우스를 게임창 밖 랜덤 위치로 설정
+        Vector3 randomMousePos = GetRandomPositionOutsideWindow(screenBounds, windowBounds);
         
         // 마우스 부드럽게 이동한 후 볼 발사
         StartCoroutine(MoveMouseAndShoot(randomMousePos));
@@ -1210,13 +1210,15 @@ public class BeatBounce : MonoBehaviour
             return;
         }
 
-        // 창 안 랜덤 위치 계산 (게임 창 경계)
+        // 화면 경계 및 게임 창 경계 가져오기
+        Bounds screenBounds = GetScreenBounds();
         Bounds windowBounds = GetWindowBounds();
-        Vector3 randomWindowPos = new Vector3(
-            Random.Range(windowBounds.min.x, windowBounds.max.x),
-            Random.Range(windowBounds.min.y, windowBounds.max.y),
-            0
-        );
+        
+        // 마우스를 게임창 밖 랜덤 위치로 이동
+        Vector3 randomMousePos = GetRandomPositionOutsideWindow(screenBounds, windowBounds);
+        
+        // 이등변삼각형 생성 위치도 게임창 밖 랜덤 위치
+        Vector3 randomSpawnPos = GetRandomPositionOutsideWindow(screenBounds, windowBounds);
 
         // 랜덤 방향 벡터 (정규화)
         Vector2 randomDirection = new Vector2(
@@ -1224,8 +1226,11 @@ public class BeatBounce : MonoBehaviour
             Random.Range(-1f, 1f)
         ).normalized;
 
-        // 이등변삼각형 생성
-        GameObject triangle = Instantiate(isoscelesTrianglePrefab, mousePosition.position, Quaternion.identity);
+        // 마우스를 게임창 밖으로 먼저 이동
+        StartCoroutine(MoveMouseToPosition(randomMousePos));
+        
+        // 이등변삼각형 생성 (게임창 밖에서)
+        GameObject triangle = Instantiate(isoscelesTrianglePrefab, randomSpawnPos, Quaternion.identity);
         
         // SpriteRenderer 설정 (원본 유지, sortingOrder = 3으로 마스크 적용)
         SpriteRenderer sr = triangle.GetComponent<SpriteRenderer>();
@@ -1249,47 +1254,118 @@ public class BeatBounce : MonoBehaviour
         trail.sortingOrder = -1; // 창보다 아래 (창 밖에서만 보이도록)
 
         // 삼각형 애니메이션 시작
-        StartCoroutine(BouncingTriangleSequence(triangle, randomWindowPos, randomDirection, trail));
+        StartCoroutine(BouncingTriangleSequence(triangle, randomSpawnPos, randomDirection, trail));
         
-        Debug.Log($"[BeatBounce] 이등변삼각형 생성: {mousePosition.position} → {randomWindowPos}, 방향: {randomDirection}");
+        Debug.Log($"[BeatBounce] 이등변삼각형 생성: {randomSpawnPos}, 마우스: {randomMousePos}, 방향: {randomDirection}");
+    }
+    
+    /// <summary>
+    /// 게임창 밖의 랜덤 위치 반환 (화면 안, 게임창 밖)
+    /// </summary>
+    private Vector3 GetRandomPositionOutsideWindow(Bounds screenBounds, Bounds windowBounds)
+    {
+        Vector3 randomPos;
+        int maxAttempts = 20;
+        int attempts = 0;
+        
+        do
+        {
+            // 화면 안의 랜덤 위치
+            randomPos = new Vector3(
+                Random.Range(screenBounds.min.x, screenBounds.max.x),
+                Random.Range(screenBounds.min.y, screenBounds.max.y),
+                0
+            );
+            attempts++;
+        }
+        while (IsInsideWindow(randomPos, windowBounds) && attempts < maxAttempts);
+        
+        // 최대 시도 후에도 창 안이면 강제로 창 밖으로 배치
+        if (IsInsideWindow(randomPos, windowBounds))
+        {
+            // 창의 4방향 중 랜덤으로 선택해서 밖에 배치
+            int side = Random.Range(0, 4);
+            switch (side)
+            {
+                case 0: // 왼쪽
+                    randomPos.x = windowBounds.min.x - Random.Range(1f, 3f);
+                    randomPos.y = Random.Range(screenBounds.min.y, screenBounds.max.y);
+                    break;
+                case 1: // 오른쪽
+                    randomPos.x = windowBounds.max.x + Random.Range(1f, 3f);
+                    randomPos.y = Random.Range(screenBounds.min.y, screenBounds.max.y);
+                    break;
+                case 2: // 위쪽
+                    randomPos.y = windowBounds.max.y + Random.Range(1f, 3f);
+                    randomPos.x = Random.Range(screenBounds.min.x, screenBounds.max.x);
+                    break;
+                case 3: // 아래쪽
+                    randomPos.y = windowBounds.min.y - Random.Range(1f, 3f);
+                    randomPos.x = Random.Range(screenBounds.min.x, screenBounds.max.x);
+                    break;
+            }
+        }
+        
+        return randomPos;
+    }
+    
+    /// <summary>
+    /// 위치가 게임창 안에 있는지 확인
+    /// </summary>
+    private bool IsInsideWindow(Vector3 position, Bounds windowBounds)
+    {
+        return position.x >= windowBounds.min.x && position.x <= windowBounds.max.x &&
+               position.y >= windowBounds.min.y && position.y <= windowBounds.max.y;
+    }
+    
+    /// <summary>
+    /// 마우스를 특정 위치로 이동
+    /// </summary>
+    private IEnumerator MoveMouseToPosition(Vector3 targetPos)
+    {
+        if (mousePosition == null) yield break;
+        
+        Vector3 startPos = mousePosition.position;
+        float elapsed = 0f;
+        float duration = mouseMoveDuration;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+            
+            // 부드러운 이동 (Ease-out)
+            float smoothT = 1f - Mathf.Pow(1f - t, 3f);
+            mousePosition.position = Vector3.Lerp(startPos, targetPos, smoothT);
+            
+            yield return null;
+        }
+        
+        mousePosition.position = targetPos;
     }
     /// <summary>
     /// 이등변삼각형 애니메이션 시퀀스
     /// </summary>
-    private IEnumerator BouncingTriangleSequence(GameObject triangle, Vector3 targetPos, Vector2 direction, TrailRenderer trail)
+    private IEnumerator BouncingTriangleSequence(GameObject triangle, Vector3 startPos, Vector2 direction, TrailRenderer trail)
     {
         if (triangle == null) yield break;
 
-        Vector3 startPos = triangle.transform.position;
+        // 삼각형은 이미 게임창 밖에서 생성됨
+        triangle.transform.position = startPos;
         
-        // 1단계: 마우스 → 창 안 랜덤 위치 (1/4박자 = beatInterval / 4)
-        float moveTime = beatInterval / 4f;
-        float elapsed = 0f;
-
-        while (elapsed < moveTime)
-        {
-            if (triangle == null) yield break;
-            
-            elapsed += Time.deltaTime;
-            float t = elapsed / moveTime;
-            triangle.transform.position = Vector3.Lerp(startPos, targetPos, t);
-            
-            // 방향 회전 (삼각형이 이동 방향을 향하도록)
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
-            
-            yield return null;
-        }
-
-        // 2단계: 2/4박자 대기 후 날아가기
-        yield return new WaitForSeconds(beatInterval / 2f);
+        // 방향 회전 (삼각형이 이동 방향을 향하도록)
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
         
-        // 3단계: 랜덤 방향으로 쭉 날아가기 (화면 경계에서 반사)
+        // 1/4박자 대기 후 날아가기
+        yield return new WaitForSeconds(beatInterval / 4f);
+        
+        // 2단계: 랜덤 방향으로 쭉 날아가기 (화면 경계에서 반사)
         Vector2 velocity = direction * triangleFlySpeed;
-        Vector3 currentPos = targetPos;
+        Vector3 currentPos = startPos;
 
         float maxTime = trianglePatternEnd - trianglePatternStart; // 최대 생존 시간
-        elapsed = 0f;
+        float elapsed = 0f;
 
         while (elapsed < maxTime && triangle != null)
         {
@@ -1318,8 +1394,8 @@ public class BeatBounce : MonoBehaviour
             triangle.transform.position = currentPos;
             
             // 방향 회전
-            float angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90f;
-            triangle.transform.rotation = Quaternion.Euler(0, 0, angle);
+            float rotationAngle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg - 90f;
+            triangle.transform.rotation = Quaternion.Euler(0, 0, rotationAngle);
             
             yield return null;
         }
