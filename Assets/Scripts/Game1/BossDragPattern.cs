@@ -15,6 +15,7 @@ public class BossDragPattern : MonoBehaviour
     
     [Header("드래그 영역 설정")]
     public GameObject dragAreaPrefab; // 드래그 영역 프리팹 (빨간색 반투명 사각형)
+    public Sprite explosionSprite; // 터질 때 드래그 영역 이미지
     public Color dragAreaColor = new Color(1f, 0f, 0f, 0.5f); // 빨간색 반투명
     public GameObject explosionEffectPrefab; // 폭발 이펙트 프리팹 (사진처럼)
     public GameObject background; // 배경 오브젝트
@@ -135,12 +136,7 @@ public class BossDragPattern : MonoBehaviour
     {
         if (mouseCursor == null) yield break;
         
-        // 보스를 시작 위치로 즉시 이동
-        Vector3 bossStartPos = startPos;
-        bossStartPos.z = mouseCursor.position.z;
-        mouseCursor.position = bossStartPos;
-        
-        // 드래그 영역 생성 (프리팹 크기 그대로)
+        // 드래그 영역 생성 (프리팹 원본 크기로 시작, 왼쪽 위에 배치)
         GameObject dragArea = null;
         if (dragAreaPrefab != null)
         {
@@ -153,42 +149,60 @@ public class BossDragPattern : MonoBehaviour
         
         onAreaCreated?.Invoke(dragArea);
         
+        // 프리팹 원본 크기 저장
+        Vector3 originalScale = dragArea.transform.localScale;
+        
+        // 보스를 프리팹의 왼쪽 위로 이동 (시작점)
+        Vector3 topLeft = GetTopLeftOfPrefab(dragArea, startPos);
+        topLeft.z = mouseCursor.position.z;
+        mouseCursor.position = topLeft;
+        
         float elapsed = 0f;
-        Vector3 dragAreaOriginalScale = dragArea.transform.localScale; // 프리팹 원본 크기 저장
         
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             
-            // 보스 이동
+            // 프리팹이 점점 커짐 (1배 → t배)
             float smoothT = Mathf.SmoothStep(0f, 1f, t);
-            Vector3 bossPos = Vector3.Lerp(startPos, endPos, smoothT);
-            bossPos.z = mouseCursor.position.z;
-            mouseCursor.position = bossPos;
+            dragArea.transform.localScale = originalScale * smoothT;
             
-            // 드래그 영역 위치만 업데이트 (크기는 유지)
-            Vector3 currentEndPos = Vector3.Lerp(startPos, endPos, smoothT);
-            Vector3 center = (startPos + currentEndPos) / 2f;
-            center.z = 0f;
-            
-            dragArea.transform.position = center;
-            // 크기는 프리팹 원본 그대로 유지
-            dragArea.transform.localScale = dragAreaOriginalScale;
+            // 마우스는 프리팹의 오른쪽 아래로 이동
+            Vector3 bottomRight = GetBottomRightOfPrefab(dragArea, startPos);
+            bottomRight.z = mouseCursor.position.z;
+            mouseCursor.position = bottomRight;
             
             yield return null;
         }
         
-        // 최종 위치
-        Vector3 finalPos = endPos;
-        finalPos.z = mouseCursor.position.z;
-        mouseCursor.position = finalPos;
+        // 최종 크기
+        dragArea.transform.localScale = originalScale;
         
-        Vector3 finalCenter = (startPos + endPos) / 2f;
-        finalCenter.z = 0f;
-        dragArea.transform.position = finalCenter;
+        // 마우스를 프리팹의 오른쪽 아래로
+        Vector3 finalBottomRight = GetBottomRightOfPrefab(dragArea, startPos);
+        finalBottomRight.z = mouseCursor.position.z;
+        mouseCursor.position = finalBottomRight;
         
-        Debug.Log($"[BossDragPattern] 드래그 완료: {startPos} → {endPos}");
+        Debug.Log($"[BossDragPattern] 드래그 완료: 왼쪽 위 → 오른쪽 아래");
+    }
+    
+    Vector3 GetTopLeftOfPrefab(GameObject prefab, Vector3 center)
+    {
+        if (prefab == null) return center;
+        
+        Vector3 scale = prefab.transform.localScale;
+        Vector3 topLeft = center + new Vector3(-scale.x / 2f, scale.y / 2f, 0f);
+        return topLeft;
+    }
+    
+    Vector3 GetBottomRightOfPrefab(GameObject prefab, Vector3 center)
+    {
+        if (prefab == null) return center;
+        
+        Vector3 scale = prefab.transform.localScale;
+        Vector3 bottomRight = center + new Vector3(scale.x / 2f, -scale.y / 2f, 0f);
+        return bottomRight;
     }
     
     IEnumerator ExplodeDragArea(GameObject dragArea, float duration)
@@ -199,11 +213,19 @@ public class BossDragPattern : MonoBehaviour
         
         Debug.Log($"[BossDragPattern] 폭발 시작! 위치: {explosionCenter}");
         
-        // 1. 배경을 빨갛게
-        StartCoroutine(FlashBackground(Color.red, duration));
+        // 1. 드래그 영역 이미지를 폭발 이미지로 변경
+        if (explosionSprite != null)
+        {
+            SpriteRenderer dragSr = dragArea.GetComponent<SpriteRenderer>();
+            if (dragSr != null)
+            {
+                dragSr.sprite = explosionSprite;
+                Debug.Log("[BossDragPattern] 드래그 영역 이미지를 폭발 이미지로 변경");
+            }
+        }
         
-        // 2. 드래그 영역 삭제
-        Destroy(dragArea);
+        // 2. 배경을 빨갛게
+        StartCoroutine(FlashBackground(Color.red, duration));
         
         // 3. 랜덤 정사각형들 따다닥 소환 (30~50개)
         int squareCount = Random.Range(30, 50);
@@ -222,6 +244,9 @@ public class BossDragPattern : MonoBehaviour
         
         // 4. 나머지 duration 대기
         yield return new WaitForSeconds(duration - 0.06f);
+        
+        // 5. 드래그 영역 삭제
+        Destroy(dragArea);
         
         Debug.Log("[BossDragPattern] 폭발 완료, 원래대로 복구");
     }
@@ -243,11 +268,11 @@ public class BossDragPattern : MonoBehaviour
             yield break;
         }
         
-        // 배경을 빨간색으로 변경하고 order를 1로 올림
+        // 배경을 빨간색으로 변경하고 order를 0으로 올림
         Color redColor = new Color(1f, 0f, 0f, 1f);
         bgSr.color = redColor;
-        bgSr.sortingOrder = 1;
-        Debug.Log($"[BossDragPattern] {background.name} 색상 빨간색 + sortingOrder 1로 변경");
+        bgSr.sortingOrder = 0;
+        Debug.Log($"[BossDragPattern] {background.name} 색상 빨간색 + sortingOrder 0으로 변경");
         
         // duration 동안 대기
         yield return new WaitForSeconds(duration);
