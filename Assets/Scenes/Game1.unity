@@ -3057,7 +3057,7 @@ Transform:
   m_GameObject: {fileID: 1889527671}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 2.05, y: 0.71, z: -0.28088832}
+  m_LocalPosition: {x: 3.17, y: 0.13, z: -0.28088832}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3079,6 +3079,7 @@ MonoBehaviour:
   missilePrefab: {fileID: 2638940183825822579, guid: 76e38b0aca3a2c3478717361a8ab1c48, type: 3}
   outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
   smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
+  beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
   missileCount: 4
   spawnDelay: 0.2
   fireDelay: 0.5

@@ -12,6 +12,9 @@ public class MissileLauncher : MonoBehaviour
     public GameObject missilePrefab;        // 미사일 프리팹 (GuidedMissile 스크립트 포함)
     public GameObject outerObjectPrefab;    // 오브젝트 프리팹
     public GameObject smallCirclePrefab;    // 팡! 터지는 프리팹
+    [Header("이펙트 프리팹")]
+    public GameObject beamPrefab; // 빔 쏘는 연출용
+
     public int missileCount = 4;            // 한 번에 생성할 개수
     public float spawnDelay = 0.2f;         // 각 미사일 생성 간격
     public float fireDelay = 0.5f;          // 마지막 미사일 생성 후 발사까지의 지연
@@ -113,18 +116,34 @@ public class MissileLauncher : MonoBehaviour
                 yield return new WaitForSeconds(spawnDelay);
             }
 
+            yield return new WaitForSeconds(fireDelay);
+
+            // 🔥 빔 일제히 발사!
+            foreach (var outer in spawnedOuters)
+            {
+                if (outer != null && beamPrefab != null)
+                {
+                    // outer의 앞방향으로 살짝 (0.5~1 정도) 밀어서 빔 생성
+                    Vector3 beamOffset = -outer.transform.up * 8f; // 0.8f는 거리, 필요시 조정
+                    Vector3 beamPos = outer.transform.position + beamOffset;
+                    Quaternion beamRot = outer.transform.rotation;
+                    GameObject beam = Instantiate(beamPrefab, beamPos, beamRot);
+
+                    // 빔 길이 및 지속시간 조절
+                    StartCoroutine(BeamShootAndFade(beam, 1f, 0.4f)); // (길이, 유지시간)
+                }
+            }
+
+            foreach (var missile in spawnedMissiles)
+                if (missile != null)
+                    missile.IsReadyToFire = true;
+
             // ✅ 모든 탄막 생성 완료 후 → 큰 오브젝트 한꺼번에 사라지기 시작
             foreach (var outer in spawnedOuters)
             {
                 if (outer != null)
                     StartCoroutine(FadeAndDestroy(outer, 0.8f));
             }
-
-            yield return new WaitForSeconds(fireDelay);
-
-            foreach (var missile in spawnedMissiles)
-                if (missile != null)
-                    missile.IsReadyToFire = true;
         }
     }
 
@@ -179,6 +198,67 @@ public class MissileLauncher : MonoBehaviour
         }
 
         Destroy(obj);
+    }
+
+    // 빔이 쏘아지는 듯한 번쩍 효과
+    private IEnumerator BeamFlashEffect(GameObject outer)
+    {
+        SpriteRenderer sr = outer.GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
+        float flashTime = 0.25f;
+        float elapsed = 0f;
+
+        // 크기 살짝 키우고 밝게 만들기
+        Vector3 originalScale = outer.transform.localScale;
+        while (elapsed < flashTime)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.PingPong(elapsed * 4f, 1f);
+            sr.color = Color.Lerp(sr.color, Color.white, t);
+            outer.transform.localScale = originalScale * (1f + 0.2f * t);
+            yield return null;
+        }
+
+        // 원상복구
+        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 1f);
+        outer.transform.localScale = originalScale;
+    }
+
+    private IEnumerator BeamShootAndFade(GameObject beam, float targetLength, float duration)
+    {
+        if (beam == null) yield break;
+
+        SpriteRenderer sr = beam.GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
+        Vector3 startScale = beam.transform.localScale;
+        Color startColor = sr.color;
+        float elapsed = 0f;
+
+        // 1️⃣ 빔이 빠르게 뻗어나감
+        while (elapsed < 0.1f)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / 0.1f;
+            beam.transform.localScale = new Vector3(startScale.x, Mathf.Lerp(0f, targetLength, t), startScale.z);
+            yield return null;
+        }
+
+        // 2️⃣ 잠깐 유지
+        yield return new WaitForSeconds(duration);
+
+        // 3️⃣ 서서히 사라짐
+        elapsed = 0f;
+        while (elapsed < 0.3f)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / 0.3f);
+            sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        Destroy(beam);
     }
 
 }
