@@ -937,9 +937,10 @@ MonoBehaviour:
   mainCamera: {fileID: 632646935}
   gameWindow: {fileID: 118774634}
   dragAreaPrefab: {fileID: 8932346987546887, guid: bd2f3f9ca91c9494ab739d6747da700b, type: 3}
+  explosionSprite: {fileID: -2332426946593458350, guid: 5c861c3802039994795ec4c64fb28078, type: 3}
   dragAreaColor: {r: 1, g: 0, b: 0, a: 0.5}
   explosionEffectPrefab: {fileID: 0}
-  background: {fileID: 1545155520}
+  background: {fileID: 1545529422}
 --- !u!1 &696100252
 GameObject:
   m_ObjectHideFlags: 0
