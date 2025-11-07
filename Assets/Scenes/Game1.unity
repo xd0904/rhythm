@@ -3077,6 +3077,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   beatBounce: {fileID: 1740529744}
   missilePrefab: {fileID: 2638940183825822579, guid: 76e38b0aca3a2c3478717361a8ab1c48, type: 3}
+  outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
+  smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
   missileCount: 4
   spawnDelay: 0.2
   fireDelay: 0.5

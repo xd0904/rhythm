@@ -10,6 +10,8 @@ public class MissileLauncher : MonoBehaviour
     // 제공된 힌트 변수들
     [Header("미사일 설정")]
     public GameObject missilePrefab;        // 미사일 프리팹 (GuidedMissile 스크립트 포함)
+    public GameObject outerObjectPrefab;    // 오브젝트 프리팹
+    public GameObject smallCirclePrefab;    // 팡! 터지는 프리팹
     public int missileCount = 4;            // 한 번에 생성할 개수
     public float spawnDelay = 0.2f;         // 각 미사일 생성 간격
     public float fireDelay = 0.5f;          // 마지막 미사일 생성 후 발사까지의 지연
@@ -43,43 +45,36 @@ public class MissileLauncher : MonoBehaviour
 
     IEnumerator SpawnAndFireRoutine()
     {
-        // 1. 패턴 시작 시간(57초)까지 대기
-        while (beatBounce.GetMusicTime() < 57f) { yield return null; }
-
+        while (beatBounce.GetMusicTime() < 57f)
+            yield return null;
 
         while (beatBounce.GetMusicTime() >= 57f && beatBounce.GetMusicTime() < 89f)
         {
-            // ✅ 1. 발사 시작 시점에 플레이어 위치 '고정' (중요!)
             Vector3 fixedPlayerPos = playerTransform.position;
-
-
-            // 생성된 미사일을 저장할 리스트
             List<GuidedMissile> spawnedMissiles = new List<GuidedMissile>();
+            List<GameObject> spawnedOuters = new List<GameObject>(); // 🔸 큰 오브젝트 저장 리스트
 
-            // ✅ 2. 미사일 생성
+
             for (int i = 0; i < missileCount; i++)
             {
-                // 부채꼴 각도 계산
                 float angleStep = missileCount > 1 ? spreadAngle / (missileCount - 1f) : 0;
                 float angle = -spreadAngle / 2f + angleStep * i;
 
-                // 스포너 → 고정된 플레이어 위치 방향
                 Vector3 directionToTarget = (fixedPlayerPos - transform.position).normalized;
-
-                // 기본 회전 (플레이어를 향함)
                 Quaternion baseRotation = Quaternion.LookRotation(Vector3.forward, directionToTarget);
-
-                // 부채꼴 각도만큼 회전 추가
                 Quaternion finalRotation = baseRotation * Quaternion.Euler(0, 0, angle);
 
-                // ✅ 플레이어의 '고정된 위치' 주변에 생성 (움직여도 변하지 않음)
-                float spawnRadius = 1.0f;
-                Vector3 spawnPos = fixedPlayerPos + (finalRotation * Vector3.up) * spawnRadius;
+                // 기존 탄막 위치 (작은 원)
+                float innerRadius = 1.0f;
+                Vector3 missilePos = fixedPlayerPos + (finalRotation * Vector3.up) * innerRadius;
 
-                // 미사일 생성
-                GameObject missileObj = Instantiate(missilePrefab, spawnPos, finalRotation);
+                // 새 오브젝트 위치 (더 큰 원)
+                float outerRadius = 2.5f;
+                Vector3 outerPos = fixedPlayerPos + (finalRotation * Vector3.up) * outerRadius;
+
+                // 탄막 생성
+                GameObject missileObj = Instantiate(missilePrefab, missilePos, finalRotation);
                 GuidedMissile missile = missileObj.GetComponent<GuidedMissile>();
-
                 if (missile != null)
                 {
                     missile.IsReadyToFire = false;
@@ -87,19 +82,103 @@ public class MissileLauncher : MonoBehaviour
                     spawnedMissiles.Add(missile);
                 }
 
-                // 미사일 사이 생성 딜레이
+                // 🔸 탄막 주위에 작은 원 3개 팡! 튀는 효과
+                if (smallCirclePrefab != null)
+                {
+                    for (int j = 0; j < 3; j++)
+                    {
+                        // 360도를 3등분해서 각 방향으로 튀게
+                        float burstAngle = j * 120f;
+                        Vector3 dir = Quaternion.Euler(0, 0, burstAngle) * Vector3.up;
+
+                        // 살짝 랜덤 위치로 퍼지게
+                        Vector3 spawnPos = missilePos + dir * Random.Range(0.2f, 0.5f);
+
+                        GameObject circle = Instantiate(smallCirclePrefab, spawnPos, Quaternion.identity);
+
+                        // 크기·속도 랜덤화
+                        float moveDistance = Random.Range(0.8f, 1.3f);
+                        float fadeTime = Random.Range(0.4f, 0.6f);
+                        StartCoroutine(MoveAndFade(circle, dir, moveDistance, fadeTime));
+                    }
+                }
+
+                // 🔸 더 큰 원 오브젝트 생성 + 페이드아웃
+                if (outerObjectPrefab != null)
+                {
+                    GameObject outer = Instantiate(outerObjectPrefab, outerPos, finalRotation);
+                    spawnedOuters.Add(outer);
+                }
+
                 yield return new WaitForSeconds(spawnDelay);
             }
 
-            // ✅ 3. 잠깐 대기 후 일제히 발사
+            // ✅ 모든 탄막 생성 완료 후 → 큰 오브젝트 한꺼번에 사라지기 시작
+            foreach (var outer in spawnedOuters)
+            {
+                if (outer != null)
+                    StartCoroutine(FadeAndDestroy(outer, 0.8f));
+            }
+
             yield return new WaitForSeconds(fireDelay);
 
             foreach (var missile in spawnedMissiles)
-            {
                 if (missile != null)
                     missile.IsReadyToFire = true;
-            }
-
         }
     }
+
+    private IEnumerator FadeAndDestroy(GameObject obj, float duration)
+    {
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr == null)
+        {
+            yield break;
+        }
+
+        float elapsed = 0f;
+        Color startColor = sr.color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
+            sr.color = new Color(startColor.r, startColor.g, startColor.b, alpha);
+            yield return null;
+        }
+
+        Destroy(obj);
+    }
+
+    private IEnumerator MoveAndFade(GameObject obj, Vector3 dir, float distance, float duration)
+    {
+        SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
+        if (sr == null) yield break;
+
+        Vector3 startPos = obj.transform.position;
+        Vector3 targetPos = startPos + dir * distance;
+
+        float elapsed = 0f;
+        Color startColor = sr.color;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / duration;
+
+            // 위치 이동
+            obj.transform.position = Vector3.Lerp(startPos, targetPos, t);
+
+            // 서서히 사라지기
+            sr.color = new Color(startColor.r, startColor.g, startColor.b, 1f - t);
+
+            // 크기 살짝 줄이기
+            obj.transform.localScale = Vector3.one * (1f - 0.3f * t);
+
+            yield return null;
+        }
+
+        Destroy(obj);
+    }
+
 }
