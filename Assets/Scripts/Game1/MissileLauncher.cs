@@ -111,6 +111,15 @@ public class MissileLauncher : MonoBehaviour
                 {
                     GameObject outer = Instantiate(outerObjectPrefab, outerPos, finalRotation);
                     spawnedOuters.Add(outer);
+
+                    // 🔹 SpriteRenderer 색상 조정 (빨간색 + 투명도 조절)
+                    SpriteRenderer sr = outer.GetComponent<SpriteRenderer>();
+                    if (sr != null)
+                    {
+                        // 생성 순서에 따라 투명도 설정 (i=0은 불투명, i가 커질수록 투명)
+                        float alpha = Mathf.Lerp(1f, 0.4f, (float)i / (missileCount - 1f));
+                        sr.color = new Color(1f, 0f, 0f, alpha); // 빨간색 + 투명도
+                    }
                 }
 
                 yield return new WaitForSeconds(spawnDelay);
@@ -123,14 +132,31 @@ public class MissileLauncher : MonoBehaviour
             {
                 if (outer != null && beamPrefab != null)
                 {
-                    // outer의 앞방향으로 살짝 (0.5~1 정도) 밀어서 빔 생성
-                    Vector3 beamOffset = -outer.transform.up * 8f; // 0.8f는 거리, 필요시 조정
+                    // 🔹 outer 즉시 흰색으로 변함
+                    SpriteRenderer outerSr = outer.GetComponent<SpriteRenderer>();
+                    float alpha = 1f; // 기본값
+
+                    var data = outer.GetComponent<OuterData>();
+                    if (data != null)
+                        alpha = data.alpha;
+
+                    if (outerSr != null)
+                        outerSr.color = new Color(1f, 1f, 1f, alpha); // 흰색 + 같은 투명도
+
+                    // 🔹 빔 생성 시 같은 투명도 적용
+                    Vector3 beamOffset = -outer.transform.up * 8f;
                     Vector3 beamPos = outer.transform.position + beamOffset;
                     Quaternion beamRot = outer.transform.rotation;
                     GameObject beam = Instantiate(beamPrefab, beamPos, beamRot);
 
-                    // 빔 길이 및 지속시간 조절
-                    StartCoroutine(BeamShootAndFade(beam, 1f, 0.4f)); // (길이, 유지시간)
+                    SpriteRenderer beamSr = beam.GetComponent<SpriteRenderer>();
+                    if (beamSr != null)
+                    {
+                        Color c = beamSr.color;
+                        beamSr.color = new Color(c.r, c.g, c.b, alpha);
+                    }
+
+                    StartCoroutine(BeamShootAndFade(beam, 1f, 0.4f));
                 }
             }
 
@@ -209,20 +235,20 @@ public class MissileLauncher : MonoBehaviour
         float flashTime = 0.25f;
         float elapsed = 0f;
 
-        // 크기 살짝 키우고 밝게 만들기
+        Color originalColor = sr.color;
         Vector3 originalScale = outer.transform.localScale;
+
         while (elapsed < flashTime)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.PingPong(elapsed * 4f, 1f);
-            sr.color = Color.Lerp(sr.color, Color.white, t);
-            outer.transform.localScale = originalScale * (1f + 0.2f * t);
+            float t = elapsed / flashTime;
+            // 빨강 → 흰색으로 부드럽게 전환
+            sr.color = Color.Lerp(originalColor, Color.white, t);
+            outer.transform.localScale = originalScale * (1f + 0.1f * Mathf.Sin(t * Mathf.PI));
             yield return null;
         }
 
-        // 원상복구
-        sr.color = new Color(sr.color.r, sr.color.g, sr.color.b, 1f);
-        outer.transform.localScale = originalScale;
+        sr.color = Color.white; // 완전히 흰색으로 마무리
     }
 
     private IEnumerator BeamShootAndFade(GameObject beam, float targetLength, float duration)
