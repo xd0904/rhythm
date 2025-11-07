@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 87bed0e8ad38df141a8344ec6979a355
+guid: d620a6bf5e7f6284facf8c00f8700837
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4691834761665015933
-    second: drag_0
+      213: 3483988289918770128
+    second: Polygon 85_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: drag_0
+      name: Polygon 85_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 382
-        height: 388
+        width: 101
+        height: 1183
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d707fd97bdebc1140800000000000000
-      internalID: 4691834761665015933
+      spriteID: 0db9a3604ec995030800000000000000
+      internalID: 3483988289918770128
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      drag_0: 4691834761665015933
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

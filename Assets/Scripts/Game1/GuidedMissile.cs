@@ -10,7 +10,7 @@ public class GuidedMissile : MonoBehaviour
     [HideInInspector] public bool IsReadyToFire = false;
 
     [Header("소멸 설정")]
-    public float lifeTime = 3f; // 발사 후 3초 뒤에 사라짐
+    public float lifeTime = 5f; // 발사 후 3초 뒤에 사라짐
 
     private Vector3 initialDirection;
 
@@ -18,8 +18,8 @@ public class GuidedMissile : MonoBehaviour
     {
         // Awake에서 초기 방향을 저장. (Instantiate될 때의 방향)
         // 이 방향으로 계속 직진하게 됩니다.
-        initialDirection = transform.up;
-
+        initialDirection = -transform.up;
+        LaunchMissile();
         // Start()가 아닌 Awake()에서 설정하므로, Instanstiate 직후 바로 설정 가능
         // 하지만 발사는 IsReadyToFire = true 가 된 후에 이루어집니다.
     }
@@ -37,8 +37,6 @@ public class GuidedMissile : MonoBehaviour
     // 발사 명령이 내려지면(IsReadyToFire = true) 이 코루틴을 시작합니다.
     public void LaunchMissile()
     {
-        // 미사일 발사 허용
-        IsReadyToFire = true;
         // 수명 코루틴 시작
         StartCoroutine(DestroyAfterTime(lifeTime));
     }

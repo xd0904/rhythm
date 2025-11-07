@@ -2124,9 +2124,9 @@ Transform:
   - {fileID: 2085585817}
   - {fileID: 1438955275}
   - {fileID: 1841797415}
-  - {fileID: 2131504729}
   - {fileID: 787115991}
   - {fileID: 639917811}
+  - {fileID: 1889527672}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1075201703
@@ -3031,6 +3031,61 @@ Transform:
   m_Children: []
   m_Father: {fileID: 981275979}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1889527671
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1889527672}
+  - component: {fileID: 1889527673}
+  m_Layer: 0
+  m_Name: "\uD0C4\uB9C9\uC0DD\uC131"
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1889527672
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889527671}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.17, y: 0.13, z: -0.28088832}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981275979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1889527673
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1889527671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cda0d6b3f33ece945be32468676727d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  beatBounce: {fileID: 1740529744}
+  missilePrefab: {fileID: 2638940183825822579, guid: 76e38b0aca3a2c3478717361a8ab1c48, type: 3}
+  outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
+  smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
+  beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
+  missileCount: 4
+  spawnDelay: 0.2
+  fireDelay: 0.5
+  missileSpeed: 8
+  spreadAngle: 90
+  spawnRadius: 0.5
 --- !u!1 &2026007672
 GameObject:
   m_ObjectHideFlags: 0
@@ -3256,4 +3311,3 @@ SceneRoots:
   - {fileID: 1545155523}
   - {fileID: 465735090}
   - {fileID: 981275979}
-  - {fileID: 1173599380}
