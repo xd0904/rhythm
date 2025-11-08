@@ -86,18 +86,13 @@ public class BossDragPattern : MonoBehaviour
     
     IEnumerator DragPatternSequence()
     {
-        // 따 따따따 따따 패턴 (6번)
-        // 각 "따"마다 드래그 → 터짐
-        
-        for (int i = 0; i < 6; i++)
+        // 96초부터 108초까지 계속 반복
+        while (BeatBounce.Instance != null && BeatBounce.Instance.GetMusicTime() < patternEndTime)
         {
             yield return StartCoroutine(CreateDragArea());
             
-            // 다음 "따"까지 대기 (1박자)
-            if (i < 5) // 마지막 공격 후에는 대기 안 함
-            {
-                yield return new WaitForSeconds(beatInterval);
-            }
+            // 다음 공격까지 대기 (1박자)
+            yield return new WaitForSeconds(beatInterval);
         }
         
         Debug.Log("[BossDragPattern] 시퀀스 완료");
