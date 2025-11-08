@@ -371,7 +371,7 @@ public class BossTransformation : MonoBehaviour
         
         // 링 텍스처 생성 (원형)
         Texture2D ringTexture = new Texture2D(64, 64);
-        Color ringColor = new Color(0.965f, 0.118f, 0.129f, 0.8f); // #F61E21 (빨간색)
+        Color ringColor = new Color(1f, 0.5f, 0.2f, 0.8f); // 주황색
         
         for (int y = 0; y < 64; y++)
         {

@@ -563,7 +563,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &575792470
 Transform:
   m_ObjectHideFlags: 0
@@ -937,7 +937,6 @@ MonoBehaviour:
   mainCamera: {fileID: 632646935}
   gameWindow: {fileID: 118774634}
   dragAreaPrefab: {fileID: 8932346987546887, guid: bd2f3f9ca91c9494ab739d6747da700b, type: 3}
-  explosionSprite: {fileID: 0}
   dragAreaColor: {r: 1, g: 0, b: 0, a: 0.5}
   explosionEffectPrefab: {fileID: 0}
   background: {fileID: 1545155520}
@@ -1955,7 +1954,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &945507455
 Transform:
   m_ObjectHideFlags: 0
