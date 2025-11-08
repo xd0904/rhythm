@@ -148,8 +148,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 120.00001, y: 120.00001, z: 120.00001}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 159725284}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -937,9 +937,10 @@ MonoBehaviour:
   mainCamera: {fileID: 632646935}
   gameWindow: {fileID: 118774634}
   dragAreaPrefab: {fileID: 8932346987546887, guid: bd2f3f9ca91c9494ab739d6747da700b, type: 3}
+  explosionSprite: {fileID: -2332426946593458350, guid: 5c861c3802039994795ec4c64fb28078, type: 3}
   dragAreaColor: {r: 1, g: 0, b: 0, a: 0.5}
   explosionEffectPrefab: {fileID: 0}
-  background: {fileID: 1545155520}
+  background: {fileID: 1545529422}
 --- !u!1 &696100252
 GameObject:
   m_ObjectHideFlags: 0
@@ -2127,6 +2128,7 @@ Transform:
   - {fileID: 787115991}
   - {fileID: 639917811}
   - {fileID: 1889527672}
+  - {fileID: 2041029069}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1075201703
@@ -3173,6 +3175,81 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &2041029068
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2041029069}
+  - component: {fileID: 2041029070}
+  m_Layer: 0
+  m_Name: BossRectanglePattern
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2041029069
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041029068}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 3.0202558, y: 2.1162086, z: 568.8992}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981275979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2041029070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2041029068}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02fb007e10857344299bc4fc85e00f8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patternStartTime: 108
+  patternEndTime: 121
+  beatInterval: 0.4
+  gameWindow: {fileID: 118774634}
+  boss: {fileID: 1075201704}
+  bossMoveSpeed: 5
+  bossRushSpeed: 15
+  bossWaitPosition: {x: 5, y: 0, z: 0}
+  bossRushTargetPosition: {x: -5, y: 0, z: 0}
+  vaccineColor: {r: 0, g: 1, b: 0, a: 1}
+  originalBossColor: {r: 1, g: 0, b: 0, a: 1}
+  colorChangeDuration: 0.3
+  noiseDuration: 0.2
+  vaccineProgram: {fileID: 0}
+  redGaugeImage: {fileID: 0}
+  gaugeText: {fileID: 0}
+  gaugeText2: {fileID: 0}
+  gaugeText4: {fileID: 0}
+  percentIncrement: 0.08
+  topRectangles:
+  - {fileID: 8861441649813185161, guid: c98db5a645467d949b59e649e5e98212, type: 3}
+  - {fileID: 6135274680598175947, guid: 4bbe6d086768ec849b898f34c34ceb0f, type: 3}
+  - {fileID: 7637223201918265532, guid: 24a1fe7dbd06ca945aef0178fb5e911c, type: 3}
+  - {fileID: 1903675573072129950, guid: 100925a9a31b1574198aa7181d614e39, type: 3}
+  - {fileID: 665884390155957688, guid: 622e3f7502888be4cbcd5f24c1db7c9d, type: 3}
+  bottomRectangles:
+  - {fileID: 8702611122254897075, guid: 762d3af7c1f64724e9a90e1712fe30ef, type: 3}
+  - {fileID: 8099809194534337635, guid: 62756048747f7ee4cbacfafe7f77c410, type: 3}
+  - {fileID: 7555694481600514878, guid: 8bbb8ab6355c6ea449b3d2cb8fe50031, type: 3}
+  - {fileID: 5606802850964334186, guid: 997c66950c30ca84f93ca911ee283258, type: 3}
+  - {fileID: 2180894902005402115, guid: 9b328613ae20cb543b2ae3ccab67a8d5, type: 3}
 --- !u!1 &2085585815
 GameObject:
   m_ObjectHideFlags: 0
