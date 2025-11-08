@@ -5155,8 +5155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gaugeText: {fileID: 2100628952}
-  errorWindow: {fileID: 861044114}
-  VaccineWindow: {fileID: 162484856}
+  gaugeText2: {fileID: 1028219638}
 --- !u!1 &2109627503
 GameObject:
   m_ObjectHideFlags: 0

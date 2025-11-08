@@ -6,10 +6,8 @@ using UnityEngine.UI;
 public class TextChange : MonoBehaviour
 {
     public Text gaugeText;
+    public Text gaugeText2;
 
-    [Tooltip("에러창 게임오브젝트")]
-    public GameObject errorWindow; 
-    public GameObject VaccineWindow;
 
     void Start()
     {
@@ -20,10 +18,10 @@ public class TextChange : MonoBehaviour
     {
         yield return new WaitForSeconds(2);
 
-        gaugeText.text = "21830";
+        gaugeText.text = "1";
+        gaugeText2.text = "21830";
 
-
-    }
+}
 
    
 }
