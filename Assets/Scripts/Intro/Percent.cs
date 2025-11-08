@@ -64,22 +64,24 @@ public class Percent : MonoBehaviour
     [Tooltip("게임 프로그램 뜬 후 씬 전환까지 대기 시간 (초)")]
     public float sceneTransitionDelay = 2f;
 
+
     public void OnStartButtonClicked()
     {
-        if (!isFilling)
-        {
-            StartCoroutine(FillGauge());
+        
+         StartCoroutine(FillGauge());
 
-            Object.SetActive(true);
-            Object2.SetActive(true);
-            Object3.SetActive(false);
-        }
+         Object.SetActive(true);
+         Object2.SetActive(true);
+         Object3.SetActive(false);
+        
+        
     }
 
     IEnumerator FillGauge()
     {
         isFilling = true;
 
+      
         while (gaugeImage.fillAmount < 0.05f)
         {
             gaugeImage.fillAmount += Time.deltaTime * fillSpeed;
@@ -152,7 +154,7 @@ public class Percent : MonoBehaviour
         
         //Object4.SetActive(true);
     }
-    
+
     private void ChangeToRedImages()
     {
         // 초록색 게이지바 숨기고 빨간색 게이지바 켜기

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 5c861c3802039994795ec4c64fb28078
+guid: 84c4bde714d9bc54e90ed5cde13d1554
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2332426946593458350
-    second: drag_pung_0
+      213: -6531741467596212897
+    second: Frame 207_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,30 +96,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: drag_pung_0
+      name: Frame 207_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 382
-        height: 388
+        width: 178
+        height: 54
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2577fbfbc0e81afd0800000000000000
-      internalID: -2332426946593458350
+      spriteID: f553d3bedb79a55a0800000000000000
+      internalID: -6531741467596212897
       vertices: []
       indices: 
       edges: []
@@ -147,8 +134,7 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable:
-      drag_pung_0: -2332426946593458350
+    nameFileIdTable: {}
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

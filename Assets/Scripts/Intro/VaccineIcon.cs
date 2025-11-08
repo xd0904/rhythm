@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class VaccineIcon : MonoBehaviour
 {
@@ -16,20 +17,35 @@ public class VaccineIcon : MonoBehaviour
     private int clickCount = 0;
     private int trueCount = 0;
 
+    private string sceneName; // 전역 변수로 선언 (여기가 중요!)
+
+    private void Start()
+    {
+        sceneName = SceneManager.GetActiveScene().name;
+    }
+
     private void Update()
     {
-        // GameOver에서 돌아온 경우 즉시 활성화
-        if (GameSequenceManager.ReturnFromGameOver && trueCount == 0)
+        if(sceneName == "Intro")
+        {
+            // GameOver에서 돌아온 경우 즉시 활성화
+            if (GameSequenceManager.ReturnFromGameOver && trueCount == 0)
+            {
+                trueCount = 1;
+                Debug.Log("[VaccineIcon] GameOver 복귀 - 즉시 활성화");
+            }
+
+            // Object가 null이 아닐 때만 체크
+            if (Object != null && Object.activeSelf == true)
+            {
+                trueCount = 1;
+            }
+        }
+        else if(sceneName == "Game2")
         {
             trueCount = 1;
-            Debug.Log("[VaccineIcon] GameOver 복귀 - 즉시 활성화");
         }
         
-        // Object가 null이 아닐 때만 체크
-        if(Object != null && Object.activeSelf == true)
-        {
-            trueCount = 1;
-        }
     }
 
     void OnMouseDown()
