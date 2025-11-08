@@ -15,6 +15,10 @@ public class MissileLauncher : MonoBehaviour
     [Header("이펙트 프리팹")]
     public GameObject beamPrefab; // 빔 쏘는 연출용
 
+    [Header("숨길 오브젝트")]
+    [Tooltip("스크립트 시작 시 비활성화할 오브젝트")]
+    public GameObject objectToHide; // 스크립트 시작 시 숨길 오브젝트
+
     public int missileCount = 4;            // 한 번에 생성할 개수
     public float spawnDelay = 0.2f;         // 각 미사일 생성 간격
     public float fireDelay = 0.5f;          // 마지막 미사일 생성 후 발사까지의 지연
@@ -50,6 +54,13 @@ public class MissileLauncher : MonoBehaviour
     {
         while (beatBounce.GetMusicTime() < 57f)
             yield return null;
+
+        // 스크립트 시작 시(57초) 오브젝트 비활성화
+        if (objectToHide != null)
+        {
+            objectToHide.SetActive(false);
+            Debug.Log("MissileLauncher: 오브젝트를 비활성화했습니다.");
+        }
 
         while (beatBounce.GetMusicTime() >= 57f && beatBounce.GetMusicTime() < 89f)
         {

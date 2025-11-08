@@ -9,6 +9,7 @@ public class Wave : MonoBehaviour
     [Header("Wave Prefabs")]
     public GameObject bounceWavePrefab; // 사용할 물결 오브젝트 프리팹
     public Transform waveParent;       // 생성된 물결을 정리할 부모 오브젝트
+    public GameObject shadowCorridor;  // 그림자복도 오브젝트
 
     [Header("Generation Settings")]
     public int seriesCount = 4;         // 한 번에 쏟아지는 줄(시리즈)의 총 개수
@@ -52,6 +53,13 @@ public class Wave : MonoBehaviour
 
         // 25.7초가 될 때까지 대기합니다.
         yield return new WaitUntil(() => beatBounce.GetMusicTime() >= startSyncTime);
+
+        // 그림자복도 비활성화
+        if (shadowCorridor != null)
+        {
+            shadowCorridor.SetActive(false);
+            Debug.Log("Wave Manager: 그림자복도를 비활성화했습니다.");
+        }
 
         Debug.Log($"Wave Manager: {startSyncTime}초에 도달하여 웨이브 생성 루프를 시작합니다.");
 
