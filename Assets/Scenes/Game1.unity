@@ -1602,8 +1602,8 @@ MonoBehaviour:
   dashCooldown: 0.5
   dashAfterimageCount: 5
   afterimageDuration: 0.3
-  dashStartColor: {r: 0, g: 1, b: 1, a: 0.7}
-  dashEndColor: {r: 1, g: 0, b: 1, a: 0.7}
+  dashStartColor: {r: 0.14509805, g: 0.5568628, b: 0.36078432, a: 0.3137255}
+  dashEndColor: {r: 0.14509805, g: 0.5568628, b: 0.36078432, a: 0.7}
   godMode: 0
   dangerousTags:
   - Triangle
@@ -1612,10 +1612,10 @@ MonoBehaviour:
   - WaveAlt
   - BounceWave
   - IsoscelesTriangle
-  minX: -8
-  maxX: 8
-  minY: -4.5
-  maxY: 4.5
+  minX: -4.4
+  maxX: 4.4
+  minY: -3.35
+  maxY: 3.35
   deathColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   slowMotionDuration: 0.8
   minTimeScale: 0.1
@@ -2441,8 +2441,8 @@ RectTransform:
   m_Children:
   - {fileID: 353205614}
   - {fileID: 1545529423}
-  - {fileID: 945507455}
   - {fileID: 575792470}
+  - {fileID: 945507455}
   - {fileID: 632170198}
   - {fileID: 159725284}
   m_Father: {fileID: 0}
@@ -4726,6 +4726,7 @@ MonoBehaviour:
   mouseCursor: {fileID: 924480924}
   normalMouse: {fileID: 924480919}
   bossHead: {fileID: 1075201703}
+  boss: {fileID: 0}
   orbCount: 50
   orbSpawnRadius: 8
   orbColor: {r: 0.83921576, g: 0.17254902, b: 0.17254902, a: 1}
@@ -5280,6 +5281,7 @@ MonoBehaviour:
   bulletSize: 0.4
   bulletSpeed: 2.5
   bulletTrailLength: 1.5
+  blueBossSprite: {fileID: 0}
   explosionColor: {r: 1, g: 1, b: 1, a: 1}
   explosionBulletCount: 30
   explosionSpeed: 5
