@@ -128,17 +128,16 @@ public class BossRectanglePattern : MonoBehaviour
     IEnumerator RectanglePatternSequence()
     {
         // 108.8초부터 121.6초까지 4번 반복 (총 32박자)
+        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
+        
+        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
+        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        
         for (int repeat = 0; repeat < 4; repeat++)
         {
             if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime)
             {
                 break;
-            }
-            
-            // 첫 번째 반복이면 Boss를 오른쪽으로 이동
-            if (repeat == 0)
-            {
-                yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
             }
             
             // === 1단계: 직사각형 생성 + 돌진 (총 8박자) ===
@@ -183,17 +182,16 @@ public class BossRectanglePattern : MonoBehaviour
     IEnumerator RectanglePatternSequence2()
     {
         // 134.4초부터 147.2초까지 4번 반복 (총 32박자)
+        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
+        
+        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
+        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        
         for (int repeat = 0; repeat < 4; repeat++)
         {
             if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime2)
             {
                 break;
-            }
-            
-            // 첫 번째 반복이면 Boss를 오른쪽으로 이동
-            if (repeat == 0)
-            {
-                yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
             }
             
             // === 1단계: 직사각형 생성 + 돌진 (총 8박자) ===
