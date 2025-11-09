@@ -94,7 +94,14 @@ public class BossRectanglePattern : MonoBehaviour
         
         double musicTime = BeatBounce.Instance.GetMusicTime();
         
-        // 1분 48초에 패턴 시작 (첫 번째 구간) - 정확히 108초에만 트리거
+        // 1분 48초보다 1초 전에 보스 이동 시작 (107.8초)
+        if (!patternStarted && musicTime >= patternStartTime - 1.0 && musicTime < patternStartTime)
+        {
+            Debug.Log($"[BossRectanglePattern] 보스 준비 이동 시작 (1차)! musicTime: {musicTime}");
+            StartCoroutine(PrepareBossPosition(bossWaitPosition, patternStartTime));
+        }
+        
+        // 1분 48.8초에 패턴 시작 (첫 번째 구간) - 정확히 108.8초에만 트리거
         if (!patternStarted && musicTime >= patternStartTime && musicTime < patternStartTime + 0.1)
         {
             patternStarted = true;
@@ -102,7 +109,14 @@ public class BossRectanglePattern : MonoBehaviour
             StartCoroutine(RectanglePatternSequence());
         }
         
-        // 2분 14초에 패턴 다시 시작 (두 번째 구간) - 정확히 134초에만 트리거
+        // 2분 14.4초보다 1초 전에 보스 이동 시작 (133.4초)
+        if (!patternStarted && musicTime >= patternStartTime2 - 1.0 && musicTime < patternStartTime2)
+        {
+            Debug.Log($"[BossRectanglePattern] 보스 준비 이동 시작 (2차)! musicTime: {musicTime}");
+            StartCoroutine(PrepareBossPosition(bossWaitPosition, patternStartTime2));
+        }
+        
+        // 2분 14.4초에 패턴 다시 시작 (두 번째 구간) - 정확히 134.4초에만 트리거
         if (!patternStarted && musicTime >= patternStartTime2 && musicTime < patternStartTime2 + 0.1)
         {
             patternStarted = true;
@@ -128,10 +142,7 @@ public class BossRectanglePattern : MonoBehaviour
     IEnumerator RectanglePatternSequence()
     {
         // 108.8초부터 121.6초까지 4번 반복 (총 32박자)
-        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
-        
-        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
-        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        // ⚠️ Boss 이동은 이미 Update()에서 1초 전에 시작했음!
         
         for (int repeat = 0; repeat < 4; repeat++)
         {
@@ -182,10 +193,7 @@ public class BossRectanglePattern : MonoBehaviour
     IEnumerator RectanglePatternSequence2()
     {
         // 134.4초부터 147.2초까지 4번 반복 (총 32박자)
-        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
-        
-        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
-        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        // ⚠️ Boss 이동은 이미 Update()에서 1초 전에 시작했음!
         
         for (int repeat = 0; repeat < 4; repeat++)
         {
@@ -240,8 +248,28 @@ public class BossRectanglePattern : MonoBehaviour
         {
             GameObject topRect = Instantiate(topRectangles[index]);
             topRect.SetActive(true); // 명시적으로 활성화
+            
+            // 스케일 확인 및 강제 설정
+            if (topRect.transform.localScale == Vector3.zero)
+            {
+                topRect.transform.localScale = Vector3.one;
+                Debug.LogWarning($"[BossRectanglePattern] 위 직사각형 {index} 스케일이 0이어서 1로 설정!");
+            }
+            
+            // SpriteRenderer 확인
+            SpriteRenderer sr = topRect.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.enabled = true;
+                Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} SpriteRenderer 활성화, sortingOrder: {sr.sortingOrder}");
+            }
+            
             spawnedRectangles.Add(topRect); // 리스트에 추가
-            Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} 생성 및 활성화: {topRect.transform.position}");
+            Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} 생성: 위치={topRect.transform.position}, 스케일={topRect.transform.localScale}, 활성={topRect.activeSelf}");
+        }
+        else
+        {
+            Debug.LogError($"[BossRectanglePattern] 위 직사각형 {index} 프리팹이 할당되지 않았습니다!");
         }
         
         // 아래쪽 직사각형 생성
@@ -249,8 +277,28 @@ public class BossRectanglePattern : MonoBehaviour
         {
             GameObject bottomRect = Instantiate(bottomRectangles[index]);
             bottomRect.SetActive(true); // 명시적으로 활성화
+            
+            // 스케일 확인 및 강제 설정
+            if (bottomRect.transform.localScale == Vector3.zero)
+            {
+                bottomRect.transform.localScale = Vector3.one;
+                Debug.LogWarning($"[BossRectanglePattern] 아래 직사각형 {index} 스케일이 0이어서 1로 설정!");
+            }
+            
+            // SpriteRenderer 확인
+            SpriteRenderer sr = bottomRect.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.enabled = true;
+                Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} SpriteRenderer 활성화, sortingOrder: {sr.sortingOrder}");
+            }
+            
             spawnedRectangles.Add(bottomRect); // 리스트에 추가
-            Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} 생성 및 활성화: {bottomRect.transform.position}");
+            Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} 생성: 위치={bottomRect.transform.position}, 스케일={bottomRect.transform.localScale}, 활성={bottomRect.activeSelf}");
+        }
+        else
+        {
+            Debug.LogError($"[BossRectanglePattern] 아래 직사각형 {index} 프리팹이 할당되지 않았습니다!");
         }
     }
     
@@ -268,22 +316,38 @@ public class BossRectanglePattern : MonoBehaviour
         Debug.Log("[BossRectanglePattern] 모든 직사각형 제거 완료");
     }
     
-    IEnumerator MoveBossToPosition(Vector3 targetPosition)
+    IEnumerator PrepareBossPosition(Vector3 targetPosition, float patternStartTime)
     {
         if (boss == null) yield break;
         
-        Debug.Log($"[BossRectanglePattern] Boss 이동 시작: {boss.position} → {targetPosition}");
+        Vector3 startPosition = boss.position;
+        float distance = Vector3.Distance(startPosition, targetPosition);
         
-        while (Vector3.Distance(boss.position, targetPosition) > 0.1f)
+        // 패턴 시작까지 남은 시간 (1초 전에 호출되므로 약 1초)
+        double currentTime = BeatBounce.Instance.GetMusicTime();
+        float timeUntilPattern = (float)(patternStartTime - currentTime);
+        
+        // 남은 시간에 맞춰 속도 계산
+        float requiredSpeed = distance / timeUntilPattern;
+        
+        // 최대 속도 제한 (너무 빠르지 않게)
+        requiredSpeed = Mathf.Min(requiredSpeed, bossMoveSpeed * 5f);
+        
+        Debug.Log($"[BossRectanglePattern] 보스 준비 이동: {startPosition} → {targetPosition}, 거리: {distance:F2}, 남은 시간: {timeUntilPattern:F2}초, 속도: {requiredSpeed:F2}");
+        
+        float elapsed = 0f;
+        while (elapsed < timeUntilPattern && Vector3.Distance(boss.position, targetPosition) > 0.1f)
         {
-            boss.position = Vector3.MoveTowards(boss.position, targetPosition, bossMoveSpeed * Time.deltaTime);
+            boss.position = Vector3.MoveTowards(boss.position, targetPosition, requiredSpeed * Time.deltaTime);
+            elapsed += Time.deltaTime;
             yield return null;
         }
         
+        // 정확히 목표 위치로
         boss.position = targetPosition;
-        Debug.Log($"[BossRectanglePattern] Boss 이동 완료: {boss.position}");
+        Debug.Log($"[BossRectanglePattern] 보스 준비 완료: {boss.position}");
     }
-    
+
     IEnumerator BossRushLeft()
     {
         if (boss == null) yield break;

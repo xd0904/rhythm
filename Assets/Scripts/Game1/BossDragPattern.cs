@@ -103,28 +103,26 @@ public class BossDragPattern : MonoBehaviour
     
     IEnumerator DragPatternSequence()
     {
-        // 96초부터 108.8초까지 16번 반복 (32박자)
-        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
-        for (int i = 0; i < 16; i++)
+        // 96초부터 108.8초까지 7번 반복 (28박자 = 11.2초)
+        // ⚠️ 2배 느리게: 드래그 2박자 + 폭발/쉬기 2박자 = 총 4박자
+        for (int i = 0; i < 7; i++)
         {
-            // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
         
-        Debug.Log("[BossDragPattern] 시퀀스 완료 (1차): 16번 반복, 32박자");
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (1차): 7번 반복, 28박자, 11.2초");
     }
     
     IEnumerator DragPatternSequence2()
     {
-        // 121.6초부터 134.4초까지 16번 반복 (32박자)
-        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
-        for (int i = 0; i < 16; i++)
+        // 121.6초부터 134.4초까지 7번 반복 (28박자 = 11.2초)
+        // ⚠️ 2배 느리게: 드래그 2박자 + 폭발/쉬기 2박자 = 총 4박자
+        for (int i = 0; i < 7; i++)
         {
-            // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
         
-        Debug.Log("[BossDragPattern] 시퀀스 완료 (2차): 16번 반복, 32박자");
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (2차): 7번 반복, 28박자, 11.2초");
     }
     
     IEnumerator CreateDragArea()
@@ -143,13 +141,13 @@ public class BossDragPattern : MonoBehaviour
         
         Debug.Log($"[BossDragPattern] 드래그: {startPos} → {endPos}");
         
-        // 1단계: 1박자 동안 드래그
-        float dragDuration = beatInterval; // 1박자 = 0.4초
+        // 1단계: 2박자 동안 드래그 (2배 느리게)
+        float dragDuration = beatInterval * 2f; // 2박자 = 0.8초
         GameObject dragArea = null;
         
         yield return StartCoroutine(DragToPosition(startPos, endPos, dragDuration, (area) => dragArea = area));
         
-        // 2단계: 1박자 동안 터짐 (폭발 + 쉬기)
+        // 2단계: 2박자 동안 터짐 (폭발 + 쉬기) (2배 느리게)
         if (dragArea != null)
         {
             yield return StartCoroutine(ExplodeDragArea(dragArea, dragDuration));
@@ -160,26 +158,39 @@ public class BossDragPattern : MonoBehaviour
     {
         if (mouseCursor == null) yield break;
         
-        // 드래그 영역 생성 (프리팹 원본 크기로 시작, 왼쪽 위에 배치)
+        // 프리팹 원본 크기 가져오기
+        Vector3 originalScale = dragAreaPrefab != null ? dragAreaPrefab.transform.localScale : new Vector3(2f, 2f, 1f);
+        
+        Debug.Log($"[BossDragPattern] 프리팹 원본 스케일: {originalScale}");
+        
+        // 보스 시작 위치: 게임창 안의 랜덤 위치
+        Vector3 bossStartPos = GetRandomPositionInWindow();
+        bossStartPos.z = 0f; // ⚠️ Z값 고정 (누적 방지)
+        
+        Debug.Log($"[BossDragPattern] 보스 시작 위치(월드): {bossStartPos}");
+        
+        mouseCursor.position = bossStartPos;
+        
+        // 드래그 영역 생성 위치: 보스가 왼쪽 위 끝에 오도록 계산
+        // 프리팹 중심 = 보스위치 + (원본너비/2, -원본높이/2)
+        Vector3 dragAreaCenter = bossStartPos + new Vector3(originalScale.x / 2f, -originalScale.y / 2f, 0f);
+        
+        Debug.Log($"[BossDragPattern] 드래그 영역 중심: {dragAreaCenter}");
+        
         GameObject dragArea = null;
         if (dragAreaPrefab != null)
         {
-            dragArea = Instantiate(dragAreaPrefab, startPos, Quaternion.identity);
+            dragArea = Instantiate(dragAreaPrefab, dragAreaCenter, Quaternion.identity);
         }
         else
         {
-            dragArea = CreateDefaultDragArea(startPos);
+            dragArea = CreateDefaultDragArea(dragAreaCenter);
         }
         
         onAreaCreated?.Invoke(dragArea);
         
-        // 프리팹 원본 크기 저장
-        Vector3 originalScale = dragArea.transform.localScale;
-        
-        // 보스를 프리팹의 왼쪽 위로 이동 (시작점)
-        Vector3 topLeft = GetTopLeftOfPrefab(dragArea, startPos);
-        topLeft.z = mouseCursor.position.z;
-        mouseCursor.position = topLeft;
+        // 프리팹을 0 크기로 시작
+        dragArea.transform.localScale = Vector3.zero;
         
         float elapsed = 0f;
         
@@ -188,25 +199,35 @@ public class BossDragPattern : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             
-            // 프리팹이 점점 커짐 (1배 → t배)
+            // 프리팹이 점점 커짐 (0 → 원본 크기, 오른쪽 아래로만 확장)
             float smoothT = Mathf.SmoothStep(0f, 1f, t);
             dragArea.transform.localScale = originalScale * smoothT;
             
-            // 마우스는 프리팹의 오른쪽 아래로 이동
-            Vector3 bottomRight = GetBottomRightOfPrefab(dragArea, startPos);
-            bottomRight.z = mouseCursor.position.z;
-            mouseCursor.position = bottomRight;
+            // 프리팹 중심 업데이트: 보스 위치를 기준으로 오른쪽 아래로 이동
+            Vector3 currentScale = dragArea.transform.localScale;
+            Vector3 newCenter = bossStartPos + new Vector3(currentScale.x / 2f, -currentScale.y / 2f, 0f);
+            dragArea.transform.position = newCenter;
+            
+            // ⚠️ 보스도 같이 이동: 프리팹 크기의 3.3배 거리만큼 대각선 이동
+            // 왼쪽 위 → 오른쪽 아래 (X: 3.3배, Y: 3.6배)
+            Vector3 bossOffset = new Vector3(currentScale.x * 3.3f * smoothT, -currentScale.y * 3.6f * smoothT, 0f);
+            Vector3 newBossPos = bossStartPos + bossOffset;
+            newBossPos.z = 0f; // ⚠️ Z값 고정 (누적 방지)
+            mouseCursor.position = newBossPos;
             
             yield return null;
         }
         
         // 최종 크기
         dragArea.transform.localScale = originalScale;
+        Vector3 finalCenter = bossStartPos + new Vector3(originalScale.x / 2f, -originalScale.y / 2f, 0f);
+        dragArea.transform.position = finalCenter;
         
-        // 마우스를 프리팹의 오른쪽 아래로
-        Vector3 finalBottomRight = GetBottomRightOfPrefab(dragArea, startPos);
-        finalBottomRight.z = mouseCursor.position.z;
-        mouseCursor.position = finalBottomRight;
+        // 최종 보스 위치: X 3.3배, Y 3.6배 (더 아래로)
+        Vector3 finalBossOffset = new Vector3(originalScale.x * 3.3f, -originalScale.y * 3.6f, 0f);
+        Vector3 finalBossPos = bossStartPos + finalBossOffset;
+        finalBossPos.z = 0f; // ⚠️ Z값 고정 (누적 방지)
+        mouseCursor.position = finalBossPos;
         
         Debug.Log($"[BossDragPattern] 드래그 완료: 왼쪽 위 → 오른쪽 아래");
     }
@@ -216,6 +237,7 @@ public class BossDragPattern : MonoBehaviour
         if (prefab == null) return center;
         
         Vector3 scale = prefab.transform.localScale;
+        // ⚠️ 프리팹의 정확한 왼쪽 위 끝으로 이동 (진짜 드래그처럼)
         Vector3 topLeft = center + new Vector3(-scale.x / 2f, scale.y / 2f, 0f);
         return topLeft;
     }
@@ -225,6 +247,7 @@ public class BossDragPattern : MonoBehaviour
         if (prefab == null) return center;
         
         Vector3 scale = prefab.transform.localScale;
+        // ⚠️ 프리팹의 정확한 오른쪽 아래 끝으로 이동 (진짜 드래그처럼)
         Vector3 bottomRight = center + new Vector3(scale.x / 2f, -scale.y / 2f, 0f);
         return bottomRight;
     }
@@ -377,7 +400,11 @@ public class BossDragPattern : MonoBehaviour
         float randomX = Random.Range(bounds.min.x + margin, bounds.max.x - margin);
         float randomY = Random.Range(bounds.min.y + margin, bounds.max.y - margin);
         
-        return new Vector3(randomX, randomY, 0f);
+        // ⚠️ 평행이동 오프셋 적용: (-3.5, -0.2) → (-4.45, 0.95)
+        // X: -0.95, Y: +1.15
+        Vector3 offset = new Vector3(-0.95f, 1.15f, 0f);
+        
+        return new Vector3(randomX, randomY, 0f) + offset;
     }
     
     Bounds GetWindowBounds()

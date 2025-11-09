@@ -195,7 +195,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 11
   m_Sprite: {fileID: 5854817708375854329, guid: 9e2844b7c44587840b9a0f32379ca34d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -958,6 +958,7 @@ MonoBehaviour:
   doubleClickTime: 0.3
   targetObject: {fileID: 0}
   targetObject2: {fileID: 0}
+  targetObject2: {fileID: 0}
   Object: {fileID: 0}
   animationDuration: 0.5
 --- !u!1 &605433583
@@ -1604,8 +1605,8 @@ MonoBehaviour:
   dashCooldown: 0.5
   dashAfterimageCount: 5
   afterimageDuration: 0.3
-  dashStartColor: {r: 0, g: 1, b: 1, a: 0.7}
-  dashEndColor: {r: 1, g: 0, b: 1, a: 0.7}
+  dashStartColor: {r: 0.14509805, g: 0.5568628, b: 0.36078432, a: 0.3137255}
+  dashEndColor: {r: 0.14509805, g: 0.5568628, b: 0.36078432, a: 0.7}
   godMode: 0
   dangerousTags:
   - Triangle
@@ -1614,10 +1615,10 @@ MonoBehaviour:
   - WaveAlt
   - BounceWave
   - IsoscelesTriangle
-  minX: -8
-  maxX: 8
-  minY: -4.5
-  maxY: 4.5
+  minX: -4.4
+  maxX: 4.4
+  minY: -3.35
+  maxY: 3.35
   deathColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   slowMotionDuration: 0.8
   minTimeScale: 0.1
@@ -2443,8 +2444,8 @@ RectTransform:
   m_Children:
   - {fileID: 353205614}
   - {fileID: 1545529423}
-  - {fileID: 945507455}
   - {fileID: 575792470}
+  - {fileID: 945507455}
   - {fileID: 632170198}
   - {fileID: 159725284}
   m_Father: {fileID: 0}
@@ -4280,7 +4281,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 111
   m_TargetDisplay: 0
 --- !u!224 &1689840533
 RectTransform:
@@ -5055,6 +5056,8 @@ MonoBehaviour:
   outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
   smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
   beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
+  beamHitParticlePrefab: {fileID: 0}
+  hitParticleCount: 5
   bossObject: {fileID: 1075201703}
   missileCount: 4
   spawnDelay: 0.2
@@ -5273,6 +5276,8 @@ MonoBehaviour:
   player: {fileID: 696100253}
   redBoss: {fileID: 1075201703}
   blueBoss: {fileID: 1991576427}
+  bossHead: {fileID: 815907394}
+  bossMouse: {fileID: 1346312332}
   bossCenterPosition: {x: 0, y: 0, z: 0}
   moveSpeed: 3
   moveOutDistance: 15
@@ -5282,7 +5287,7 @@ MonoBehaviour:
   bulletSize: 0.4
   bulletSpeed: 2.5
   bulletTrailLength: 1.5
-  blueBossSprite: {fileID: 0}
+  blueBossSprite: {fileID: 21300000, guid: 6efb99cfbbdf7664eb7921c1f5e536db, type: 3}
   explosionColor: {r: 1, g: 1, b: 1, a: 1}
   explosionBulletCount: 30
   explosionSpeed: 5

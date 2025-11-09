@@ -5,40 +5,38 @@ public class WindowPush : MonoBehaviour
     public Transform window;
     public Transform player;
 
-    private BoxCollider2D windowCollider;
-    private Vector2 windowHalfSize;
-    private Vector2 playerHalfSize;
+    private Player playerScript;
 
     void Start()
     {
-        windowCollider = window.GetComponent<BoxCollider2D>();
-        windowHalfSize = windowCollider.size * 0.5f;
+        // Player ìŠ¤í¬ë¦½íŠ¸ ì°¸ì¡° ê°€ì ¸ì˜¤ê¸°
+        if (player != null)
+        {
+            playerScript = player.GetComponent<Player>();
+        }
 
-        BoxCollider2D playerCollider = player.GetComponent<BoxCollider2D>();
-        playerHalfSize = playerCollider.size * 0.5f;
-
-        // Z°ª ÃÊ±âÈ­ (±íÀÌ ÁÂÇ¥ ¾ÈÀüÇÏ°Ô)
+        // Zï¿½ï¿½ ï¿½Ê±ï¿½È­ (ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½)
         window.position = new Vector3(window.position.x, window.position.y, 0f);
     }
 
     void LateUpdate()
     {
-        // ÇÃ·¹ÀÌ¾îÀÇ ·ÎÄÃ À§Ä¡ (window ±âÁØ)
-        Vector2 playerLocalPos = player.position - window.position;
+        // Player ìŠ¤í¬ë¦½íŠ¸ê°€ ì—†ìœ¼ë©´ ì‹¤í–‰í•˜ì§€ ì•ŠìŒ
+        if (playerScript == null || player == null) return;
 
-        // window ¾È¿¡¼­ ÇÃ·¹ÀÌ¾î°¡ °¡Áú ¼ö ÀÖ´Â ÃÖ¼Ò/ÃÖ´ë À§Ä¡ °è»ê
-        Vector2 min = -windowHalfSize + playerHalfSize;
-        Vector2 max = windowHalfSize - playerHalfSize;
+        // Player.csì˜ ê²½ê³„ ê°’ ì‚¬ìš©
+        float minX = playerScript.minX;
+        float maxX = playerScript.maxX;
+        float minY = playerScript.minY;
+        float maxY = playerScript.maxY;
 
-        // ÇÃ·¹ÀÌ¾îÀÇ À§Ä¡¸¦ °æ°è ¾ÈÀ¸·Î Á¦ÇÑ
-        float clampedX = Mathf.Clamp(playerLocalPos.x, min.x, max.x);
-        float clampedY = Mathf.Clamp(playerLocalPos.y, min.y, max.y);
+        // í”Œë ˆì´ì–´ì˜ ìœ„ì¹˜ë¥¼ ê²½ê³„ ì•ˆìœ¼ë¡œ ì œí•œ
+        Vector3 playerPos = player.position;
+        float clampedX = Mathf.Clamp(playerPos.x, minX, maxX);
+        float clampedY = Mathf.Clamp(playerPos.y, minY, maxY);
 
-        // Á¦ÇÑµÈ ÁÂÇ¥¸¦ ´Ù½Ã ¿ùµå ÁÂÇ¥·Î º¯È¯
-        Vector2 clampedPos = new Vector2(clampedX, clampedY) + (Vector2)window.position;
-
-        // ½ÇÁ¦ ÇÃ·¹ÀÌ¾î À§Ä¡ °»½Å
-        player.position = new Vector3(clampedPos.x, clampedPos.y, player.position.z);
+        // ì œí•œëœ í”Œë ˆì´ì–´ ìœ„ì¹˜ ì ìš©
+        player.position = new Vector3(clampedX, clampedY, playerPos.z);
     }
 }
 
