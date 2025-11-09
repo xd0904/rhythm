@@ -19,9 +19,8 @@ public class MissileLauncher : MonoBehaviour
     public GameObject bossObject; // 비활성화할 보스 오브젝트
 
     public int missileCount = 4;            // 한 번에 생성할 개수
-    public float spawnDelay = 0.2f;         // 각 미사일 생성 간격
-    public float fireDelay = 0.5f;          // 마지막 미사일 생성 후 발사까지의 지연
-    public float missileSpeed = 8f;         // 발사 속도 (GuidedMissile로 전달)
+    public float spawnDelay = 0.2f;         // 각 미사일 생성 간격 
+    public float missileSpeed = 7f;         // 발사 속도 (GuidedMissile로 전달)
 
     [Header("발사 패턴 설정")]
     public float spreadAngle = 90f;         // 미사일이 펼쳐질 부채꼴 각도 (예: 90도)
@@ -79,6 +78,7 @@ public class MissileLauncher : MonoBehaviour
             List<GuidedMissile> spawnedMissiles = new List<GuidedMissile>();
             List<GameObject> spawnedOuters = new List<GameObject>(); // 🔸 큰 오브젝트 저장 리스트
 
+            yield return new WaitForSeconds(0.6f);
 
             for (int i = 0; i < missileCount; i++)
             {
@@ -147,7 +147,7 @@ public class MissileLauncher : MonoBehaviour
                 yield return new WaitForSeconds(spawnDelay);
             }
 
-            yield return new WaitForSeconds(fireDelay);
+            yield return new WaitForSeconds(0.2f); // 마지막 미사일 생성 후 발사까지의 지연 걍 수동으로 해놓음
 
             // 🔥 빔 일제히 발사!
             foreach (var outer in spawnedOuters)
