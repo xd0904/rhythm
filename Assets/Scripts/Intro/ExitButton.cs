@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+
 public class ExitButton : MonoBehaviour
 {
     [Header("버튼 상태 게임오브젝트")]
@@ -13,6 +14,12 @@ public class ExitButton : MonoBehaviour
     
     [Tooltip("클릭 상태 버튼")]
     public GameObject activeButton;
+
+    [Tooltip("텍스트 창")]
+    public GameObject window;
+
+    [Tooltip("몬스터 창")]
+    public GameObject window2;
 
     [Header("텍스트 설정")]
     [Tooltip("바뀔 텍스트 게임오브젝트")]
@@ -40,8 +47,11 @@ public class ExitButton : MonoBehaviour
     private TypingEffect typingEffect;
     private bool isSequenceRunning = false;
 
+
     void Start()
     {
+     
+
         SetButtonState(ButtonState.Normal);
         Debug.Log("[ExitButton] 초기화 완료");
         
@@ -146,11 +156,14 @@ public class ExitButton : MonoBehaviour
             legacyText.text = newText;
         }
 
-        // 마지막 메시지면 점점 빨갛게 하고 시퀀스 시작
-        if (clickCount == clickMessages.Length)
-        {
+
+
+       // 마지막 메시지면 점점 빨갛게 하고 시퀀스 시작
+       if (clickCount == clickMessages.Length )
+       {
             StartCoroutine(FadeToRedAndStartSequence());
-        }
+       }
+      
     }
 
     private System.Collections.IEnumerator FadeToRedAndStartSequence()
