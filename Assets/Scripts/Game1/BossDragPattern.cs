@@ -104,13 +104,9 @@ public class BossDragPattern : MonoBehaviour
     IEnumerator DragPatternSequence()
     {
         // 96초부터 108.8초까지 16번 반복 (32박자)
+        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
         for (int i = 0; i < 16; i++)
         {
-            if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime)
-            {
-                break;
-            }
-            
             // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
@@ -121,13 +117,9 @@ public class BossDragPattern : MonoBehaviour
     IEnumerator DragPatternSequence2()
     {
         // 121.6초부터 134.4초까지 16번 반복 (32박자)
+        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
         for (int i = 0; i < 16; i++)
         {
-            if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime2)
-            {
-                break;
-            }
-            
             // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
