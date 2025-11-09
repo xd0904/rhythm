@@ -11,12 +11,10 @@ public class SoundManager : MonoBehaviour
     [SerializeField] AudioSource bgmSource;
     [SerializeField] AudioSource sfxSource;
     [SerializeField] AudioSource noteSource;
-    [SerializeField] AudioSource morseAudioSource;
 
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float bgmVolume = 1f;
     [Range(0f, 1f)] public float sfxVolume = 0.7f;
-    [Range(0f, 1f)] public float morseVolume = 1f;
 
     [Header("Musics")]
     [SerializeField] List<AudioClip> musics;
@@ -53,7 +51,6 @@ public class SoundManager : MonoBehaviour
         if (bgmSource != null) bgmSource.volume = bgmVolume;
         if (sfxSource != null) sfxSource.volume = sfxVolume;
         if (noteSource != null) noteSource.volume = sfxVolume;
-        if (morseAudioSource != null) morseAudioSource.volume = morseVolume;
     }
 
     public void PlayBGM(AudioClip clip)
@@ -82,9 +79,10 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFX(AudioClip clip)
     {
-        if (sfxSource != null)
+        if (sfxSource != null && clip != null)
         {
             sfxSource.PlayOneShot(clip);
+            Debug.Log($"[SoundManager] SFX 재생: {clip.name}");
         }
     }
 
@@ -129,55 +127,5 @@ public class SoundManager : MonoBehaviour
         }
 
         bgmVolume = 0;
-    }
-
-    // === 모스부호 관련 기능 ===
-    
-    /// <summary>
-    /// 모스부호 사운드 재생
-    /// </summary>
-    public void PlayMorseSound()
-    {
-        if (morseAudioSource != null && morseAudioSource.clip != null)
-        {
-            morseAudioSource.Play();
-            Debug.Log($"[SoundManager] 모스부호 사운드 재생 (볼륨: {morseVolume:F2})");
-        }
-        else
-        {
-            Debug.LogWarning("[SoundManager] 모스부호 AudioSource 또는 Clip이 설정되지 않았습니다!");
-        }
-    }
-
-    /// <summary>
-    /// 모스부호 사운드 정지
-    /// </summary>
-    public void StopMorseSound()
-    {
-        if (morseAudioSource != null && morseAudioSource.isPlaying)
-        {
-            morseAudioSource.Stop();
-            Debug.Log("[SoundManager] 모스부호 사운드 정지");
-        }
-    }
-
-    /// <summary>
-    /// 모스부호 AudioSource가 재생 중인지 확인
-    /// </summary>
-    public bool IsMorsePlaying()
-    {
-        return morseAudioSource != null && morseAudioSource.isPlaying;
-    }
-
-    /// <summary>
-    /// 모스부호 오디오 길이 가져오기
-    /// </summary>
-    public float GetMorseClipLength()
-    {
-        if (morseAudioSource != null && morseAudioSource.clip != null)
-        {
-            return morseAudioSource.clip.length;
-        }
-        return 0f;
     }
 }

@@ -34,6 +34,13 @@ public class ExitButton : MonoBehaviour
         "NONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONON"
     };
 
+    [Tooltip("클릭 사운드")]
+    public AudioClip ClickSound;
+
+
+    [Tooltip("글리치 사운드")]
+    public AudioClip Glitch;
+
     private int clickCount = 0;
     private TextMeshProUGUI tmpText;
     private Text legacyText;
@@ -109,6 +116,7 @@ public class ExitButton : MonoBehaviour
     void OnMouseDown()
     {
         if (isSequenceRunning) return;
+        SoundManager.Instance.PlaySFX(ClickSound);
         SetButtonState(ButtonState.Active);
     }
 
@@ -173,6 +181,8 @@ public class ExitButton : MonoBehaviour
             }
         }
 
+        SoundManager.Instance.PlaySFX(Glitch);
+
         // Glitch 효과 (텍스트 Glitch) - 끝날 때까지 대기
         yield return StartCoroutine(ApplyTextGlitch());
 
@@ -201,6 +211,7 @@ public class ExitButton : MonoBehaviour
 
     private System.Collections.IEnumerator FadeToRed()
     {
+
         float elapsed = 0f;
         Color startColor = Color.white;
         Color endColor = Color.red;

@@ -7,7 +7,7 @@ public class VaccineAlarm : MonoBehaviour
     public float slideDuration = 0.5f;
     
     [Tooltip("화면에 표시되는 시간 (초)")]
-    public float displayDuration = 3f;
+    public float displayDuration = 8f;
     
     [Tooltip("화면 밖 시작 X 오프셋 (픽셀)")]
     public float offScreenOffset = 800f;
