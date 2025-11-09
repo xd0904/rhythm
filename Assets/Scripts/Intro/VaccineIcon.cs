@@ -10,6 +10,9 @@ public class VaccineIcon : MonoBehaviour
     [Tooltip("더블클릭 시 열릴 게임오브젝트")]
     public GameObject targetObject;
 
+    [Tooltip("더블클릭 시 열릴 게임오브젝트")]
+    public GameObject targetObject2;
+
     [Tooltip("바이러스 알람 울리고 난 후에 켜질 수 있게 하려고 그 오브젝트 감지")]
     public GameObject Object;   
 
@@ -41,10 +44,7 @@ public class VaccineIcon : MonoBehaviour
                 trueCount = 1;
             }
         }
-        else if(sceneName == "Game2")
-        {
-            trueCount = 1;
-        }
+   
         
     }
 
@@ -56,12 +56,26 @@ public class VaccineIcon : MonoBehaviour
         {
             // 더블클릭!
             clickCount++;
-            
+
+            if (clickCount >= 2 && trueCount == 0 && sceneName == "Game2")
+            {
+                OnDoubleClick();
+                clickCount = 0;
+            }
+            else if (clickCount >= 2 && trueCount == 1 && sceneName == "Game2")
+            {
+                OnDoubleClick2();
+                clickCount = 0;
+            }
+
             if (clickCount >= 2 && trueCount == 1)
             {
                 OnDoubleClick();
                 clickCount = 0;
             }
+            
+            
+
         }
         else
         {
@@ -73,6 +87,11 @@ public class VaccineIcon : MonoBehaviour
     }
     private void OnDoubleClick()
     {
+        if (sceneName == "Game2")
+        {
+            trueCount = 1;
+        }
+        
         Debug.Log("[VaccineIcon] 더블클릭 감지!");
         
         if (targetObject != null)
@@ -83,6 +102,21 @@ public class VaccineIcon : MonoBehaviour
         else
         {
             Debug.LogWarning("[VaccineIcon] Target Object가 설정되지 않았습니다!");
+        }
+    }
+
+    private void OnDoubleClick2()
+    {
+        Debug.Log("[VaccineIcon] 더블클릭 감지!");
+
+        if (targetObject2 != null)
+        {
+            targetObject2.SetActive(true);
+            Debug.Log($"[VaccineIcon] {targetObject2.name} 활성화");
+        }
+        else
+        {
+            Debug.LogWarning("[VaccineIcon] Target Object2가 설정되지 않았습니다!");
         }
     }
 }
