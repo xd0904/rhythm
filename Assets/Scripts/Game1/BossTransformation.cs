@@ -13,7 +13,6 @@ public class BossTransformation : MonoBehaviour
     public Transform mouseCursor; // 마우스 커서 (보스로 변신!)
     public GameObject normalMouse; // Mouse (1) - 일반 마우스
     public GameObject bossHead; // BossHead - 보스 모드
-    public GameObject boss; // Boss - 보스 게임오브젝트 (처음엔 꺼져있어야 함)
     
     [Header("오브 설정")]
     public int orbCount = 80; // 생성할 작은 오브 개수 (44~55초, 11초 동안)
@@ -66,24 +65,9 @@ public class BossTransformation : MonoBehaviour
             }
         }
         
-        // Boss 자동 찾기
-        if (boss == null)
-        {
-            boss = GameObject.Find("Boss");
-            if (boss != null)
-            {
-                Debug.Log("[BossTransformation] Boss 자동 찾기 완료");
-            }
-        }
-        
-        // 초기 상태: 일반 마우스 ON, 보스/보스헤드 OFF
+        // 초기 상태: 일반 마우스 ON, 보스 OFF
         if (normalMouse != null) normalMouse.SetActive(true);
         if (bossHead != null) bossHead.SetActive(false);
-        if (boss != null)
-        {
-            boss.SetActive(false);
-            Debug.Log("[BossTransformation] Boss 초기 상태: 비활성화 (44초까지 대기)");
-        };
     }
 
     void Update()
@@ -289,13 +273,6 @@ public class BossTransformation : MonoBehaviour
         else
         {
             Debug.LogWarning("[BossTransformation] BossHead가 할당되지 않았습니다!");
-        }
-        
-        // Boss 게임오브젝트 활성화 (패턴 시작 가능)
-        if (boss != null)
-        {
-            boss.SetActive(true);
-            Debug.Log("[BossTransformation] Boss 활성화 - 보스 패턴 시작 가능!");
         }
         
         // 보스 등장 임팩트 애니메이션 (2초)
