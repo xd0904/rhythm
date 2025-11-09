@@ -13,8 +13,8 @@ public class Player : MonoBehaviour
     public float dashCooldown = 0.5f; // 대쉬 쿨타임
     public int dashAfterimageCount = 3; // 잔상 개수 (줄임)
     public float afterimageDuration = 0.2f; // 잔상 지속 시간 (짧게)
-    public Color dashStartColor = new Color(0f, 1f, 1f, 0.3f); // 시작 위치 색상 (더 투명)
-    public Color dashEndColor = new Color(1f, 0f, 1f, 0.3f); // 끝 위치 색상 (더 투명)
+    public Color dashStartColor = new Color(0.267f, 0.886f, 0.576f, 0.6f); // #44E293 투명도 60%
+    public Color dashEndColor = new Color(0.267f, 0.886f, 0.576f, 0.6f); // #44E293 투명도 60%
     
     [Header("개발자 설정")]
     public bool godMode = false; // 무적 모드 (F1 토글)
@@ -207,11 +207,11 @@ public class Player : MonoBehaviour
             
             // 매우 작은 사각형 (1x1)
             Texture2D particleTex = new Texture2D(1, 1);
-            particleTex.SetPixel(0, 0, Color.white);
+            particleTex.SetPixel(0, 0, dashStartColor);
             particleTex.Apply();
             
             particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 20f);
-            particleSR.color = dashStartColor;
+            particleSR.color = Color.white;
             particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
             
             particle.transform.position = startPos;
@@ -232,11 +232,11 @@ public class Player : MonoBehaviour
             
             // 매우 작은 사각형 (1x1)
             Texture2D particleTex = new Texture2D(1, 1);
-            particleTex.SetPixel(0, 0, Color.white);
+            particleTex.SetPixel(0, 0, dashEndColor);
             particleTex.Apply();
             
             particleSR.sprite = Sprite.Create(particleTex, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 20f);
-            particleSR.color = dashEndColor;
+            particleSR.color = Color.white;
             particleSR.sortingOrder = spriteRenderer.sortingOrder - 1;
             
             particle.transform.position = endPos;
