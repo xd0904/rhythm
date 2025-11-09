@@ -16,6 +16,8 @@ public class BossBlueTransformation : MonoBehaviour
     public Transform player; // 플레이어
     public GameObject redBoss; // 빨간 보스 (Boss)
     public GameObject blueBoss; // 파란 보스 (BlueBoss)
+    public GameObject bossHead; // BossHead (Inspector에서 할당)
+    public GameObject bossMouse; // BossMouse (Inspector에서 할당)
     
     [Header("이동 설정")]
     public Vector3 bossCenterPosition = new Vector3(0f, 0f, 0f); // 화면 중앙
@@ -45,7 +47,8 @@ public class BossBlueTransformation : MonoBehaviour
     private List<GameObject> bullets = new List<GameObject>();
     private Vector3 originalWindowPosition;
     private Vector3 originalPlayerPosition;
-    private SpriteRenderer bossRenderer;
+    private SpriteRenderer bossHeadRenderer; // BossHead의 SpriteRenderer
+    private SpriteRenderer bossMouseRenderer; // BossMouse의 SpriteRenderer
     private GameObject blueBossGhost; // 페이드 인용 파란 보스 이미지
 
     void Start()
@@ -57,17 +60,35 @@ public class BossBlueTransformation : MonoBehaviour
             if (bossObj != null)
             {
                 boss = bossObj.transform;
-                
-                // Boss 오브젝트 자체를 빨간 보스로
                 redBoss = bossObj;
-                bossRenderer = redBoss.GetComponent<SpriteRenderer>();
-                
-                if (bossRenderer == null)
-                {
-                    // 자식에서 SpriteRenderer 찾기
-                    bossRenderer = redBoss.GetComponentInChildren<SpriteRenderer>();
-                }
             }
+        }
+        
+        // BossHead, BossMouse SpriteRenderer 가져오기
+        if (bossHead != null)
+        {
+            bossHeadRenderer = bossHead.GetComponent<SpriteRenderer>();
+            if (bossHeadRenderer != null)
+            {
+                Debug.Log("[BossBlueTransformation] BossHead SpriteRenderer 찾기 완료");
+            }
+        }
+        else
+        {
+            Debug.LogError("[BossBlueTransformation] bossHead가 할당되지 않았습니다! Inspector에서 할당하세요.");
+        }
+        
+        if (bossMouse != null)
+        {
+            bossMouseRenderer = bossMouse.GetComponent<SpriteRenderer>();
+            if (bossMouseRenderer != null)
+            {
+                Debug.Log("[BossBlueTransformation] BossMouse SpriteRenderer 찾기 완료");
+            }
+        }
+        else
+        {
+            Debug.LogError("[BossBlueTransformation] bossMouse가 할당되지 않았습니다! Inspector에서 할당하세요.");
         }
         
         // BlueBoss 자동 찾기
@@ -150,8 +171,9 @@ public class BossBlueTransformation : MonoBehaviour
         float elapsed = 0f;
         
         Vector3 bossStartPos = boss != null ? boss.position : Vector3.zero;
-        Vector3 windowStartPos = originalWindowPosition;
-        Vector3 playerStartPos = originalPlayerPosition;
+        // 현재 위치를 시작 위치로 사용 (이미 다른 패턴에서 움직였을 수 있음)
+        Vector3 windowStartPos = gameWindow != null ? gameWindow.position : originalWindowPosition;
+        Vector3 playerStartPos = player != null ? player.position : originalPlayerPosition;
         
         // 목표 위치 (아래로 내려가고 다시 안 올라옴)
         Vector3 windowTargetPos = windowStartPos + new Vector3(0f, -moveOutDistance, 0f);
@@ -214,9 +236,8 @@ public class BossBlueTransformation : MonoBehaviour
     
     IEnumerator FadeOutRedBoss(float duration)
     {
-        if (bossRenderer == null) yield break;
-        
-        Color originalColor = bossRenderer.color;
+        Color originalHeadColor = bossHeadRenderer != null ? bossHeadRenderer.color : Color.white;
+        Color originalMouseColor = bossMouseRenderer != null ? bossMouseRenderer.color : Color.white;
         float elapsed = 0f;
         
         while (elapsed < duration)
@@ -224,20 +245,41 @@ public class BossBlueTransformation : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             
-            // 보스 알파값 0으로 (사라짐)
-            Color color = originalColor;
-            color.a = Mathf.Lerp(1f, 0f, t);
-            bossRenderer.color = color;
+            // BossHead 페이드 아웃
+            if (bossHeadRenderer != null)
+            {
+                Color color = originalHeadColor;
+                color.a = Mathf.Lerp(1f, 0f, t);
+                bossHeadRenderer.color = color;
+            }
+            
+            // BossMouse 페이드 아웃
+            if (bossMouseRenderer != null)
+            {
+                Color color = originalMouseColor;
+                color.a = Mathf.Lerp(1f, 0f, t);
+                bossMouseRenderer.color = color;
+            }
             
             yield return null;
         }
         
         // 완전히 투명하게
-        Color finalColor = originalColor;
-        finalColor.a = 0f;
-        bossRenderer.color = finalColor;
+        if (bossHeadRenderer != null)
+        {
+            Color finalColor = originalHeadColor;
+            finalColor.a = 0f;
+            bossHeadRenderer.color = finalColor;
+        }
         
-        Debug.Log("[BossBlueTransformation] 빨간 보스 페이드 아웃 완료");
+        if (bossMouseRenderer != null)
+        {
+            Color finalColor = originalMouseColor;
+            finalColor.a = 0f;
+            bossMouseRenderer.color = finalColor;
+        }
+        
+        Debug.Log("[BossBlueTransformation] 빨간 보스 페이드 아웃 완료 (Head + Mouse)");
     }
 
     void CreateBlueBullet()
@@ -327,19 +369,29 @@ public class BossBlueTransformation : MonoBehaviour
         float fadeInDuration = 2f; // 파란 보스 페이드 인 (탄막 계속 오는 동안)
         float explosionDelay = 1.8f; // 폭발 타이밍
         
-        // 1. 먼저 빨간 보스의 SpriteRenderer를 blueBossSprite으로 교체 (투명 상태)
-        if (bossRenderer != null && blueBossSprite != null)
+        // 1. BossHead, BossMouse를 blueBossSprite으로 교체 (투명 상태)
+        if (bossHeadRenderer != null && blueBossSprite != null)
         {
-            bossRenderer.sprite = blueBossSprite;
-            Color color = bossRenderer.color;
+            bossHeadRenderer.sprite = blueBossSprite;
+            Color color = bossHeadRenderer.color;
             color.a = 0f; // 투명
-            bossRenderer.color = color;
+            bossHeadRenderer.color = color;
             
-            Debug.Log("[BossBlueTransformation] 보스 스프라이트를 파란색으로 교체 (투명 상태)");
+            Debug.Log("[BossBlueTransformation] BossHead 스프라이트를 파란색으로 교체 (투명 상태)");
+        }
+        
+        if (bossMouseRenderer != null && blueBossSprite != null)
+        {
+            bossMouseRenderer.sprite = blueBossSprite;
+            Color color = bossMouseRenderer.color;
+            color.a = 0f; // 투명
+            bossMouseRenderer.color = color;
+            
+            Debug.Log("[BossBlueTransformation] BossMouse 스프라이트를 파란색으로 교체 (투명 상태)");
         }
         
         // 2. 파란 보스 페이드 인 시작 (탄막이 계속 모이는 동안)
-        StartCoroutine(FadeInBlueBoss(bossRenderer, fadeInDuration));
+        StartCoroutine(FadeInBlueBoss(fadeInDuration));
         
         // 3. 탄막들 중앙으로 계속 모임 (페이드 인과 동시에)
         yield return new WaitForSeconds(explosionDelay);
@@ -381,32 +433,52 @@ public class BossBlueTransformation : MonoBehaviour
         Debug.Log("[BossBlueTransformation] 3단계 완료 - 변신 완료");
     }
     
-    IEnumerator FadeInBlueBoss(SpriteRenderer sr, float duration)
+    IEnumerator FadeInBlueBoss(float duration)
     {
-        if (sr == null) yield break;
-        
+        Color originalHeadColor = bossHeadRenderer != null ? bossHeadRenderer.color : Color.white;
+        Color originalMouseColor = bossMouseRenderer != null ? bossMouseRenderer.color : Color.white;
         float elapsed = 0f;
-        Color originalColor = sr.color;
         
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             
-            // 파란 보스 알파값 0 → 1 (점점 나타남)
-            Color color = originalColor;
-            color.a = Mathf.Lerp(0f, 1f, t);
-            sr.color = color;
+            // BossHead 페이드 인
+            if (bossHeadRenderer != null)
+            {
+                Color color = originalHeadColor;
+                color.a = Mathf.Lerp(0f, 1f, t);
+                bossHeadRenderer.color = color;
+            }
+            
+            // BossMouse 페이드 인
+            if (bossMouseRenderer != null)
+            {
+                Color color = originalMouseColor;
+                color.a = Mathf.Lerp(0f, 1f, t);
+                bossMouseRenderer.color = color;
+            }
             
             yield return null;
         }
         
         // 완전히 불투명하게
-        Color finalColor = originalColor;
-        finalColor.a = 1f;
-        sr.color = finalColor;
+        if (bossHeadRenderer != null)
+        {
+            Color finalColor = originalHeadColor;
+            finalColor.a = 1f;
+            bossHeadRenderer.color = finalColor;
+        }
         
-        Debug.Log("[BossBlueTransformation] 파란 보스 페이드 인 완료");
+        if (bossMouseRenderer != null)
+        {
+            Color finalColor = originalMouseColor;
+            finalColor.a = 1f;
+            bossMouseRenderer.color = finalColor;
+        }
+        
+        Debug.Log("[BossBlueTransformation] 파란 보스 페이드 인 완료 (Head + Mouse)");
     }
 
     IEnumerator WhiteExplosion()

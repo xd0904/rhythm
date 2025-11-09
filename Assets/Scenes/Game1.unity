@@ -195,7 +195,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 11
   m_Sprite: {fileID: 5854817708375854329, guid: 9e2844b7c44587840b9a0f32379ca34d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -2926,7 +2926,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1075201704
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4278,7 +4278,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 111
   m_TargetDisplay: 0
 --- !u!224 &1689840533
 RectTransform:
@@ -4726,6 +4726,7 @@ MonoBehaviour:
   mouseCursor: {fileID: 924480924}
   normalMouse: {fileID: 924480919}
   bossHead: {fileID: 1075201703}
+  boss: {fileID: 0}
   boss: {fileID: 0}
   orbCount: 50
   orbSpawnRadius: 8
@@ -5272,6 +5273,8 @@ MonoBehaviour:
   player: {fileID: 696100253}
   redBoss: {fileID: 1075201703}
   blueBoss: {fileID: 1991576427}
+  bossHead: {fileID: 815907394}
+  bossMouse: {fileID: 1346312332}
   bossCenterPosition: {x: 0, y: 0, z: 0}
   moveSpeed: 3
   moveOutDistance: 15
@@ -5281,7 +5284,6 @@ MonoBehaviour:
   bulletSize: 0.4
   bulletSpeed: 2.5
   bulletTrailLength: 1.5
-  blueBossSprite: {fileID: 0}
   explosionColor: {r: 1, g: 1, b: 1, a: 1}
   explosionBulletCount: 30
   explosionSpeed: 5

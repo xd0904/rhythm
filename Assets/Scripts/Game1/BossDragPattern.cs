@@ -103,28 +103,28 @@ public class BossDragPattern : MonoBehaviour
     
     IEnumerator DragPatternSequence()
     {
-        // 96초부터 108.8초까지 16번 반복 (32박자)
+        // 96초부터 108.8초까지 15번 반복 (30박자 = 12초)
         // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 15; i++)
         {
             // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
         
-        Debug.Log("[BossDragPattern] 시퀀스 완료 (1차): 16번 반복, 32박자");
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (1차): 15번 반복, 30박자, 12초");
     }
     
     IEnumerator DragPatternSequence2()
     {
-        // 121.6초부터 134.4초까지 16번 반복 (32박자)
+        // 121.6초부터 134.4초까지 15번 반복 (30박자 = 12초)
         // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
-        for (int i = 0; i < 16; i++)
+        for (int i = 0; i < 15; i++)
         {
             // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
         }
         
-        Debug.Log("[BossDragPattern] 시퀀스 완료 (2차): 16번 반복, 32박자");
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (2차): 15번 반복, 30박자, 12초");
     }
     
     IEnumerator CreateDragArea()
