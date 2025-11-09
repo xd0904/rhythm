@@ -4,10 +4,12 @@ using System.Collections;
 public class BossBulletPattern : MonoBehaviour
 {
     [Header("타이밍 설정")]
+    public float bossActivateTime = 70f; // 1분 10초 (70초)
     public float pattern1StartTime = 89f; // 1분 29초 (89초)
     public float pattern1EndTime = 95f; // 1분 35초 (95초)
     
     [Header("대상 오브젝트")]
+    public GameObject bossObject; // Boss 오브젝트 (활성화할 대상)
     public Transform mouseCursor; // 마우스/보스 커서
     public Camera mainCamera;
     public Transform gameWindow; // 게임 내부 창 오브젝트
@@ -30,6 +32,7 @@ public class BossBulletPattern : MonoBehaviour
     public GameObject backgroundMousePrefab; // 배경 마우스 프리팹
     public int backgroundMouseCount = 5; // 배경 마우스 개수
     
+    private bool bossActivated = false;
     private bool pattern1Started = false;
     private Vector3 windowTargetPosition;
     private float windowNextDirectionChangeTime;
@@ -45,6 +48,7 @@ public class BossBulletPattern : MonoBehaviour
         }
         
         // 타이밍 강제 설정
+        bossActivateTime = 70f;
         pattern1StartTime = 89f;
         pattern1EndTime = 95f;
         mouseMoveToBottomRightDuration = 1.5f;
@@ -134,6 +138,21 @@ public class BossBulletPattern : MonoBehaviour
         
         // 음악이 시작 안 했으면 대기
         if (musicTime <= 0) return;
+        
+        // 1분 10초 (70초)에 Boss 오브젝트 활성화
+        if (!bossActivated && musicTime >= bossActivateTime)
+        {
+            bossActivated = true;
+            if (bossObject != null)
+            {
+                bossObject.SetActive(true);
+                Debug.Log($"[BossBulletPattern] 1분 10초에 Boss 오브젝트 활성화! musicTime: {musicTime}");
+            }
+            else
+            {
+                Debug.LogWarning("[BossBulletPattern] bossObject가 할당되지 않았습니다!");
+            }
+        }
         
         // 1분 29초 (89초)에 패턴 1 시작
         if (!pattern1Started && musicTime >= pattern1StartTime)

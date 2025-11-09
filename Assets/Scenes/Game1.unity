@@ -1767,8 +1767,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1570f1518a6cc5b4a812df3e9054d112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossActivateTime: 70
   pattern1StartTime: 89
   pattern1EndTime: 95
+  bossObject: {fileID: 1075201703}
   mouseCursor: {fileID: 1075201704}
   mainCamera: {fileID: 632646935}
   gameWindow: {fileID: 118774634}
@@ -4477,6 +4479,8 @@ MonoBehaviour:
   trailColor: {r: 1, g: 0, b: 0, a: 1}
   trailFadeDistance: 2
   triangleBeatsPerSpawn: 4
+  icon1: {fileID: 945507454}
+  icon2: {fileID: 575792469}
 --- !u!1 &1744098456
 GameObject:
   m_ObjectHideFlags: 0
@@ -5048,6 +5052,7 @@ MonoBehaviour:
   outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
   smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
   beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
+  bossObject: {fileID: 1075201703}
   missileCount: 4
   spawnDelay: 0.2
   fireDelay: 0.5

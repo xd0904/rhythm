@@ -91,6 +91,10 @@ public class BeatBounce : MonoBehaviour
     public float trailFadeDistance = 2f;        // 창에서 이 거리만큼 멀어지면 완전 투명
     public int triangleBeatsPerSpawn = 4;       // 4박자마다 삼각형 생성
     private int trianglePatternCounter = 0;     // 패턴 카운터
+    
+    [Header("아이콘 설정")]
+    public GameObject icon1;  // 아이콘 1
+    public GameObject icon2;  // 아이콘 2
 
     void Awake()
     {
@@ -112,6 +116,19 @@ public class BeatBounce : MonoBehaviour
         beatInterval = 60f / bpm;
         
         Debug.Log($"[BeatBounce] Start - BPM: {bpm}, Beat Interval: {beatInterval:F3}초");
+        
+        // 아이콘 비활성화
+        if (icon1 != null)
+        {
+            icon1.SetActive(false);
+            Debug.Log("[BeatBounce] Icon1 비활성화됨");
+        }
+        
+        if (icon2 != null)
+        {
+            icon2.SetActive(false);
+            Debug.Log("[BeatBounce] Icon2 비활성화됨");
+        }
         
         if (spawnPoint == null)
         {
