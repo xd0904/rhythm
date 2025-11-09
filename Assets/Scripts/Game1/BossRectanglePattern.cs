@@ -248,8 +248,28 @@ public class BossRectanglePattern : MonoBehaviour
         {
             GameObject topRect = Instantiate(topRectangles[index]);
             topRect.SetActive(true); // 명시적으로 활성화
+            
+            // 스케일 확인 및 강제 설정
+            if (topRect.transform.localScale == Vector3.zero)
+            {
+                topRect.transform.localScale = Vector3.one;
+                Debug.LogWarning($"[BossRectanglePattern] 위 직사각형 {index} 스케일이 0이어서 1로 설정!");
+            }
+            
+            // SpriteRenderer 확인
+            SpriteRenderer sr = topRect.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.enabled = true;
+                Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} SpriteRenderer 활성화, sortingOrder: {sr.sortingOrder}");
+            }
+            
             spawnedRectangles.Add(topRect); // 리스트에 추가
-            Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} 생성 및 활성화: {topRect.transform.position}");
+            Debug.Log($"[BossRectanglePattern] 위 직사각형 {index} 생성: 위치={topRect.transform.position}, 스케일={topRect.transform.localScale}, 활성={topRect.activeSelf}");
+        }
+        else
+        {
+            Debug.LogError($"[BossRectanglePattern] 위 직사각형 {index} 프리팹이 할당되지 않았습니다!");
         }
         
         // 아래쪽 직사각형 생성
@@ -257,8 +277,28 @@ public class BossRectanglePattern : MonoBehaviour
         {
             GameObject bottomRect = Instantiate(bottomRectangles[index]);
             bottomRect.SetActive(true); // 명시적으로 활성화
+            
+            // 스케일 확인 및 강제 설정
+            if (bottomRect.transform.localScale == Vector3.zero)
+            {
+                bottomRect.transform.localScale = Vector3.one;
+                Debug.LogWarning($"[BossRectanglePattern] 아래 직사각형 {index} 스케일이 0이어서 1로 설정!");
+            }
+            
+            // SpriteRenderer 확인
+            SpriteRenderer sr = bottomRect.GetComponent<SpriteRenderer>();
+            if (sr != null)
+            {
+                sr.enabled = true;
+                Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} SpriteRenderer 활성화, sortingOrder: {sr.sortingOrder}");
+            }
+            
             spawnedRectangles.Add(bottomRect); // 리스트에 추가
-            Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} 생성 및 활성화: {bottomRect.transform.position}");
+            Debug.Log($"[BossRectanglePattern] 아래 직사각형 {index} 생성: 위치={bottomRect.transform.position}, 스케일={bottomRect.transform.localScale}, 활성={bottomRect.activeSelf}");
+        }
+        else
+        {
+            Debug.LogError($"[BossRectanglePattern] 아래 직사각형 {index} 프리팹이 할당되지 않았습니다!");
         }
     }
     

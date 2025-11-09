@@ -171,13 +171,18 @@ public class BossBlueTransformation : MonoBehaviour
         float elapsed = 0f;
         
         Vector3 bossStartPos = boss != null ? boss.position : Vector3.zero;
-        // 현재 위치를 시작 위치로 사용 (이미 다른 패턴에서 움직였을 수 있음)
-        Vector3 windowStartPos = gameWindow != null ? gameWindow.position : originalWindowPosition;
-        Vector3 playerStartPos = player != null ? player.position : originalPlayerPosition;
         
-        // 목표 위치 (아래로 내려가고 다시 안 올라옴)
-        Vector3 windowTargetPos = windowStartPos + new Vector3(0f, -moveOutDistance, 0f);
-        Vector3 playerTargetPos = playerStartPos + new Vector3(0f, -moveOutDistance, 0f);
+        // ⚠️ 창과 플레이어가 이미 아래로 내려가 있을 수 있으므로, 
+        // 현재 위치에서 더 아래로 내려가게 설정
+        Vector3 windowStartPos = gameWindow != null ? gameWindow.position : Vector3.zero;
+        Vector3 playerStartPos = player != null ? player.position : Vector3.zero;
+        
+        // 목표 위치: 화면 아래로 충분히 멀리 (절대 안 보이게)
+        Vector3 windowTargetPos = new Vector3(windowStartPos.x, -20f, windowStartPos.z); // Y = -20 (완전히 아래)
+        Vector3 playerTargetPos = new Vector3(playerStartPos.x, -20f, playerStartPos.z); // Y = -20 (완전히 아래)
+        
+        Debug.Log($"[BossBlueTransformation] 창 시작위치: {windowStartPos}, 목표위치: {windowTargetPos}");
+        Debug.Log($"[BossBlueTransformation] 플레이어 시작위치: {playerStartPos}, 목표위치: {playerTargetPos}");
         
         while (elapsed < duration)
         {
@@ -206,7 +211,17 @@ public class BossBlueTransformation : MonoBehaviour
             yield return null;
         }
         
-        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 (다시 안 올라옴)");
+        // 최종 위치 강제 설정 (확실하게)
+        if (gameWindow != null)
+        {
+            gameWindow.position = windowTargetPos;
+        }
+        if (player != null)
+        {
+            player.position = playerTargetPos;
+        }
+        
+        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 완료 (Y=-20으로 고정)");
     }
 
     // === 2단계: 빨간 보스 페이드 아웃 + 파란 탄막 집중 ===
@@ -369,7 +384,7 @@ public class BossBlueTransformation : MonoBehaviour
         float fadeInDuration = 2f; // 파란 보스 페이드 인 (탄막 계속 오는 동안)
         float explosionDelay = 1.8f; // 폭발 타이밍
         
-        // 1. BossHead, BossMouse를 blueBossSprite으로 교체 (투명 상태)
+        // 1. BossHead만 blueBossSprite으로 교체 (투명 상태)
         if (bossHeadRenderer != null && blueBossSprite != null)
         {
             bossHeadRenderer.sprite = blueBossSprite;
@@ -380,14 +395,15 @@ public class BossBlueTransformation : MonoBehaviour
             Debug.Log("[BossBlueTransformation] BossHead 스프라이트를 파란색으로 교체 (투명 상태)");
         }
         
-        if (bossMouseRenderer != null && blueBossSprite != null)
+        // ⚠️ BossMouse는 스프라이트 교체 안 함! (원본 유지)
+        // BossMouse는 페이드만 처리
+        if (bossMouseRenderer != null)
         {
-            bossMouseRenderer.sprite = blueBossSprite;
             Color color = bossMouseRenderer.color;
-            color.a = 0f; // 투명
+            color.a = 0f; // 투명 상태로 시작
             bossMouseRenderer.color = color;
             
-            Debug.Log("[BossBlueTransformation] BossMouse 스프라이트를 파란색으로 교체 (투명 상태)");
+            Debug.Log("[BossBlueTransformation] BossMouse는 원본 스프라이트 유지 (투명 상태)");
         }
         
         // 2. 파란 보스 페이드 인 시작 (탄막이 계속 모이는 동안)
@@ -439,6 +455,13 @@ public class BossBlueTransformation : MonoBehaviour
         Color originalMouseColor = bossMouseRenderer != null ? bossMouseRenderer.color : Color.white;
         float elapsed = 0f;
         
+        // ⚠️ BossMouse 비활성화
+        if (bossMouse != null)
+        {
+            bossMouse.SetActive(false);
+            Debug.Log("[BossBlueTransformation] BossMouse 비활성화됨");
+        }
+        
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
@@ -452,18 +475,10 @@ public class BossBlueTransformation : MonoBehaviour
                 bossHeadRenderer.color = color;
             }
             
-            // BossMouse 페이드 인
-            if (bossMouseRenderer != null)
-            {
-                Color color = originalMouseColor;
-                color.a = Mathf.Lerp(0f, 1f, t);
-                bossMouseRenderer.color = color;
-            }
-            
             yield return null;
         }
         
-        // 완전히 불투명하게
+        // 완전히 불투명하게 (BossHead만)
         if (bossHeadRenderer != null)
         {
             Color finalColor = originalHeadColor;
@@ -471,14 +486,7 @@ public class BossBlueTransformation : MonoBehaviour
             bossHeadRenderer.color = finalColor;
         }
         
-        if (bossMouseRenderer != null)
-        {
-            Color finalColor = originalMouseColor;
-            finalColor.a = 1f;
-            bossMouseRenderer.color = finalColor;
-        }
-        
-        Debug.Log("[BossBlueTransformation] 파란 보스 페이드 인 완료 (Head + Mouse)");
+        Debug.Log("[BossBlueTransformation] 파란 보스 페이드 인 완료 (Head만, Mouse는 꺼짐)");
     }
 
     IEnumerator WhiteExplosion()
