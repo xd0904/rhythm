@@ -2,6 +2,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 
+
 public class TypingEffect : MonoBehaviour
 {
     [Header("타이핑 설정")]
