@@ -957,7 +957,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doubleClickTime: 0.3
   targetObject: {fileID: 0}
+  targetObject2: {fileID: 0}
   Object: {fileID: 0}
+  animationDuration: 0.5
 --- !u!1 &605433583
 GameObject:
   m_ObjectHideFlags: 0
@@ -2926,7 +2928,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1075201704
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4727,7 +4729,6 @@ MonoBehaviour:
   normalMouse: {fileID: 924480919}
   bossHead: {fileID: 1075201703}
   boss: {fileID: 0}
-  boss: {fileID: 0}
   orbCount: 50
   orbSpawnRadius: 8
   orbColor: {r: 0.83921576, g: 0.17254902, b: 0.17254902, a: 1}
@@ -5284,6 +5285,7 @@ MonoBehaviour:
   bulletSize: 0.4
   bulletSpeed: 2.5
   bulletTrailLength: 1.5
+  blueBossSprite: {fileID: 0}
   explosionColor: {r: 1, g: 1, b: 1, a: 1}
   explosionBulletCount: 30
   explosionSpeed: 5
