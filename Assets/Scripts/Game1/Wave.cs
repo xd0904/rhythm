@@ -11,11 +11,11 @@ public class Wave : MonoBehaviour
     public Transform waveParent;       // 생성된 물결을 정리할 부모 오브젝트
 
     [Header("Generation Settings")]
-    public int seriesCount = 4;         // 한 번에 쏟아지는 줄(시리즈)의 총 개수
+    public int seriesCount = 5;         // 한 번에 쏟아지는 줄(시리즈)의 총 개수
     public int burstCount = 3;          // 한 줄당 생성될 오브젝트의 개수 (물결 길이)
     public float waveSpacing = 0.4f;    // 한 줄 내 오브젝트 간 세로 간격
     public float burstInterval = 1.0f;  // 줄과 줄 사이의 대기 간격 (툭툭 떨어지는 템포)
-    public float seriesCooldown = 3.0f; // 전체 시리즈가 끝난 후 다음 시리즈 시작까지의 대기 시간
+    public float seriesCooldown = 1.0f; // 전체 시리즈가 끝난 후 다음 시리즈 시작까지의 대기 시간
 
     [Header("Movement & Appearance")]
     public float waveLifetime = 2.5f;   // ⭐물결의 길이 결정 (0.8f로 짧게 설정)

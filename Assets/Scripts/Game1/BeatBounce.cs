@@ -273,7 +273,7 @@ public class BeatBounce : MonoBehaviour
             Debug.Log($"[BeatBounce] Beat {currentBeatIndex} at {currentMusicTime:F2}s");
 
             // 25.7초 이상이면 물결 생성 (한 번만)
-            if (!waveSpawned && currentMusicTime >= 25.7f && currentMusicTime <= 44f)
+            if (!waveSpawned && currentMusicTime >= 25.6f && currentMusicTime <= 51f)
             {
                 waveSpawned = true;
                 SpawnWave();
@@ -1152,70 +1152,7 @@ public class BeatBounce : MonoBehaviour
             Destroy(waveObj);
     }
 
-    // 위에서 아래로 쏟아지는 대각선 물결
-    private IEnumerator VerticalBounceDiagonal(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
-    {
-        Vector3 startPos = wave.transform.position;
-        float timer = 0f;
-
-        while (wave != null && timer < 1.5f)
-        {
-            timer += Time.deltaTime * speed;
-
-            // 좌우 흔들림 (물결 잔상 느낌)
-            float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
-
-            // 제한된 y 이동 (짧은 물결)
-            float moveY = -timer * moveSpeed * 6f;
-
-            // 왼쪽 흐름
-            float moveX = -timer * leftFlowSpeed * 1.8f;
-
-            wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
-
-            // 아래쪽 화면 밖으로 충분히 나갔을 때 파괴하도록 수정 (⭐수정: -7f → -10f)
-            if (wave.transform.position.y < -10f)
-            {
-                Destroy(wave);
-                yield break;
-            }
-
-
-            yield return null;
-        }
-
-        if (wave != null)
-            Destroy(wave);
-    }
-
-    // 아래에서 위로 솟아오르는 대각선 물결
-    private IEnumerator VerticalBounceDiagonalUp(GameObject wave, float amplitude, float speed, float moveSpeed, float leftFlowSpeed)
-    {
-        Vector3 startPos = wave.transform.position;
-        float timer = 0f;
-
-        while (wave != null && timer < 1.5f)
-        {
-            timer += Time.deltaTime * speed;
-            float offsetX = Mathf.Sin(timer * Mathf.PI * 6f) * amplitude * 0.1f;
-            float moveY = timer * moveSpeed * 6f;
-            float moveX = -timer * leftFlowSpeed * 1.8f;
-
-            wave.transform.position = startPos + new Vector3(moveX + offsetX, moveY, 0f);
-
-            if (wave.transform.position.y > 10f)
-            {
-                Destroy(wave);
-                yield break;
-            }
-
-            yield return null;
-        }
-
-        if (wave != null)
-            Destroy(wave);
-    }
-
+    
     /// <summary>
     /// 이등변삼각형 생성 및 튕기기 (13.7초 ~ 25.7초 패턴)
     /// </summary>
