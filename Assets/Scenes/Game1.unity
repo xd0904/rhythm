@@ -958,6 +958,7 @@ MonoBehaviour:
   doubleClickTime: 0.3
   targetObject: {fileID: 0}
   targetObject2: {fileID: 0}
+  targetObject2: {fileID: 0}
   Object: {fileID: 0}
   animationDuration: 0.5
 --- !u!1 &605433583
@@ -5055,6 +5056,8 @@ MonoBehaviour:
   outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
   smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
   beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
+  beamHitParticlePrefab: {fileID: 0}
+  hitParticleCount: 5
   bossObject: {fileID: 1075201703}
   missileCount: 4
   spawnDelay: 0.2
