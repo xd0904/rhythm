@@ -119,6 +119,13 @@ public class GameOver : MonoBehaviour
         PlayerPrefs.SetFloat("StartTime", 44f);
         PlayerPrefs.Save();
         
+        // BGM 피치 초기화 (죽었을 때 낮아진 피치 복구)
+        if (SoundManager.Instance != null && SoundManager.Instance.BGMSource != null)
+        {
+            SoundManager.Instance.BGMSource.pitch = 1.0f;
+            Debug.Log("[GameOver] BGM 피치 초기화: 1.0");
+        }
+        
         SceneManager.LoadScene("Game1");
     }
 }

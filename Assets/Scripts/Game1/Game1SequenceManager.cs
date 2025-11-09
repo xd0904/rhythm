@@ -312,6 +312,17 @@ public class Game1SequenceManager : MonoBehaviour
         {
             SoundManager.Instance.PlayBGM(bgmClip);
             Debug.Log($"[Game1SequenceManager] BGM 시작: {bgmClip.name}");
+            
+            // BGM 루프 끄기 (노래 반복 안 되게)
+            if (SoundManager.Instance.BGMSource != null)
+            {
+                SoundManager.Instance.BGMSource.loop = false;
+                Debug.Log("[Game1SequenceManager] BGM Loop OFF");
+                
+                // 피치 초기화 (죽었다 재시작했을 때를 위해)
+                SoundManager.Instance.BGMSource.pitch = 1.0f;
+                Debug.Log("[Game1SequenceManager] BGM Pitch 초기화: 1.0");
+            }
         }
         else
         {
