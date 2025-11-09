@@ -5,7 +5,9 @@ public class BossDragPattern : MonoBehaviour
 {
     [Header("타이밍 설정")]
     public float patternStartTime = 96f; // 1분 36초
-    public float patternEndTime = 108f; // 1분 48초
+    public float patternEndTime = 108.8f; // 1분 48.8초
+    public float patternStartTime2 = 121.6f; // 2분 1.6초 (두 번째 구간)
+    public float patternEndTime2 = 134.4f; // 2분 14.4초 (두 번째 구간)
     public float beatInterval = 0.4f; // BPM 150 기준 (60/150)
     
     [Header("대상 오브젝트")]
@@ -68,34 +70,61 @@ public class BossDragPattern : MonoBehaviour
         
         double musicTime = BeatBounce.Instance.GetMusicTime();
         
-        // 1분 36초에 패턴 시작
+        // 1분 36초에 패턴 시작 (첫 번째 구간)
         if (!patternStarted && musicTime >= patternStartTime && musicTime < patternEndTime)
         {
             patternStarted = true;
-            Debug.Log($"[BossDragPattern] 패턴 시작! musicTime: {musicTime}");
+            Debug.Log($"[BossDragPattern] 패턴 시작 (1차)! musicTime: {musicTime}");
             StartCoroutine(DragPatternSequence());
         }
         
-        // 패턴 종료
-        if (patternStarted && musicTime >= patternEndTime)
+        // 2분 1초에 패턴 다시 시작 (두 번째 구간)
+        if (!patternStarted && musicTime >= patternStartTime2 && musicTime < patternEndTime2)
+        {
+            patternStarted = true;
+            Debug.Log($"[BossDragPattern] 패턴 시작 (2차)! musicTime: {musicTime}");
+            StartCoroutine(DragPatternSequence2());
+        }
+        
+        // 패턴 종료 (첫 번째 구간)
+        if (patternStarted && musicTime >= patternEndTime && musicTime < patternStartTime2)
         {
             patternStarted = false;
-            Debug.Log("[BossDragPattern] 패턴 종료");
+            Debug.Log("[BossDragPattern] 패턴 종료 (1차)");
+        }
+        
+        // 패턴 종료 (두 번째 구간)
+        if (patternStarted && musicTime >= patternEndTime2)
+        {
+            patternStarted = false;
+            Debug.Log("[BossDragPattern] 패턴 종료 (2차)");
         }
     }
     
     IEnumerator DragPatternSequence()
     {
-        // 96초부터 108초까지 계속 반복
-        while (BeatBounce.Instance != null && BeatBounce.Instance.GetMusicTime() < patternEndTime)
+        // 96초부터 108.8초까지 16번 반복 (32박자)
+        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
+        for (int i = 0; i < 16; i++)
         {
+            // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
             yield return StartCoroutine(CreateDragArea());
-            
-            // 다음 공격까지 대기 (1박자)
-            yield return new WaitForSeconds(beatInterval);
         }
         
-        Debug.Log("[BossDragPattern] 시퀀스 완료");
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (1차): 16번 반복, 32박자");
+    }
+    
+    IEnumerator DragPatternSequence2()
+    {
+        // 121.6초부터 134.4초까지 16번 반복 (32박자)
+        // ⚠️ 시간 체크는 시작 전에만! 루프 중에는 횟수로만 제어 (안 그러면 마지막에 끊김)
+        for (int i = 0; i < 16; i++)
+        {
+            // 드래그 (1박자) + 폭발/쉬기 (1박자) = 총 2박자
+            yield return StartCoroutine(CreateDragArea());
+        }
+        
+        Debug.Log("[BossDragPattern] 시퀀스 완료 (2차): 16번 반복, 32박자");
     }
     
     IEnumerator CreateDragArea()
@@ -114,13 +143,13 @@ public class BossDragPattern : MonoBehaviour
         
         Debug.Log($"[BossDragPattern] 드래그: {startPos} → {endPos}");
         
-        // 1단계: 4분의 2박자(0.2초) 동안 드래그
-        float dragDuration = beatInterval / 2f; // 2/4박자 = 0.2초
+        // 1단계: 1박자 동안 드래그
+        float dragDuration = beatInterval; // 1박자 = 0.4초
         GameObject dragArea = null;
         
         yield return StartCoroutine(DragToPosition(startPos, endPos, dragDuration, (area) => dragArea = area));
         
-        // 2단계: 4분의 2박자(0.2초) 동안 터짐
+        // 2단계: 1박자 동안 터짐 (폭발 + 쉬기)
         if (dragArea != null)
         {
             yield return StartCoroutine(ExplodeDragArea(dragArea, dragDuration));

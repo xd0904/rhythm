@@ -5,8 +5,10 @@ using System.Collections;
 public class BossRectanglePattern : MonoBehaviour
 {
     [Header("타이밍 설정")]
-    public float patternStartTime = 108f; // 1분 48초
-    public float patternEndTime = 121f; // 2분 1초
+    public float patternStartTime = 108.8f; // 1분 48.8초
+    public float patternEndTime = 121.6f; // 2분 1.6초
+    public float patternStartTime2 = 134.4f; // 2분 14.4초 (두 번째 구간)
+    public float patternEndTime2 = 147.2f; // 2분 27.2초 (두 번째 구간)
     public float beatInterval = 0.4f; // BPM 150 기준 (60/150)
     
     [Header("대상 오브젝트")]
@@ -34,7 +36,7 @@ public class BossRectanglePattern : MonoBehaviour
     private int scannedCount = 1024; // 스캔된 개수
     
     [Header("백신 창 표시 시간")]
-    public float vaccineProgramDisplayDuration = 1.5f; // 백신 창 표시 시간 (초)
+    public float vaccineProgramDisplayDuration = 0.8f; // 백신 창 표시 시간 (초) - 직사각형 재소환 전에 꺼지도록 짧게
     
     [Header("직사각형 설정")]
     public GameObject[] topRectangles = new GameObject[5]; // 위쪽 직사각형 5개 (1, 2, 3, 4, 5)
@@ -92,90 +94,143 @@ public class BossRectanglePattern : MonoBehaviour
         
         double musicTime = BeatBounce.Instance.GetMusicTime();
         
-        // 1분 48초에 패턴 시작
-        if (!patternStarted && musicTime >= patternStartTime && musicTime < patternEndTime)
+        // 1분 48초에 패턴 시작 (첫 번째 구간) - 정확히 108초에만 트리거
+        if (!patternStarted && musicTime >= patternStartTime && musicTime < patternStartTime + 0.1)
         {
             patternStarted = true;
-            Debug.Log($"[BossRectanglePattern] 패턴 시작! musicTime: {musicTime}");
+            Debug.Log($"[BossRectanglePattern] 패턴 시작 (1차)! musicTime: {musicTime}");
             StartCoroutine(RectanglePatternSequence());
         }
         
-        // 패턴 종료
-        if (patternStarted && musicTime >= patternEndTime)
+        // 2분 14초에 패턴 다시 시작 (두 번째 구간) - 정확히 134초에만 트리거
+        if (!patternStarted && musicTime >= patternStartTime2 && musicTime < patternStartTime2 + 0.1)
+        {
+            patternStarted = true;
+            Debug.Log($"[BossRectanglePattern] 패턴 시작 (2차)! musicTime: {musicTime}");
+            StartCoroutine(RectanglePatternSequence2());
+        }
+        
+        // 패턴 종료 (첫 번째 구간)
+        if (patternStarted && musicTime >= patternEndTime && musicTime < patternStartTime2)
         {
             patternStarted = false;
-            Debug.Log("[BossRectanglePattern] 패턴 종료");
+            Debug.Log("[BossRectanglePattern] 패턴 종료 (1차)");
+        }
+        
+        // 패턴 종료 (두 번째 구간)
+        if (patternStarted && musicTime >= patternEndTime2)
+        {
+            patternStarted = false;
+            Debug.Log("[BossRectanglePattern] 패턴 종료 (2차)");
         }
     }
     
     IEnumerator RectanglePatternSequence()
     {
-        // 108초부터 121초까지 계속 반복
-        while (BeatBounce.Instance != null && BeatBounce.Instance.GetMusicTime() < patternEndTime)
+        // 108.8초부터 121.6초까지 4번 반복 (총 32박자)
+        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
+        
+        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
+        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        
+        for (int repeat = 0; repeat < 4; repeat++)
         {
-            // Boss를 오른쪽 가운데로 이동
-            yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+            if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime)
+            {
+                break;
+            }
             
-            // === 1단계: 직사각형 생성 + 왼쪽 돌진 (4박자) ===
+            // === 1단계: 직사각형 생성 + 돌진 (총 8박자) ===
             // 0번 소환
             SpawnRectangle(0);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
             // 1번 소환
             SpawnRectangle(1);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
             // 2번 소환
             SpawnRectangle(2);
-            yield return new WaitForSeconds(beatInterval / 4f); // 4분의 1박자
+            yield return new WaitForSeconds(beatInterval / 4f); // 0.25박자
             
             // 3번 소환
             SpawnRectangle(3);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
-            // 4번 소환과 동시에 Boss 왼쪽으로 돌진!
+            // 4번 소환과 동시에 Boss 돌진!
             SpawnRectangle(4);
-            StartCoroutine(BossRushLeft());
+            if (repeat % 2 == 0)
+            {
+                StartCoroutine(BossRushLeft()); // 짝수 번째: 오른쪽 → 왼쪽
+            }
+            else
+            {
+                StartCoroutine(BossRushRight()); // 홀수 번째: 왼쪽 → 오른쪽
+            }
             
-            // 나머지 시간 대기 (총 4박자 맞추기: 2박자 + 1.75박자 = 3.75박자, 0.25박자 추가)
-            yield return new WaitForSeconds(beatInterval * 2.25f);
+            // 나머지 시간 대기 (총 8박자: 1.75박자 지남, 6.25박자 남음)
+            yield return new WaitForSeconds(beatInterval * 6.25f);
             
-            // === 2단계: 직사각형 제거 + 4박자 쉬기 (4박자) ===
+            // === 2단계: 직사각형 제거 + Boss 반전 ===
             FlipBoss(); // Boss 반전
             ClearSpawnedRectangles(); // 직사각형 제거
-            yield return new WaitForSeconds(beatInterval * 4f); // 4박자 쉬기
+        }
+        
+        Debug.Log("[BossRectanglePattern] 시퀀스 완료 (1차): 4번 반복, 32박자");
+    }
+    
+    IEnumerator RectanglePatternSequence2()
+    {
+        // 134.4초부터 147.2초까지 4번 반복 (총 32박자)
+        // 첫 번째 Boss 이동은 시간에 포함 안 됨 (패턴 시작 전)
+        
+        // Boss를 오른쪽으로 이동 (패턴 시작 전 준비)
+        yield return StartCoroutine(MoveBossToPosition(bossWaitPosition));
+        
+        for (int repeat = 0; repeat < 4; repeat++)
+        {
+            if (BeatBounce.Instance == null || BeatBounce.Instance.GetMusicTime() >= patternEndTime2)
+            {
+                break;
+            }
             
-            // === 3단계: 직사각형 생성 + 오른쪽 돌진 (4박자) ===
+            // === 1단계: 직사각형 생성 + 돌진 (총 8박자) ===
             // 0번 소환
             SpawnRectangle(0);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
             // 1번 소환
             SpawnRectangle(1);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
             // 2번 소환
             SpawnRectangle(2);
-            yield return new WaitForSeconds(beatInterval / 4f); // 4분의 1박자
+            yield return new WaitForSeconds(beatInterval / 4f); // 0.25박자
             
             // 3번 소환
             SpawnRectangle(3);
-            yield return new WaitForSeconds(beatInterval / 2f); // 2분의 1박자
+            yield return new WaitForSeconds(beatInterval / 2f); // 0.5박자
             
-            // 4번 소환과 동시에 Boss 오른쪽으로 돌진!
+            // 4번 소환과 동시에 Boss 돌진!
             SpawnRectangle(4);
-            StartCoroutine(BossRushRight());
+            if (repeat % 2 == 0)
+            {
+                StartCoroutine(BossRushLeft()); // 짝수 번째: 오른쪽 → 왼쪽
+            }
+            else
+            {
+                StartCoroutine(BossRushRight()); // 홀수 번째: 왼쪽 → 오른쪽
+            }
             
-            // 나머지 시간 대기 (총 4박자 맞추기)
-            yield return new WaitForSeconds(beatInterval * 2.25f);
+            // 나머지 시간 대기 (총 8박자: 1.75박자 지남, 6.25박자 남음)
+            yield return new WaitForSeconds(beatInterval * 6.25f);
             
-            // === 4단계: 직사각형 제거 + 4박자 쉬기 (4박자) ===
-            FlipBoss(); // Boss 반전 (원래 방향으로)
+            // === 2단계: 직사각형 제거 + Boss 반전 ===
+            FlipBoss(); // Boss 반전
             ClearSpawnedRectangles(); // 직사각형 제거
-            yield return new WaitForSeconds(beatInterval * 4f); // 4박자 쉬기
         }
         
-        Debug.Log("[BossRectanglePattern] 시퀀스 완료");
+        Debug.Log("[BossRectanglePattern] 시퀀스 완료 (2차): 4번 반복, 32박자");
     }
     
     void SpawnRectangle(int index)

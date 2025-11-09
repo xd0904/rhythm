@@ -14,6 +14,9 @@ public class MissileLauncher : MonoBehaviour
     public GameObject smallCirclePrefab;    // 팡! 터지는 프리팹
     [Header("이펙트 프리팹")]
     public GameObject beamPrefab; // 빔 쏘는 연출용
+    
+    [Header("보스 오브젝트")]
+    public GameObject bossObject; // 비활성화할 보스 오브젝트
 
     public int missileCount = 4;            // 한 번에 생성할 개수
     public float spawnDelay = 0.2f;         // 각 미사일 생성 간격
@@ -25,6 +28,7 @@ public class MissileLauncher : MonoBehaviour
     public float spawnRadius = 0.5f;        // 스포너를 중심으로 생성될 반경 (곡선 생성 느낌을 위해)
 
     private Transform playerTransform;      // 플레이어의 위치를 저장할 변수
+    private bool bossDeactivated = false;   // 보스 비활성화 여부
 
     void Start()
     {
@@ -43,6 +47,24 @@ public class MissileLauncher : MonoBehaviour
         if (playerTransform != null)
         {
             StartCoroutine(SpawnAndFireRoutine());
+        }
+    }
+    
+    void Update()
+    {
+        if (beatBounce == null) return;
+        
+        double musicTime = beatBounce.GetMusicTime();
+        
+        // 57초에 보스 오브젝트 비활성화
+        if (!bossDeactivated && musicTime >= 57f)
+        {
+            bossDeactivated = true;
+            if (bossObject != null)
+            {
+                bossObject.SetActive(false);
+                Debug.Log("[MissileLauncher] 57초에 Boss 오브젝트 비활성화됨");
+            }
         }
     }
 
