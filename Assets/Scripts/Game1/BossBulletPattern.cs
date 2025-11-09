@@ -4,7 +4,7 @@ using System.Collections;
 public class BossBulletPattern : MonoBehaviour
 {
     [Header("타이밍 설정")]
-    public float bossActivateTime = 70f; // 1분 10초 (70초)
+    public float bossActivateTime = 89f; // 1분 29초 (89초)
     public float pattern1StartTime = 89f; // 1분 29초 (89초)
     public float pattern1EndTime = 95f; // 1분 35초 (95초)
     
@@ -48,7 +48,7 @@ public class BossBulletPattern : MonoBehaviour
         }
         
         // 타이밍 강제 설정
-        bossActivateTime = 70f;
+        bossActivateTime = 89f;
         pattern1StartTime = 89f;
         pattern1EndTime = 95f;
         mouseMoveToBottomRightDuration = 1.5f;
