@@ -15,8 +15,8 @@ public class SoundManager : MonoBehaviour
 
     [Header("Volume Settings")]
     [Range(0f, 1f)] public float bgmVolume = 1f;
-    [Range(0f, 1f)] public float sfxVolume = 0.7f;
-    [Range(0f, 1f)] public float morseVolume = 1f;
+    [Range(0f, 1f)] public float sfxVolume = 0.5f;
+    [Range(0f, 1f)] public float morseVolume = 0.7f;
 
     [Header("Musics")]
     [SerializeField] List<AudioClip> musics;
