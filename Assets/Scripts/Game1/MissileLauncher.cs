@@ -74,7 +74,7 @@ public class MissileLauncher : MonoBehaviour
         while (beatBounce.GetMusicTime() < 57f)
             yield return null;
 
-        while (beatBounce.GetMusicTime() >= 57f && beatBounce.GetMusicTime() < 89f)
+        while (beatBounce.GetMusicTime() >= 57f && beatBounce.GetMusicTime() < 70f)
         {
             Vector3 fixedPlayerPos = playerTransform.position;
             List<GuidedMissile> spawnedMissiles = new List<GuidedMissile>();
