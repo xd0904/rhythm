@@ -1260,7 +1260,7 @@ MonoBehaviour:
   patternEndTime2: 134
   beatInterval: 0.4
   mouseCursor: {fileID: 1075201704}
-  mainCamera: {fileID: 632646935}
+  mainCamera: {fileID: 0}
   gameWindow: {fileID: 118774634}
   dragAreaPrefab: {fileID: 8932346987546887, guid: bd2f3f9ca91c9494ab739d6747da700b, type: 3}
   explosionSprite: {fileID: -2332426946593458350, guid: 5c861c3802039994795ec4c64fb28078, type: 3}
@@ -5515,8 +5515,8 @@ MonoBehaviour:
   boss: {fileID: 1075201704}
   bossMoveSpeed: 5
   bossRushSpeed: 15
-  bossWaitPosition: {x: 5, y: 0, z: 0}
-  bossRushTargetPosition: {x: -5, y: 0, z: 0}
+  bossWaitPosition: {x: 8, y: 0, z: 0}
+  bossRushTargetPosition: {x: -8, y: 0, z: 0}
   vaccineColor: {r: 0, g: 1, b: 0, a: 1}
   originalBossColor: {r: 1, g: 0, b: 0, a: 1}
   colorChangeDuration: 0.3

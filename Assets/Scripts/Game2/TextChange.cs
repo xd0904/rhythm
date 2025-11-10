@@ -181,11 +181,21 @@ public class TextChange : MonoBehaviour
             yield return null;
         }
 
-        // window들 비활성화
-        window.SetActive(false);
-        window2.SetActive(false);
-
-        SceneManager.LoadScene("Game3");
+        // window들 애니메이션으로 전환
+        Game2ToGame3Transition transition = FindFirstObjectByType<Game2ToGame3Transition>();
+        if (transition != null)
+        {
+            // 전환 애니메이션 시작
+            transition.StartTransition();
+        }
+        else
+        {
+            // 전환 스크립트가 없으면 바로 씬 전환
+            Debug.LogWarning("[TextChange] Game2ToGame3Transition을 찾을 수 없습니다. 바로 씬 전환합니다.");
+            window.SetActive(false);
+            window2.SetActive(false);
+            SceneManager.LoadScene("Game3");
+        }
 
     }
 
