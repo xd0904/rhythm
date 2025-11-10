@@ -46,6 +46,11 @@ public class BossRectanglePattern : MonoBehaviour
     private Bounds gameWindowBounds;
     private System.Collections.Generic.List<GameObject> spawnedRectangles = new System.Collections.Generic.List<GameObject>(); // 생성된 직사각형 추적
     
+    private bool bossTagChanged1 = false; // 1분 48.8초 태그 변경 플래그
+    private bool bossTagReverted1 = false; // 2분 1.6초 태그 복원 플래그
+    private bool bossTagChanged2 = false; // 2분 14.4초 태그 변경 플래그
+    private bool bossTagReverted2 = false; // 2분 27.2초 태그 복원 플래그
+    
     void Start()
     {
         // 게임 창 정보 가져오기
@@ -93,6 +98,102 @@ public class BossRectanglePattern : MonoBehaviour
         if (BeatBounce.Instance == null) return;
         
         double musicTime = BeatBounce.Instance.GetMusicTime();
+        
+        // 1분 48.8초 (108.8초)에 Boss 태그를 RectangleBoss로 변경
+        if (!bossTagChanged1 && musicTime >= 108.8f)
+        {
+            bossTagChanged1 = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    bossTransform.gameObject.tag = "RectangleBoss";
+                    Debug.Log("[BossRectanglePattern] 108.8초에 Boss 태그를 'RectangleBoss'로 변경했습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning("[BossRectanglePattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossRectanglePattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        
+        // 2분 1.6초 (121.6초)에 Boss 태그를 Untagged로 복원
+        if (!bossTagReverted1 && musicTime >= 121.6f)
+        {
+            bossTagReverted1 = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    bossTransform.gameObject.tag = "Untagged";
+                    Debug.Log("[BossRectanglePattern] 121.6초에 Boss 태그를 'Untagged'로 복원했습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning("[BossRectanglePattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossRectanglePattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        
+        // 2분 14.4초 (134.4초)에 Boss 태그를 RectangleBoss로 변경
+        if (!bossTagChanged2 && musicTime >= 134.4f)
+        {
+            bossTagChanged2 = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    bossTransform.gameObject.tag = "RectangleBoss";
+                    Debug.Log("[BossRectanglePattern] 134.4초에 Boss 태그를 'RectangleBoss'로 변경했습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning("[BossRectanglePattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossRectanglePattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        
+        // 2분 27.2초 (147.2초)에 Boss 태그를 Untagged로 복원
+        if (!bossTagReverted2 && musicTime >= 147.2f)
+        {
+            bossTagReverted2 = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    bossTransform.gameObject.tag = "Untagged";
+                    Debug.Log("[BossRectanglePattern] 147.2초에 Boss 태그를 'Untagged'로 복원했습니다.");
+                }
+                else
+                {
+                    Debug.LogWarning("[BossRectanglePattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossRectanglePattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
+        }
         
         // 1분 48초보다 1초 전에 보스 이동 시작 (107.8초)
         if (!patternStarted && musicTime >= patternStartTime - 1.0 && musicTime < patternStartTime)

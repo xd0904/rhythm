@@ -39,6 +39,8 @@ public class BossBulletPattern : MonoBehaviour
     private Vector3 bossMouseOriginalScale;
     private Vector3 bossMouseOriginalLocalPosition;
     private bool bossMouseInitialized = false;
+    private bool bossMouseTagChanged = false; // 태그 변경 여부
+    private bool bossMouseTagReverted = false; // 태그 복원 여부
 
     void Start()
     {
@@ -139,6 +141,38 @@ public class BossBulletPattern : MonoBehaviour
         // 음악이 시작 안 했으면 대기
         if (musicTime <= 0) return;
         
+        // 1분 29초 (89초)에 BossMouse 태그 변경
+        if (!bossMouseTagChanged && musicTime >= 89f)
+        {
+            bossMouseTagChanged = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    Transform bossMouseTransform = bossTransform.Find("BossMouse");
+                    if (bossMouseTransform != null)
+                    {
+                        bossMouseTransform.gameObject.tag = "Arrow";
+                        Debug.Log("[BossBulletPattern] 89초에 BossMouse 태그를 'Arrow'로 변경했습니다.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[BossBulletPattern] Mouse > Boss > BossMouse를 찾을 수 없습니다.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[BossBulletPattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossBulletPattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
+        }
+        
         // 1분 10초 (70초)에 Boss 오브젝트 활성화
         if (!bossActivated && musicTime >= bossActivateTime)
         {
@@ -160,6 +194,38 @@ public class BossBulletPattern : MonoBehaviour
             Debug.Log($"[BossBulletPattern] 패턴 1 시작! musicTime: {musicTime}");
             pattern1Started = true;
             StartCoroutine(Pattern1Sequence());
+        }
+        
+        // 1분 35초 (95초)에 BossMouse 태그 복원
+        if (!bossMouseTagReverted && musicTime >= 95f)
+        {
+            bossMouseTagReverted = true;
+            GameObject mouseCursorObj = GameObject.Find("Mouse");
+            if (mouseCursorObj != null)
+            {
+                Transform bossTransform = mouseCursorObj.transform.Find("Boss");
+                if (bossTransform != null)
+                {
+                    Transform bossMouseTransform = bossTransform.Find("BossMouse");
+                    if (bossMouseTransform != null)
+                    {
+                        bossMouseTransform.gameObject.tag = "Untagged";
+                        Debug.Log("[BossBulletPattern] 95초에 BossMouse 태그를 'Untagged'로 복원했습니다.");
+                    }
+                    else
+                    {
+                        Debug.LogWarning("[BossBulletPattern] Mouse > Boss > BossMouse를 찾을 수 없습니다.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("[BossBulletPattern] Mouse > Boss를 찾을 수 없습니다.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[BossBulletPattern] Mouse 오브젝트를 찾을 수 없습니다.");
+            }
         }
     }
 

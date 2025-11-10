@@ -11,6 +11,11 @@ TagManager:
   - BounceWave
   - TwoTriangle
   - IsoscelesTriangle
+  - Arrow
+  - RedDrag
+  - Undefined
+  - Rectangle
+  - RectangleBoss
   layers:
   - Default
   - TransparentFX

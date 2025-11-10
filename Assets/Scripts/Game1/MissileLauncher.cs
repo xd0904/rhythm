@@ -744,6 +744,12 @@ public class MissileLauncher : MonoBehaviour
     // 벽에 닿을 때 파티클 생성
     private void SpawnBeamHitParticles(Vector3 position)
     {
+        // 화면 흔들림 효과 추가
+        if (Camera.main != null)
+        {
+            StartCoroutine(ScreenShake(0.2f, 0.15f)); // 0.2초 동안, 0.15 강도
+        }
+        
         if (beamHitParticlePrefab != null)
         {
             // 프리팹 사용
@@ -815,6 +821,32 @@ public class MissileLauncher : MonoBehaviour
         }
 
         Destroy(particle);
+    }
+
+    // 화면 흔들림 효과
+    IEnumerator ScreenShake(float duration, float magnitude)
+    {
+        Camera cam = Camera.main;
+        if (cam == null) yield break;
+        
+        Vector3 originalPos = cam.transform.position;
+        float elapsed = 0f;
+        
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = 1f - (elapsed / duration); // 점점 약해짐
+            
+            float x = Random.Range(-1f, 1f) * magnitude * t;
+            float y = Random.Range(-1f, 1f) * magnitude * t;
+            
+            cam.transform.position = originalPos + new Vector3(x, y, 0f);
+            
+            yield return null;
+        }
+        
+        // 원래 위치로 복귀
+        cam.transform.position = originalPos;
     }
 
 }
