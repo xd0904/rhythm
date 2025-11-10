@@ -322,6 +322,10 @@ public class Game1SequenceManager : MonoBehaviour
                 // 피치 초기화 (죽었다 재시작했을 때를 위해)
                 SoundManager.Instance.BGMSource.pitch = 1.0f;
                 Debug.Log("[Game1SequenceManager] BGM Pitch 초기화: 1.0");
+                
+                // ⚠️ BGM 볼륨 키우기
+                SoundManager.Instance.BGMSource.volume = 1.0f;
+                Debug.Log("[Game1SequenceManager] BGM Volume: 1.0 (최대)");
             }
         }
         else

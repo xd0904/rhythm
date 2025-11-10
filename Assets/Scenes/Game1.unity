@@ -481,18 +481,18 @@ MonoBehaviour:
   beatBounce: {fileID: 1740529744}
   bounceWavePrefab: {fileID: 3963892975576905091, guid: 02b49500329c491468f4bda64f96ba21, type: 3}
   waveParent: {fileID: 198122035}
-  seriesCount: 2
+  seriesCount: 4
   burstCount: 20
   waveSpacing: 0.4
-  burstInterval: 1
-  seriesCooldown: 1
+  burstInterval: 0.6
+  seriesCooldown: 0.6
   waveLifetime: 5
   moveSpeed: 0.2
   leftFlowSpeed: 0.4
   amplitude: 0.1
   destroyBoundaryY: 10
-  startSyncTime: 28
-  endSyncTime: 42
+  startSyncTime: 32
+  endSyncTime: 44
 --- !u!1 &299626469
 GameObject:
   m_ObjectHideFlags: 0
@@ -2083,7 +2083,7 @@ MonoBehaviour:
   scaleDuration: 1
   shakeIntensity: 10
   rotationAmount: 15
-  bgmClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  bgmClip: {fileID: 8300000, guid: 820720869b7274c4d91d213b50d15dea, type: 3}
 --- !u!4 &856689019
 Transform:
   m_ObjectHideFlags: 0
@@ -5062,7 +5062,6 @@ MonoBehaviour:
   bossObject: {fileID: 1075201703}
   missileCount: 4
   spawnDelay: 0.2
-  fireDelay: 0.5
   missileSpeed: 8
   spreadAngle: 90
   spawnRadius: 0.5
@@ -5289,7 +5288,7 @@ MonoBehaviour:
   bulletSize: 0.4
   bulletSpeed: 2.5
   bulletTrailLength: 1.5
-  blueBossSprite: {fileID: 0}
+  blueBossSprite: {fileID: 21300000, guid: 6efb99cfbbdf7664eb7921c1f5e536db, type: 3}
   explosionColor: {r: 1, g: 1, b: 1, a: 1}
   explosionBulletCount: 30
   explosionSpeed: 5
@@ -5485,7 +5484,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
