@@ -1614,6 +1614,8 @@ MonoBehaviour:
   - WaveAlt
   - BounceWave
   - IsoscelesTriangle
+  - Triangle
+  - Arrow
   minX: -4.4
   maxX: 4.4
   minY: -3.35

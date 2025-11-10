@@ -11,6 +11,7 @@ TagManager:
   - BounceWave
   - TwoTriangle
   - IsoscelesTriangle
+  - Arrow
   layers:
   - Default
   - TransparentFX
