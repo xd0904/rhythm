@@ -958,7 +958,6 @@ MonoBehaviour:
   doubleClickTime: 0.3
   targetObject: {fileID: 0}
   targetObject2: {fileID: 0}
-  targetObject2: {fileID: 0}
   Object: {fileID: 0}
   animationDuration: 0.5
 --- !u!1 &605433583
@@ -2082,7 +2081,7 @@ MonoBehaviour:
   scaleDuration: 1
   shakeIntensity: 10
   rotationAmount: 15
-  bgmClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  bgmClip: {fileID: 8300000, guid: 820720869b7274c4d91d213b50d15dea, type: 3}
 --- !u!4 &856689019
 Transform:
   m_ObjectHideFlags: 0
@@ -5483,7 +5482,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1

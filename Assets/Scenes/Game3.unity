@@ -957,7 +957,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doubleClickTime: 0.3
   targetObject: {fileID: 0}
+  targetObject2: {fileID: 0}
   Object: {fileID: 0}
+  animationDuration: 0.5
 --- !u!1 &605433583
 GameObject:
   m_ObjectHideFlags: 0
@@ -1253,6 +1255,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   patternStartTime: 96
   patternEndTime: 108
+  patternStartTime2: 121.6
+  patternEndTime2: 134.4
   beatInterval: 0.4
   mouseCursor: {fileID: 1075201704}
   mainCamera: {fileID: 632646935}
@@ -1764,8 +1768,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1570f1518a6cc5b4a812df3e9054d112, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bossActivateTime: 89
   pattern1StartTime: 89
   pattern1EndTime: 95
+  bossObject: {fileID: 0}
   mouseCursor: {fileID: 1075201704}
   mainCamera: {fileID: 632646935}
   gameWindow: {fileID: 118774634}
@@ -2074,7 +2080,7 @@ MonoBehaviour:
   scaleDuration: 1
   shakeIntensity: 10
   rotationAmount: 15
-  bgmClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  bgmClip: {fileID: 8300000, guid: 12ea3ad9e15f02f41be74ed230996b79, type: 3}
 --- !u!4 &856689019
 Transform:
   m_ObjectHideFlags: 0
@@ -4333,6 +4339,8 @@ MonoBehaviour:
   trailColor: {r: 1, g: 0, b: 0, a: 1}
   trailFadeDistance: 2
   triangleBeatsPerSpawn: 4
+  icon1: {fileID: 0}
+  icon2: {fileID: 0}
 --- !u!1 &1744098456
 GameObject:
   m_ObjectHideFlags: 0
@@ -4578,6 +4586,7 @@ MonoBehaviour:
   mouseCursor: {fileID: 924480924}
   normalMouse: {fileID: 924480919}
   bossHead: {fileID: 1075201703}
+  boss: {fileID: 0}
   orbCount: 50
   orbSpawnRadius: 8
   orbColor: {r: 0.83921576, g: 0.17254902, b: 0.17254902, a: 1}
@@ -4904,9 +4913,11 @@ MonoBehaviour:
   outerObjectPrefab: {fileID: 1912242708296310440, guid: fcfd1d87555d5c440935a7f13c09c9a7, type: 3}
   smallCirclePrefab: {fileID: 7497361499506392615, guid: e8b67bbd5faa78e438d06eb5c9c07a5a, type: 3}
   beamPrefab: {fileID: 5574908150581280479, guid: 4ea0c76a5b5221f4a9334fe9ead3b57b, type: 3}
+  beamHitParticlePrefab: {fileID: 0}
+  hitParticleCount: 5
+  bossObject: {fileID: 0}
   missileCount: 4
   spawnDelay: 0.2
-  fireDelay: 0.5
   missileSpeed: 8
   spreadAngle: 90
   spawnRadius: 0.5
@@ -5166,6 +5177,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   patternStartTime: 108
   patternEndTime: 121
+  patternStartTime2: 134.4
+  patternEndTime2: 147.2
   beatInterval: 0.4
   gameWindow: {fileID: 118774634}
   boss: {fileID: 1075201704}
@@ -5223,7 +5236,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  m_audioClip: {fileID: 0}
   m_Resource: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
