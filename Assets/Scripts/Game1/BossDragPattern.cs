@@ -26,12 +26,20 @@ public class BossDragPattern : MonoBehaviour
     private Vector3 gameWindowCenter;
     private Bounds gameWindowBounds;
     private Color originalBackgroundColor;
+    private Vector3 originalCameraPosition; // 카메라 원래 위치 저장
     
     void Start()
     {
         if (mainCamera == null)
         {
             mainCamera = Camera.main;
+        }
+        
+        // ⚠️ 카메라 원래 위치 저장
+        if (mainCamera != null)
+        {
+            originalCameraPosition = mainCamera.transform.position;
+            Debug.Log($"[BossDragPattern] 카메라 원래 위치 저장: {originalCameraPosition}");
         }
         
         // 게임 창 정보 가져오기
@@ -67,6 +75,12 @@ public class BossDragPattern : MonoBehaviour
     void Update()
     {
         if (BeatBounce.Instance == null) return;
+        
+        // ⚠️ 패턴 실행 중에는 카메라 위치 강제 고정
+        if (patternStarted && mainCamera != null)
+        {
+            mainCamera.transform.position = originalCameraPosition;
+        }
         
         double musicTime = BeatBounce.Instance.GetMusicTime();
         
