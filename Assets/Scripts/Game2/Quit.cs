@@ -3,7 +3,7 @@ using UnityEngine;
 public class Quit : MonoBehaviour
 {
 
-    [Tooltip("ÁßÁö ´©¸£°í ²¨Áö±â")]
+    [Tooltip("ì¤‘ì§€ ëˆ„ë¥´ê³  êº¼ì§€ê¸°")]
     public GameObject targetObject;
     public GameObject targetObject2;
 
@@ -12,18 +12,18 @@ public class Quit : MonoBehaviour
         if (targetObject != null)
         {
             targetObject.SetActive(false);
-            Debug.Log($"[VaccineIcon] {targetObject.name} ²¨Áü");
+            Debug.Log($"[VaccineIcon] {targetObject.name} êº¼ì§");
         }
     }
 
     public void StopButton()
     {
-        // °ÔÀÓ ÇÁ·Î±×·¥ ÄÑ±â
+        // ê²Œì„ í”„ë¡œê·¸ë¨ ì¼œê¸°
         if (targetObject != null)
         {
             targetObject.SetActive(true);
             targetObject2.SetActive(false);
-            Debug.Log("[Percent] °ÔÀÓ ÇÁ·Î±×·¥ È°¼ºÈ­");
+            Debug.Log("[Percent] ê²Œì„ í”„ë¡œê·¸ë¨ í™œì„±í™”");
         }
     }
 }
