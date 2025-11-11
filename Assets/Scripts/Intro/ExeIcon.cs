@@ -6,9 +6,13 @@ public class Exe : MonoBehaviour
     [Header("더블클릭 설정")]
     [Tooltip("더블클릭 시 활성화할 게임오브젝트")]
     public GameObject targetObject;
+
     
     [Tooltip("더블클릭 인식 시간 (초)")]
     public float doubleClickTime = 0.3f;
+
+    [Tooltip("클릭 사운드")]
+    public AudioClip ClickSound;
 
     private Image image;
     private RawImage rawImage;
@@ -46,6 +50,7 @@ public class Exe : MonoBehaviour
     void OnMouseDown()
     {
         float timeSinceLastClick = Time.time - lastClickTime;
+        SoundManager.Instance.PlaySFX(ClickSound);
         
         if (timeSinceLastClick <= doubleClickTime)
         {

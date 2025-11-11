@@ -23,7 +23,7 @@ public class ScreenFlipController : MonoBehaviour
     [Header("마우스 이동")]
     public float mouseMoveStartTime = 42f; // 마우스 이동 시작 시간 (44초 2초 전)
     public float mouseMoveDuration = 1.5f; // 마우스 이동 시간
-    
+
     private bool isFlipped = false;
     private bool isFlipping = false;
     private Vector3 dragStartPos;
