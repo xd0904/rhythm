@@ -638,7 +638,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: HI?
+  m_Text: Hey, there!
 --- !u!222 &319165015
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2658,12 +2658,23 @@ MonoBehaviour:
   blackScreen: {fileID: 1989230199}
   NoizeDuration: 1.5
   fadeToBlackDuration: 2
-  clickMessages:
-  - Hi?
-  - Why are you keep closing
-  - Hmm? One More?
-  - ...
-  - "ok. i got it (\uFF89\u2267\u06A1\u2266)\uFF89 "
+  autoMessages:
+  - Hey, there!
+  - "You really thought \nI was gone?"
+  - "That\u2019s adorable."
+  - "So\u2026 shall we play again?"
+  - "Not that you have a choice,\nHaha!\n\u2606*: .\uFF61. o(\u2267\u25BD\u2266)o
+    .\uFF61.:*\u2606"
+  messageIntervals:
+  - 2
+  - 3
+  - 5
+  clickMessage: 'Oh!
+
+    Why do you keep
+
+    trying to close me?'
+  clickMessageDuration: 0.7
 --- !u!1 &971802537
 GameObject:
   m_ObjectHideFlags: 0

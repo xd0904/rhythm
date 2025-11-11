@@ -37,25 +37,43 @@ public class TextChange : MonoBehaviour
     public float fadeToBlackDuration = 2f;
 
     [Header("메시지 설정")]
-    [Tooltip("클릭할 때마다 표시될 메시지들")]
+    [Tooltip("자동으로 표시될 메시지들")]
     [TextArea(2, 5)]
-    public string[] clickMessages = new string[]
+    public string[] autoMessages = new string[]
     {
-        "No",
-        "Don't close",
-        "NONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONONON"
+        "Hey, there!",
+        "You really thought\nI was gone?",
+        "That's adorable.",
+        "So... shall we play again?",
+        "Not that you have a choice,\nHaha!\n☆*: .. o(≧▽≦)o .. :*☆"
     };
+    
+    [Tooltip("각 메시지가 표시되는 시간 간격 (초)")]
+    public float[] messageIntervals = new float[]
+    {
+        2f,  // "No" 표시 후 2초
+        3f,  // "Don't close" 표시 후 3초
+        5f   // 마지막 메시지 표시 후 5초 (검은 화면)
+    };
+    
+    [Tooltip("X 버튼 클릭 시 표시될 메시지")]
+    [TextArea(2, 5)]
+    public string clickMessage = "Oh!\nWhy do you keep\ntrying to close me?";
+    
+    [Tooltip("클릭 메시지 표시 시간 (초)")]
+    public float clickMessageDuration = 1.5f;
 
-    private int clickCount = 0;
+    private int messageIndex = 0;
     private TextMeshProUGUI tmpText;
     private Text legacyText;
     private TypingEffect typingEffect;
     private bool isSequenceRunning = false;
+    private Coroutine autoMessageCoroutine;
+    private string currentAutoMessage = ""; // 현재 자동 메시지 저장
 
 
     void Start()
     {
-
         SetButtonState(ButtonState.Normal);
         Debug.Log("[ExitButton] 초기화 완료");
 
@@ -66,19 +84,10 @@ public class TextChange : MonoBehaviour
             legacyText = textObject.GetComponent<Text>();
             typingEffect = textObject.GetComponent<TypingEffect>();
 
-
-            // 첫 번째 메시지 표시 (정상 시작)
-            if (clickMessages != null && clickMessages.Length > 0)
+            // 자동 메시지 시퀀스 시작
+            if (autoMessages != null && autoMessages.Length > 0)
             {
-                if (typingEffect != null)
-                {
-                    typingEffect.SetText(clickMessages[0]);
-                }
-                else
-                {
-                    SetTextDirectly(clickMessages[0]);
-                }
-                clickCount = 1;
+                autoMessageCoroutine = StartCoroutine(AutoMessageSequence());
             }
         }
     }
@@ -105,41 +114,73 @@ public class TextChange : MonoBehaviour
     {
         if (isSequenceRunning) return;
 
-        ChangeText();
+        // X 버튼 클릭 시 "Oh! Why..." 메시지 표시
+        StartCoroutine(ShowClickMessage());
         SetButtonState(ButtonState.Hovered);
     }
-
-    private void ChangeText()
+    
+    /// <summary>
+    /// 자동으로 메시지를 순차적으로 표시
+    /// </summary>
+    private IEnumerator AutoMessageSequence()
     {
-        if (textObject == null) return;
-        if (clickMessages == null || clickMessages.Length == 0) return;
-        if (clickCount >= clickMessages.Length) return;
-
-        // 현재 메시지 표시
-        string newText = clickMessages[clickCount];
-        clickCount++;
-
-        Debug.Log($"[ExitButton] {clickCount}번째 메시지 표시");
-
-        // 타이핑 효과로 변경
-        if (typingEffect != null)
+        for (int i = 0; i < autoMessages.Length; i++)
         {
-            typingEffect.SetText(newText);
+            messageIndex = i;
+            currentAutoMessage = autoMessages[i];
+            
+            Debug.Log($"[TextChange] {i + 1}번째 자동 메시지 표시: {autoMessages[i]}");
+            
+            // 메시지 표시
+            if (typingEffect != null)
+            {
+                typingEffect.SetText(autoMessages[i]);
+                
+                // 타이핑이 완료될 때까지 대기
+                while (typingEffect.IsTyping)
+                {
+                    yield return null;
+                }
+                
+                Debug.Log($"[TextChange] 타이핑 완료");
+            }
+            else
+            {
+                SetTextDirectly(autoMessages[i]);
+            }
+            
+            // 다음 메시지까지 대기
+            if (i < messageIntervals.Length)
+            {
+                yield return new WaitForSeconds(messageIntervals[i]);
+            }
         }
-        else if (tmpText != null)
-        {
-            tmpText.text = newText;
-        }
-        else if (legacyText != null)
-        {
-            legacyText.text = newText;
-        }
-
-        if (clickCount == clickMessages.Length)
-        {
-
-            StartCoroutine(FadeScreen(blackScreen));
-        }
+        
+        // 모든 메시지 표시 완료 후 페이드 아웃
+        Debug.Log("[TextChange] 모든 메시지 표시 완료, 페이드 시작");
+        StartCoroutine(FadeScreen(blackScreen));
+    }
+    
+    /// <summary>
+    /// X 버튼 클릭 시 잠깐 표시되는 메시지 (타이핑 효과 없이)
+    /// </summary>
+    private IEnumerator ShowClickMessage()
+    {
+        Debug.Log("[TextChange] X 버튼 클릭! 경고 메시지 표시");
+        
+        // 현재 자동 메시지 저장 (복원용)
+        string savedMessage = currentAutoMessage;
+        
+        // 클릭 메시지 표시 (타이핑 효과 없이 바로 표시)
+        SetTextDirectly(clickMessage);
+        
+        // 지정된 시간만큼 대기
+        yield return new WaitForSeconds(clickMessageDuration);
+        
+        // 원래 자동 메시지로 복원 (타이핑 효과 없이 바로 표시)
+        SetTextDirectly(savedMessage);
+        
+        Debug.Log("[TextChange] 원래 메시지로 복원");
     }
 
     private IEnumerator FadeScreen(SpriteRenderer blackScreen)
