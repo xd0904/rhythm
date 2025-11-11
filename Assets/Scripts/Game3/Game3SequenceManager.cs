@@ -19,6 +19,14 @@ public class Game3SequenceManager : MonoBehaviour
     [Tooltip("씬 시작 시 재생할 BGM")]
     public AudioClip bgmClip;
     
+    [Header("타이밍 설정")]
+    [Tooltip("BPM (비트 속도)")]
+    public float bpm = 180f;
+    
+    private double musicStartTime = 0; // DSP 기준 음악 시작 시간
+    private float beatInterval; // 한 박자 간격
+    private int lastBeatIndex = -1; // 마지막 박자 인덱스
+    
     private void Awake()
     {
         // 싱글톤 패턴
@@ -36,6 +44,10 @@ public class Game3SequenceManager : MonoBehaviour
     
     private void Start()
     {
+        // BPM 설정
+        beatInterval = 60f / bpm;
+        Debug.Log($"[Game3SequenceManager] BPM: {bpm}, 박자 간격: {beatInterval:F3}초");
+        
         // 실제 마우스 커서 숨기기
         Cursor.visible = false;
         Debug.Log("[Game3SequenceManager] 실제 마우스 커서 숨김");
@@ -47,6 +59,44 @@ public class Game3SequenceManager : MonoBehaviour
         
         // BGM 시작
         StartMusic();
+    }
+    
+    private void Update()
+    {
+        // 음악 시작 전에는 아무것도 안 함
+        if (musicStartTime == 0) return;
+        
+        // 현재 음악 시간 계산 (DSP 기반)
+        double currentMusicTime = GetMusicTime();
+        
+        // 현재 비트 인덱스 계산
+        int currentBeatIndex = Mathf.FloorToInt((float)(currentMusicTime / beatInterval));
+        
+        // 새로운 비트가 왔을 때만 실행
+        if (currentBeatIndex > lastBeatIndex)
+        {
+            lastBeatIndex = currentBeatIndex;
+            Debug.Log($"[Game3SequenceManager] 박자 {currentBeatIndex} - 시간: {currentMusicTime:F2}초");
+        }
+    }
+    
+    /// <summary>
+    /// 현재 음악 시간 가져오기 (DSP 기반)
+    /// </summary>
+    public double GetMusicTime()
+    {
+        if (musicStartTime == 0) return 0;
+        return AudioSettings.dspTime - musicStartTime;
+    }
+    
+    /// <summary>
+    /// 음악 시작 시간 리셋 (BGM 재생 시 호출)
+    /// </summary>
+    public void ResetMusicStartTime()
+    {
+        musicStartTime = AudioSettings.dspTime;
+        lastBeatIndex = -1;
+        Debug.Log($"[Game3SequenceManager] 음악 시작 시간 리셋: {musicStartTime}");
     }
     
     /// <summary>
@@ -149,6 +199,9 @@ public class Game3SequenceManager : MonoBehaviour
                 SoundManager.Instance.BGMSource.volume = 1.0f;
                 Debug.Log("[Game3SequenceManager] BGM Volume: 1.0 (최대)");
             }
+            
+            // 음악 시작 시간 기록
+            ResetMusicStartTime();
         }
         else
         {
