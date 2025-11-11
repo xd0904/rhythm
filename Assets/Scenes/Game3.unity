@@ -499,6 +499,59 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &460341990
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 460341991}
+  - component: {fileID: 460341992}
+  m_Layer: 0
+  m_Name: ErrorPattern
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &460341991
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460341990}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 1.306594, y: 1.0460075, z: -0.105035126}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981275979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &460341992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 460341990}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a075aa8bb5eb6ba43b4e72d28254d53c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patternStartBeat: 96
+  patternEndBeat: 128
+  errorPrefab: {fileID: 9109877347130423228, guid: 76cb39ac5a47ab640a2843ed55b19de9, type: 3}
+  targetCanvas: {fileID: 0}
+  errorAppearDuration: 0.1
+  errorHoldDuration: 0.333
+  errorExplodeDuration: 0.2
+  errorScaleX: 0.7479665
+  errorScaleY: 0.6842404
 --- !u!1 &466994891
 GameObject:
   m_ObjectHideFlags: 0
@@ -2474,6 +2527,7 @@ Transform:
   - {fileID: 1871174531}
   - {fileID: 856689019}
   - {fileID: 1596275603}
+  - {fileID: 460341991}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1097115110
@@ -3409,7 +3463,7 @@ MonoBehaviour:
   topLeftPosition: {x: -380, y: 360, z: 0}
   bottomRightPosition: {x: 380, y: -360, z: 0}
   splitDuration: 0.3
-  targetCanvas: {fileID: 0}
+  targetCanvas: {fileID: 908137775}
 --- !u!1 &1689840529
 GameObject:
   m_ObjectHideFlags: 0

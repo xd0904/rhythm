@@ -74,6 +74,7 @@ public class ErrorPatternManager : MonoBehaviour
     private List<GameObject> activeErrors = new List<GameObject>();
     private List<Coroutine> activeCoroutines = new List<Coroutine>();
     private HashSet<int> usedPositions = new HashSet<int>(); // 현재 사용 중인 위치들
+    private List<GameObject> hiddenWindows = new List<GameObject>(); // 숨겨진 창들
     
     void Start()
     {
@@ -142,6 +143,18 @@ public class ErrorPatternManager : MonoBehaviour
                 {
                     patternBeatIndex = 0;
                     currentBeatIndex = 1; // 다시 1부터 시작
+                    
+                    // 새 패턴 시작 시 숨겨진 창들 다시 활성화
+                    foreach (GameObject window in hiddenWindows)
+                    {
+                        if (window != null)
+                        {
+                            window.SetActive(true);
+                            Debug.Log($"[ErrorPatternManager] 창 다시 활성화: {window.name}");
+                        }
+                    }
+                    hiddenWindows.Clear();
+                    
                     Debug.Log("[ErrorPatternManager] ========== 16박자 패턴 반복! ==========");
                 }
             }
@@ -234,6 +247,12 @@ public class ErrorPatternManager : MonoBehaviour
         
         Debug.Log($"[ErrorPatternManager] ✅ 에러 생성 완료: {error.name} at Grid[{row},{col}], 총 {activeErrors.Count}개");
         
+        // 해당 창을 숨겨진 창 리스트에 추가 (나중에 숨길 예정)
+        if (!hiddenWindows.Contains(targetWindow))
+        {
+            hiddenWindows.Add(targetWindow);
+        }
+        
         // 애니메이션 시작 (코루틴 저장)
         Coroutine coroutine = StartCoroutine(ErrorAnimation(error, errorRect));
         activeCoroutines.Add(coroutine);
@@ -245,6 +264,16 @@ public class ErrorPatternManager : MonoBehaviour
     void ExplodeAllErrors()
     {
         Debug.Log($"[ErrorPatternManager] 펑! 모든 에러 폭발 - 총 {activeErrors.Count}개");
+        
+        // 에러가 있던 창들을 비활성화
+        foreach (GameObject window in hiddenWindows)
+        {
+            if (window != null)
+            {
+                window.SetActive(false);
+                Debug.Log($"[ErrorPatternManager] 창 비활성화: {window.name}");
+            }
+        }
         
         // 모든 활성 코루틴 중지
         foreach (Coroutine coroutine in activeCoroutines)
