@@ -16,6 +16,12 @@ public class TypingEffect : MonoBehaviour
     private Text legacyText;
     private string fullText;
     private string currentText = "";
+    private bool isTyping = false;
+    
+    /// <summary>
+    /// 타이핑이 진행 중인지 여부
+    /// </summary>
+    public bool IsTyping => isTyping;
 
     void Start()
     {
@@ -60,6 +66,8 @@ public class TypingEffect : MonoBehaviour
 
     private System.Collections.IEnumerator TypeText()
     {
+        isTyping = true;
+        
         // 시작 대기
         yield return new WaitForSeconds(startDelay);
 
@@ -79,6 +87,8 @@ public class TypingEffect : MonoBehaviour
 
             yield return new WaitForSeconds(typingSpeed);
         }
+        
+        isTyping = false;
     }
 
     // 외부에서 텍스트를 변경하고 싶을 때 사용
@@ -110,5 +120,6 @@ public class TypingEffect : MonoBehaviour
         {
             legacyText.text = fullText;
         }
+        isTyping = false;
     }
 }

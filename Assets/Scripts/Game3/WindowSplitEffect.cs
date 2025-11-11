@@ -39,6 +39,9 @@ public class WindowSplitEffect : MonoBehaviour
     
     private bool hasTriggered = false;
     private GameObject[,] splitWindows; // 3x3 창 배열
+    private Vector2 originalWindowSize; // 원본 창의 원래 크기
+    private Vector3 originalWindowScale; // 원본 창의 원래 스케일
+    private Vector3 originalWindowPosition; // 원본 창의 원래 위치
     
     [Header("플레이어 설정")]
     [Tooltip("Window Split 알림을 받을 플레이어")]
@@ -98,6 +101,12 @@ public class WindowSplitEffect : MonoBehaviour
             centerPosition = originalRect.anchoredPosition;
             originalScale = originalRect.localScale;
             originalSize = originalRect.sizeDelta;
+            
+            // 원본 크기 저장 (복원용)
+            originalWindowSize = originalSize;
+            originalWindowScale = originalScale;
+            originalWindowPosition = originalRect.position;
+            
             Debug.Log($"[WindowSplitEffect] 원본 창 (UI) anchoredPosition: {centerPosition}, scale: {originalScale}, sizeDelta: {originalSize}");
         }
         else
@@ -106,6 +115,12 @@ public class WindowSplitEffect : MonoBehaviour
             centerPosition = originalWindow.transform.localPosition;
             originalScale = originalWindow.transform.localScale;
             originalSize = new Vector2(originalScale.x, originalScale.y);
+            
+            // 원본 크기 저장 (복원용)
+            originalWindowSize = originalSize;
+            originalWindowScale = originalScale;
+            originalWindowPosition = originalWindow.transform.position;
+            
             Debug.Log($"[WindowSplitEffect] 원본 창 (World) localPosition: {centerPosition}, scale: {originalScale}");
         }
         
@@ -333,5 +348,29 @@ public class WindowSplitEffect : MonoBehaviour
     public GameObject GetOriginalWindow()
     {
         return originalWindow;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 크기 가져오기
+    /// </summary>
+    public Vector2 GetOriginalWindowSize()
+    {
+        return originalWindowSize;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 스케일 가져오기
+    /// </summary>
+    public Vector3 GetOriginalWindowScale()
+    {
+        return originalWindowScale;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 위치 가져오기
+    /// </summary>
+    public Vector3 GetOriginalWindowPosition()
+    {
+        return originalWindowPosition;
     }
 }
