@@ -46,8 +46,8 @@ public class FilePatternManager : MonoBehaviour
     [Tooltip("큰 문서 탄막 속도 (느림)")]
     public float bigDocumentSpeed = 3f;
     
-    [Tooltip("탄막 발사 각도들 (8개 고정)")]
-    public float[] bulletAngles = new float[] { 40f, 30f, 20f, 10f, -10f, -20f, -30f, -40f };
+    [Tooltip("탄막 발사 각도들 (7개)")]
+    public float[] bulletAngles = new float[] { 45f, 30f, 15f, 0f, -15f, -30f, -45f };
     
     [Tooltip("탄막 수명 (초)")]
     public float bulletLifetime = 10f;
@@ -64,6 +64,7 @@ public class FilePatternManager : MonoBehaviour
     private float[][] beatTimings;
     
     private bool hasStarted = false;
+    private bool hasEnded = false; // 패턴 종료 여부
     private bool folderRising = false;
     private bool folderRiseStarted = false;
     private int currentBeatIndex = 0;
@@ -186,8 +187,8 @@ public class FilePatternManager : MonoBehaviour
             StartCoroutine(RiseFolderAnimation());
         }
         
-        // 패턴 시작 체크
-        if (!hasStarted && musicTime >= patternStartTime)
+        // 패턴 시작 체크 (아직 시작 안했고, 종료도 안한 상태여야 함)
+        if (!hasStarted && !hasEnded && musicTime >= patternStartTime)
         {
             hasStarted = true;
             currentBeatIndex = 0;
@@ -222,9 +223,10 @@ public class FilePatternManager : MonoBehaviour
         }
         
         // 패턴 종료 체크
-        if (hasStarted && musicTime >= patternEndTime)
+        if (hasStarted && !hasEnded && musicTime >= patternEndTime)
         {
             hasStarted = false;
+            hasEnded = true;
             CleanupPattern();
             Debug.Log("[FilePatternManager] ========== 패턴 종료 ==========");
         }
@@ -281,20 +283,20 @@ public class FilePatternManager : MonoBehaviour
         
         switch (beatType)
         {
-            case 0: // 작은 파일 탄막 8개 발사
-                Fire8Documents(spawnPosition, false);
+            case 0: // 작은 파일 탄막 7개 발사
+                Fire7Documents(spawnPosition, false);
                 break;
                 
-            case 1: // 큰 파일 탄막 8개 발사
-                Fire8Documents(spawnPosition, true);
+            case 1: // 큰 파일 탄막 7개 발사
+                Fire7Documents(spawnPosition, true);
                 break;
         }
     }
     
     /// <summary>
-    /// 8개의 문서 탄막을 고정된 각도로 발사
+    /// 7개의 문서 탄막을 고정된 각도로 발사
     /// </summary>
-    void Fire8Documents(Vector3 spawnPosition, bool isBig)
+    void Fire7Documents(Vector3 spawnPosition, bool isBig)
     {
         GameObject prefab = isBig ? bigDocumentBulletPrefab : documentBulletPrefab;
         float speed = isBig ? bigDocumentSpeed : documentSpeed;
@@ -311,7 +313,7 @@ public class FilePatternManager : MonoBehaviour
             return;
         }
         
-        // 8개의 탄막을 고정된 각도로 발사
+        // 7개의 탄막을 고정된 각도로 발사
         for (int i = 0; i < bulletAngles.Length; i++)
         {
             float angle = bulletAngles[i];
@@ -326,7 +328,7 @@ public class FilePatternManager : MonoBehaviour
             StartCoroutine(MoveBullet(bullet, direction, speed, bulletLifetime));
         }
         
-        Debug.Log($"[FilePatternManager] {(isBig ? "큰" : "작은")} 문서 8개 발사 완료");
+        Debug.Log($"[FilePatternManager] {(isBig ? "큰" : "작은")} 문서 7개 발사 완료");
     }
     
     /// <summary>
