@@ -710,7 +710,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &316386254
 Transform:
   m_ObjectHideFlags: 0
@@ -721,7 +721,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalScale: {x: 120, y: 120, z: 120}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 852845284}
@@ -1171,7 +1171,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   doubleClickTime: 0.3
   targetObject: {fileID: 162484856}
+  targetObject2: {fileID: 0}
   Object: {fileID: 1138422031}
+  animationDuration: 0.5
 --- !u!1 &474301806
 GameObject:
   m_ObjectHideFlags: 0
@@ -2128,7 +2130,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &852845284
 Transform:
   m_ObjectHideFlags: 0
@@ -2138,8 +2140,8 @@ Transform:
   m_GameObject: {fileID: 852845283}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.49, y: -0.98, z: 0}
-  m_LocalScale: {x: 0.5879391, y: 0.5879391, z: 0.5879391}
+  m_LocalPosition: {x: -1.611, y: -0.707, z: 0}
+  m_LocalScale: {x: 0.35758457, y: 0.35758457, z: 0.35758457}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 316386254}
@@ -2592,6 +2594,8 @@ MonoBehaviour:
   normalButton: {fileID: 1128362734}
   hoveredButton: {fileID: 290143174}
   activeButton: {fileID: 206653691}
+  window: {fileID: 0}
+  window2: {fileID: 0}
   textObject: {fileID: 2117913942}
   fadeToRedDuration: 2
   glitchDuration: 0.3
