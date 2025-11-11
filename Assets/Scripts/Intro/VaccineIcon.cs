@@ -11,7 +11,10 @@ public class VaccineIcon : MonoBehaviour
     public GameObject targetObject;
 
     [Tooltip("바이러스 알람 울리고 난 후에 켜질 수 있게 하려고 그 오브젝트 감지")]
-    public GameObject Object;   
+    public GameObject Object;
+
+    [Tooltip("클릭 사운드")]
+    public AudioClip ClickSound;
 
     private float lastClickTime = 0f;
     private int clickCount = 0;
@@ -51,7 +54,8 @@ public class VaccineIcon : MonoBehaviour
     void OnMouseDown()
     {
         float timeSinceLastClick = Time.time - lastClickTime;
-        
+        SoundManager.Instance.PlaySFX(ClickSound);
+
         if (timeSinceLastClick <= doubleClickTime)
         {
             // 더블클릭!

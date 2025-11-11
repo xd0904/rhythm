@@ -37,6 +37,8 @@ public class ExitButton : MonoBehaviour
     [Tooltip("클릭 사운드")]
     public AudioClip ClickSound;
 
+    [Tooltip("NONONO 사운드")]
+    public AudioClip NONONO;
 
     [Tooltip("글리치 사운드")]
     public AudioClip Glitch;
@@ -157,6 +159,8 @@ public class ExitButton : MonoBehaviour
         // 마지막 메시지면 점점 빨갛게 하고 시퀀스 시작
         if (clickCount == clickMessages.Length)
         {
+            SoundManager.Instance.PlaySFX(NONONO);
+
             StartCoroutine(FadeToRedAndStartSequence());
         }
     }
