@@ -9,8 +9,8 @@ public class ShockWave : MonoBehaviour
     public GameObject shockwavePrefab2;
 
     [Header("충격파 생성 간격")]
-    public float firstTwoDelay = 0.2f;
-    public float lastDelay = 0.3f;
+    public float firstTwoDelay = 0.5f;
+    public float lastDelay = 0.2f;
     public float spawnInterval = 2f;
 
     [Header("음악 시간 정보")]
@@ -144,18 +144,32 @@ public class ShockWave : MonoBehaviour
             // 보스 현재 위치에서 충격파 발사
             Vector2 bossPos = Bossobj.transform.position;
 
+            yield return new WaitForSeconds(0.1f);
+
             // 처음 4개
-            for (int i = 0; i < 4; i++)
+            for (int j = 0; j < 2; j++)
             {
-                StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab, 1f, 1.2f, 5f));
-                yield return new WaitForSeconds(firstTwoDelay);
+                for (int i = 0; i < 2; i++)
+                {
+                    StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab, 1f, 1.2f, 5f));
+                    yield return new WaitForSeconds(firstTwoDelay);
+                }
+                yield return new WaitForSeconds(0.6f);
             }
 
-            // 마지막 1개
-            yield return new WaitForSeconds(lastDelay);
+            yield return new WaitForSeconds(0.2f);
+
+
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            yield return new WaitForSeconds(1.3f);
+
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            yield return new WaitForSeconds(0.4f);
+
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
 
-            yield return new WaitForSeconds(spawnInterval);
+
+            //yield return new WaitForSeconds(spawnInterval);
 
             // 다음 이동이 시작될 때까지 대기
             yield return new WaitUntil(() => isMoving);
@@ -187,7 +201,7 @@ public class ShockWave : MonoBehaviour
             obj.position = targetPos;
             isMoving = false;
 
-            yield return new WaitForSeconds(2.5f);
+            yield return new WaitForSeconds(5f);
         }
     }
 

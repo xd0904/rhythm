@@ -3977,11 +3977,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shockwavePrefab: {fileID: 1718665349294500448, guid: 7683e3ac43990564d8977b827389e0c1, type: 3}
   shockwavePrefab2: {fileID: 5438504059502255942, guid: 46bbf1ea21fff9d4f9d92dbfe329e45f, type: 3}
-  firstTwoDelay: 0.2
-  lastDelay: 0.3
-  spawnInterval: 0.8
+  firstTwoDelay: 0.5
+  lastDelay: 0.2
+  spawnInterval: 2
   beatBounce: {fileID: 1740529744}
-  startTime: 72.7
+  startTime: 69.7
   endTime: 83.2
   fadeOutDuration: 1
   Bossobj: {fileID: 49575115}
