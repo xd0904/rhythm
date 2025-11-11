@@ -326,4 +326,12 @@ public class WindowSplitEffect : MonoBehaviour
         
         return splitWindows[row, col];
     }
+    
+    /// <summary>
+    /// 원본 창 가져오기
+    /// </summary>
+    public GameObject GetOriginalWindow()
+    {
+        return originalWindow;
+    }
 }

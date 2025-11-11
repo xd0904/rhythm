@@ -361,17 +361,16 @@ MonoBehaviour:
   folderStartOffset: {x: 0, y: -300, z: 0}
   folderRiseStartTime: 8.7
   folderRiseDuration: 3
-  documentSpeed: 5
+  documentSpeed: 7
   bigDocumentSpeed: 3
   bulletAngles:
-  - 40
+  - 45
   - 30
-  - 20
-  - 10
-  - -10
-  - -20
+  - 15
+  - 0
+  - -15
   - -30
-  - -40
+  - -45
   bulletLifetime: 10
   bpm: 180
 --- !u!1 &299626469
@@ -1544,6 +1543,8 @@ MonoBehaviour:
   referenceWindowSize: {x: 128, y: 128}
   referenceMinBounds: {x: -1.47, y: -1.33}
   referenceMaxBounds: {x: 1.47, y: 1.33}
+  canDashBetweenWindows: 0
+  dashBoundaryIgnoreDuration: 0.2
   deathColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   slowMotionDuration: 0.8
   minTimeScale: 0.1
@@ -3699,6 +3700,7 @@ MonoBehaviour:
   resizeDuration: 0.5
   splitDuration: 0.3
   targetCanvas: {fileID: 908137775}
+  player: {fileID: 0}
 --- !u!1 &1689840529
 GameObject:
   m_ObjectHideFlags: 0
@@ -4478,7 +4480,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 180, y: 180, z: 93.60002}
+  m_LocalScale: {x: 249.99998, y: 234.51009, z: 49.74655}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 908137776}
