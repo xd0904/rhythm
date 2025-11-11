@@ -135,7 +135,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &49575116
 Transform:
   m_ObjectHideFlags: 0
@@ -148,8 +148,9 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 108, y: 108, z: 108}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 77100836}
+  m_Children:
+  - {fileID: 444928792}
+  m_Father: {fileID: 908137776}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &49575117
 SpriteRenderer:
@@ -294,43 +295,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!1 &77100835
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 77100836}
-  m_Layer: 5
-  m_Name: Boss (1)
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!224 &77100836
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 77100835}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 49575116}
-  - {fileID: 444928792}
-  m_Father: {fileID: 908137776}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &118774633
 GameObject:
   m_ObjectHideFlags: 0
@@ -824,11 +788,11 @@ Transform:
   m_GameObject: {fileID: 444928791}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -24.84, y: 76.68, z: 0}
-  m_LocalScale: {x: 108, y: 108, z: 108}
+  m_LocalPosition: {x: -0.23, y: 0.71, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 77100836}
+  m_Father: {fileID: 49575116}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &444928794
 SpriteRenderer:
@@ -2662,7 +2626,7 @@ RectTransform:
   - {fileID: 575792470}
   - {fileID: 945507455}
   - {fileID: 632170198}
-  - {fileID: 77100836}
+  - {fileID: 49575116}
   - {fileID: 159725284}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -4014,16 +3978,14 @@ MonoBehaviour:
   shockwavePrefab: {fileID: 1718665349294500448, guid: 7683e3ac43990564d8977b827389e0c1, type: 3}
   shockwavePrefab2: {fileID: 5438504059502255942, guid: 46bbf1ea21fff9d4f9d92dbfe329e45f, type: 3}
   firstTwoDelay: 0.2
-  lastDelay: 0.5
-  spawnInterval: 2
+  lastDelay: 0.3
+  spawnInterval: 0.8
   beatBounce: {fileID: 1740529744}
-  startTime: 70.4
+  startTime: 72.7
   endTime: 83.2
-  expandSpeed: 1
-  lifetime: 1.2
-  maxScale: 3
+  fadeOutDuration: 1
+  Bossobj: {fileID: 49575115}
   moveSpeed: 9.63
-  Bossobj: {fileID: 77100835}
   minMoveDistance: 3
 --- !u!1 &1438955273
 GameObject:
