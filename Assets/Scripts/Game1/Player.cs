@@ -312,7 +312,7 @@ public class Player : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// Window Split 알림 받기 (WindowSplitEffect에서 호출)
     /// </summary>
@@ -321,7 +321,7 @@ public class Player : MonoBehaviour
         isWindowSplit = true;
         splitWindows = windows;
         canDashBetweenWindows = true;
-        
+
         Debug.Log("[Player] Window Split 감지! 대쉬로 창 간 이동 가능");
     }
     
@@ -688,15 +688,15 @@ public class Player : MonoBehaviour
     {
         // 이미 죽었으면 무시
         if (isDead) return;
-        
+
         // 백신 충돌 처리 (죽기 전에 먼저 체크)
         if (other.CompareTag("Vaccine"))
         {
             Debug.Log("[Player] 백신 먹음!");
-            
+
             // 백신 오브젝트 제거
             Destroy(other.gameObject);
-            
+
             // FileToFolderPatternManager 찾아서 백신 효과 호출
             FileToFolderPatternManager patternManager = FindFirstObjectByType<FileToFolderPatternManager>();
             if (patternManager != null)
@@ -708,7 +708,7 @@ public class Player : MonoBehaviour
             {
                 Debug.LogWarning("[Player] FileToFolderPatternManager를 찾을 수 없습니다!");
             }
-            
+
             return; // 백신은 먹으면 끝
         }
         

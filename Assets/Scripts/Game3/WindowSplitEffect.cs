@@ -456,69 +456,68 @@ public class WindowSplitEffect : MonoBehaviour
                 }
             }
         }
-        
+
         // 원래 창 활성화 및 원래 크기로 복원
         if (originalWindow != null)
         {
             originalWindow.SetActive(true);
             originalWindow.transform.position = targetPosition;
-            
+
             RectTransform originalRect = originalWindow.GetComponent<RectTransform>();
-            
+
             if (originalRect != null)
             {
                 // UI 오브젝트인 경우
                 originalRect.sizeDelta = Vector2.zero;
                 originalRect.localScale = Vector3.zero;
-                
+
                 // 원래 크기로 커지는 애니메이션
                 float restoreDuration = 0.5f;
                 elapsed = 0f;
-                
+
                 while (elapsed < restoreDuration)
                 {
                     elapsed += Time.deltaTime;
                     float t = elapsed / restoreDuration;
                     t = 1f - (1f - t) * (1f - t); // EaseOutQuad
-                    
+
                     originalRect.sizeDelta = Vector2.Lerp(Vector2.zero, originalWindowSize, t);
                     originalRect.localScale = Vector3.Lerp(Vector3.zero, originalWindowScale, t);
-                    
+
                     yield return null;
                 }
-                
+
                 originalRect.sizeDelta = originalWindowSize;
                 originalRect.localScale = originalWindowScale;
                 originalWindow.transform.position = originalWindowPosition;
-                
+
                 Debug.Log($"[WindowSplitEffect] UI 창 복원 완료! sizeDelta: {originalRect.sizeDelta}, scale: {originalRect.localScale}");
             }
             else
             {
                 // World 오브젝트인 경우
                 originalWindow.transform.localScale = Vector3.zero;
-                
+
                 float restoreDuration = 0.5f;
                 elapsed = 0f;
-                
+
                 while (elapsed < restoreDuration)
                 {
                     elapsed += Time.deltaTime;
                     float t = elapsed / restoreDuration;
                     t = 1f - (1f - t) * (1f - t); // EaseOutQuad
-                    
+
                     originalWindow.transform.localScale = Vector3.Lerp(Vector3.zero, originalWindowScale, t);
-                    
+
                     yield return null;
                 }
-                
+
                 originalWindow.transform.localScale = originalWindowScale;
                 originalWindow.transform.position = originalWindowPosition;
-                
+
                 Debug.Log($"[WindowSplitEffect] World 창 복원 완료! scale: {originalWindow.transform.localScale}");
             }
         }
-        
         // 플레이어에게 창 합쳐짐 알림
         if (player != null)
         {
