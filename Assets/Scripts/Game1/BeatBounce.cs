@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEditor.PackageManager;
 
 public class BeatBounce : MonoBehaviour
 {
@@ -95,6 +96,16 @@ public class BeatBounce : MonoBehaviour
     [Header("아이콘 설정")]
     public GameObject icon1;  // 아이콘 1
     public GameObject icon2;  // 아이콘 2
+
+    [Tooltip("튕기는 사운드")]
+    public AudioClip Bounce;
+
+    [Tooltip("박히는 사운드")]
+    public AudioClip Hit;
+
+    [Tooltip("창 날아가는 사운드")]
+    public AudioClip Spear;
+
 
     void Awake()
     {
@@ -1334,6 +1345,7 @@ public class BeatBounce : MonoBehaviour
             // X축 반사
             if (currentPos.x <= screenBounds.min.x || currentPos.x >= screenBounds.max.x)
             {
+                SoundManager.Instance.PlaySFX(Bounce);
                 velocity.x = -velocity.x;
                 currentPos.x = Mathf.Clamp(currentPos.x, screenBounds.min.x, screenBounds.max.x);
             }
@@ -1341,6 +1353,7 @@ public class BeatBounce : MonoBehaviour
             // Y축 반사
             if (currentPos.y <= screenBounds.min.y || currentPos.y >= screenBounds.max.y)
             {
+                SoundManager.Instance.PlaySFX(Bounce);
                 velocity.y = -velocity.y;
                 currentPos.y = Mathf.Clamp(currentPos.y, screenBounds.min.y, screenBounds.max.y);
             }

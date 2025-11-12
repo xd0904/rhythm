@@ -3,8 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 
 /// <summary>
-/// Game3에서 32초~42.7초 동안 에러 패턴을 관리
-/// 16박자 패턴을 2번 반복 (총 32박자)
+/// Game3에서 32초~53초 동안 에러 패턴을 관리
+/// 16박자 패턴을 4번 반복 (총 64박자)
 /// </summary>
 public class ErrorPatternManager : MonoBehaviour
 {
@@ -13,7 +13,7 @@ public class ErrorPatternManager : MonoBehaviour
     public int patternStartBeat = 96; // 32초 = 96박자 (180 BPM 기준)
     
     [Tooltip("패턴 종료 박자")]
-    public int patternEndBeat = 159; // 53초 = 159박자 (180 BPM 기준)
+    public int patternEndBeat = 128; // 42.7초 = 128박자 (16박자 × 2 = 32박자)
     
     [Header("에러 프리팹")]
     [Tooltip("에러 프리팹 (느낌표 사각형)")]
@@ -80,7 +80,7 @@ public class ErrorPatternManager : MonoBehaviour
     
     [Header("반복 설정")]
     [Tooltip("16박자 패턴 반복 횟수")]
-    public int patternRepeatMax = 2; // 총 2번 반복 (32박자)
+    public int patternRepeatMax = 4; // 총 4번 반복 (64박자, 32초~53초)
     
     void Start()
     {
@@ -90,6 +90,10 @@ public class ErrorPatternManager : MonoBehaviour
         {
             Debug.LogError("[ErrorPatternManager] WindowSplitEffect를 찾을 수 없습니다!");
         }
+        
+        // 반복 횟수 강제 설정 (32초~53초 = 64박자 = 16박자 × 4회)
+        patternRepeatMax = 4;
+        Debug.Log($"[ErrorPatternManager] patternRepeatMax 설정: {patternRepeatMax}회");
     }
     
     void Update()
@@ -115,8 +119,8 @@ public class ErrorPatternManager : MonoBehaviour
             Debug.Log($"[ErrorPatternManager] ========== 패턴 시작! 박자: {currentBeat}, 음악시간: {musicTime:F2}초 ==========");
         }
         
-        // 패턴 진행 중
-        if (hasStarted && currentBeat < patternEndBeat)
+        // 패턴 진행 중 (patternRepeatMax에 도달할 때까지)
+        if (hasStarted && !hasEnded)
         {
             // 새로운 박자가 왔을 때만 처리
             if (currentBeat > lastProcessedBeat)
@@ -171,8 +175,8 @@ public class ErrorPatternManager : MonoBehaviour
                         hasStarted = false;
                         hasEnded = true;
                         CleanupPattern();
-                        StartCoroutine(MergeWindowsAndRestore());
-                        Debug.Log($"[ErrorPatternManager] ========== 패턴 {patternRepeatMax}회 반복 완료! 창 합치기 시작 ==========");
+                        // 창 합치기는 WindowSplitEffect에서 관리 (제거)
+                        Debug.Log($"[ErrorPatternManager] ========== 패턴 {patternRepeatMax}회 반복 완료! 종료 ==========");
                     }
                 }
             }
