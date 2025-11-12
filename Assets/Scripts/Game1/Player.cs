@@ -23,10 +23,36 @@ public class Player : MonoBehaviour
     public string[] dangerousTags = { "Triangle", "Circle", "Wave", "WaveAlt" }; // 플레이어를 죽이는 태그 리스트
     
     [Header("경계 설정")]
-    public float minX = -8f;  // 왼쪽 경계
-    public float maxX = 8f;   // 오른쪽 경계
-    public float minY = -4.5f; // 아래쪽 경계
-    public float maxY = 4.5f;  // 위쪽 경계
+    [Tooltip("게임 창 오브젝트 (경계 계산용)")]
+    public Transform gameWindow;
+    
+    [Tooltip("기준 창 크기 (128x128)")]
+    public Vector2 referenceWindowSize = new Vector2(128f, 128f);
+    
+    [Tooltip("기준 창 크기일 때의 경계값")]
+    public Vector2 referenceMinBounds = new Vector2(-1.47f, -1.33f);
+    public Vector2 referenceMaxBounds = new Vector2(1.47f, 1.33f);
+    
+    [Header("Window Split 설정")]
+    [Tooltip("Window Split 후 대쉬로 창 간 이동 가능 여부")]
+    public bool canDashBetweenWindows = false;
+    
+    [Tooltip("대쉬 시 경계 무시 시간 (초)")]
+    public float dashBoundaryIgnoreDuration = 0.2f;
+    
+    // 동적으로 계산되는 경계값
+    private float minX;
+    private float maxX;
+    private float minY;
+    private float maxY;
+    
+    // Window Split 관련
+    private bool isWindowSplit = false;
+    private GameObject[,] splitWindows;
+    private bool isDashingBetweenWindows = false;
+    
+    // 대쉬 애니메이션 중 플래그
+    private bool isDashing = false;
     
     [Header("죽음 설정")]
     public Color deathColor = Color.red; // 죽을 때 색상
@@ -73,12 +99,36 @@ public class Player : MonoBehaviour
             rb.angularDamping = 0f;      // 회전 감쇠 끄기
             rb.constraints = RigidbodyConstraints2D.FreezeRotation; // 회전 고정
         }
+        
+        // 게임 창 자동 찾기
+        if (gameWindow == null)
+        {
+            GameObject windowObj = GameObject.Find("GameWindow");
+            if (windowObj == null) windowObj = GameObject.Find("Window");
+            if (windowObj == null) windowObj = GameObject.Find("Game Window");
+            
+            if (windowObj != null)
+            {
+                gameWindow = windowObj.transform;
+                Debug.Log($"[Player] 게임 창 자동 발견: {windowObj.name}");
+            }
+            else
+            {
+                Debug.LogWarning("[Player] 게임 창을 찾을 수 없습니다. 기본 경계값을 사용합니다.");
+            }
+        }
+        
+        // 초기 경계 계산
+        UpdateBounds();
     }
 
     void Update()
     {
         // 죽었으면 입력 무시
         if (isDead) return;
+        
+        // 매 프레임마다 경계 업데이트 (창이 움직일 수 있으므로)
+        UpdateBounds();
         
         // F1 키로 무적 모드 토글
         if (Input.GetKeyDown(KeyCode.F1))
@@ -111,6 +161,185 @@ public class Player : MonoBehaviour
             PerformDash();
         }
     }
+    
+    /// <summary>
+    /// 게임 창의 크기와 위치에 따라 플레이어 경계를 동적으로 계산
+    /// </summary>
+    void UpdateBounds()
+    {
+        // Window Split 후에는 현재 플레이어가 있는 창의 경계 사용
+        if (isWindowSplit && splitWindows != null)
+        {
+            CalculateSplitWindowBounds(false); // 현재 창 경계 (가장 가까운 창)
+            return;
+        }
+        
+        // 일반 경계 계산
+        if (gameWindow == null)
+        {
+            // 게임 창이 없으면 기준값 사용
+            minX = referenceMinBounds.x;
+            maxX = referenceMaxBounds.x;
+            minY = referenceMinBounds.y;
+            maxY = referenceMaxBounds.y;
+            return;
+        }
+        
+        // 게임 창의 현재 스케일 가져오기
+        Vector3 currentScale = gameWindow.localScale;
+        Vector3 currentPosition = gameWindow.position;
+        
+        // 스케일 비율 계산 (기준 크기 대비)
+        float scaleRatioX = currentScale.x / referenceWindowSize.x;
+        float scaleRatioY = currentScale.y / referenceWindowSize.y;
+        
+        // 경계값 계산 (스케일에 비례 + 창의 중심 위치 반영)
+        float halfWidth = (referenceMaxBounds.x - referenceMinBounds.x) * 0.5f * scaleRatioX;
+        float halfHeight = (referenceMaxBounds.y - referenceMinBounds.y) * 0.5f * scaleRatioY;
+        
+        minX = currentPosition.x - halfWidth;
+        maxX = currentPosition.x + halfWidth;
+        minY = currentPosition.y - halfHeight;
+        maxY = currentPosition.y + halfHeight;
+    }
+    
+    /// <summary>
+    /// Window Split 후 경계 계산 (중앙 창 또는 전체 창)
+    /// </summary>
+    void CalculateSplitWindowBounds(bool useAllWindows)
+    {
+        if (splitWindows == null || splitWindows.Length == 0)
+        {
+            Debug.LogWarning("[Player] splitWindows가 null이거나 비어있습니다!");
+            return;
+        }
+        
+        if (useAllWindows)
+        {
+            // 전체 창의 경계 계산 (모든 창 포함)
+            float minXTemp = float.MaxValue;
+            float maxXTemp = float.MinValue;
+            float minYTemp = float.MaxValue;
+            float maxYTemp = float.MinValue;
+            
+            int validWindowCount = 0;
+            
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    GameObject window = splitWindows[row, col];
+                    if (window != null)
+                    {
+                        Transform windowTransform = window.transform;
+                        Vector3 pos = windowTransform.position;
+                        
+                        // NaN 체크
+                        if (float.IsNaN(pos.x) || float.IsNaN(pos.y))
+                        {
+                            Debug.LogError($"[Player] 창[{row},{col}] 위치가 NaN입니다!");
+                            continue;
+                        }
+                        
+                        float halfWidth = (referenceMaxBounds.x - referenceMinBounds.x) * 0.5f;
+                        float halfHeight = (referenceMaxBounds.y - referenceMinBounds.y) * 0.5f;
+                        
+                        minXTemp = Mathf.Min(minXTemp, pos.x - halfWidth);
+                        maxXTemp = Mathf.Max(maxXTemp, pos.x + halfWidth);
+                        minYTemp = Mathf.Min(minYTemp, pos.y - halfHeight);
+                        maxYTemp = Mathf.Max(maxYTemp, pos.y + halfHeight);
+                        
+                        validWindowCount++;
+                    }
+                }
+            }
+            
+            // 유효한 창이 있는 경우만 업데이트
+            if (validWindowCount > 0)
+            {
+                minX = minXTemp;
+                maxX = maxXTemp;
+                minY = minYTemp;
+                maxY = maxYTemp;
+                
+                Debug.Log($"[Player] 전체 창 경계 ({validWindowCount}개): X({minX:F2}~{maxX:F2}), Y({minY:F2}~{maxY:F2})");
+            }
+            else
+            {
+                Debug.LogError("[Player] 유효한 창이 없습니다! 경계값 업데이트 실패");
+            }
+        }
+        else
+        {
+            // 현재 플레이어와 가장 가까운 창의 경계 사용
+            Vector3 currentPos = transform.position;
+            GameObject closestWindow = null;
+            float minDistance = float.MaxValue;
+            
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    GameObject window = splitWindows[row, col];
+                    if (window != null)
+                    {
+                        Transform windowTransform = window.transform;
+                        Vector3 pos = windowTransform.position;
+                        
+                        float distance = Vector3.Distance(currentPos, pos);
+                        
+                        if (distance < minDistance)
+                        {
+                            minDistance = distance;
+                            closestWindow = window;
+                        }
+                    }
+                }
+            }
+            
+            if (closestWindow != null)
+            {
+                Transform windowTransform = closestWindow.transform;
+                Vector3 pos = windowTransform.position;
+                
+                float halfWidth = (referenceMaxBounds.x - referenceMinBounds.x) * 0.5f;
+                float halfHeight = (referenceMaxBounds.y - referenceMinBounds.y) * 0.5f;
+                
+                minX = pos.x - halfWidth;
+                maxX = pos.x + halfWidth;
+                minY = pos.y - halfHeight;
+                maxY = pos.y + halfHeight;
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Window Split 알림 받기 (WindowSplitEffect에서 호출)
+    /// </summary>
+    public void OnWindowSplit(GameObject[,] windows)
+    {
+        isWindowSplit = true;
+        splitWindows = windows;
+        canDashBetweenWindows = true;
+        
+        Debug.Log("[Player] Window Split 감지! 대쉬로 창 간 이동 가능");
+    }
+    
+    /// <summary>
+    /// 현재 경계값을 반환 (외부 스크립트에서 사용)
+    /// </summary>
+    public Vector4 GetBounds()
+    {
+        return new Vector4(minX, maxX, minY, maxY);
+    }
+    
+    /// <summary>
+    /// 개별 경계값 반환
+    /// </summary>
+    public float GetMinX() { return minX; }
+    public float GetMaxX() { return maxX; }
+    public float GetMinY() { return minY; }
+    public float GetMaxY() { return maxY; }
 
     void FixedUpdate()
     {
@@ -142,44 +371,168 @@ public class Player : MonoBehaviour
         // 속도 적용
         rb.linearVelocity = currentVelocity;
         
-        // 위치 제한 (창 밖으로 못 나가게)
-        pos.x = Mathf.Clamp(pos.x, minX, maxX);
-        pos.y = Mathf.Clamp(pos.y, minY, maxY);
-        transform.position = pos;
-        
-        // 경계에 부딪혔을 때 속도 초기화 (벽에서 미끄러지지 않게)
-        if (pos.x <= minX || pos.x >= maxX)
+        // 대쉬 중이 아닐 때만 위치 제한 (창 밖으로 못 나가게)
+        if (!isDashing)
         {
-            currentVelocity.x = 0;
-        }
-        if (pos.y <= minY || pos.y >= maxY)
-        {
-            currentVelocity.y = 0;
+            pos.x = Mathf.Clamp(pos.x, minX, maxX);
+            pos.y = Mathf.Clamp(pos.y, minY, maxY);
+            transform.position = pos;
+            
+            // 경계에 부딪혔을 때 속도 초기화 (벽에서 미끄러지지 않게)
+            if (pos.x <= minX || pos.x >= maxX)
+            {
+                currentVelocity.x = 0;
+            }
+            if (pos.y <= minY || pos.y >= maxY)
+            {
+                currentVelocity.y = 0;
+            }
         }
     }
     
     void PerformDash()
     {
-        // 순간이동: 현재 위치에서 이동 방향으로 dashDistance만큼 순간 이동
+        // Window Split 후에는 전체 창 경계로 대쉬 가능
+        if (isWindowSplit && canDashBetweenWindows)
+        {
+            StartCoroutine(DashBetweenWindows());
+        }
+        else
+        {
+            // 일반 대쉬
+            Vector3 currentPos = transform.position;
+            Vector3 dashDirection = new Vector3(moveInput.x, moveInput.y, 0f).normalized;
+            Vector3 targetPos = currentPos + dashDirection * dashDistance;
+            
+            // 경계 내로 제한
+            targetPos.x = Mathf.Clamp(targetPos.x, minX, maxX);
+            targetPos.y = Mathf.Clamp(targetPos.y, minY, maxY);
+            
+            // 순간이동 애니메이션 시작
+            StartCoroutine(DashAnimation(currentPos, targetPos));
+            
+            // 쿨타임 시작
+            dashCooldownLeft = dashCooldown;
+            
+            Debug.Log($"[Player] 대쉬! {currentPos} → {targetPos}");
+        }
+    }
+    
+    /// <summary>
+    /// Window Split 후 창 간 대쉬 (대쉬 방향에 있는 창으로 이동)
+    /// </summary>
+    IEnumerator DashBetweenWindows()
+    {
+        isDashingBetweenWindows = true;
+        
         Vector3 currentPos = transform.position;
         Vector3 dashDirection = new Vector3(moveInput.x, moveInput.y, 0f).normalized;
+        
+        // 입력이 없으면 대쉬 취소
+        if (dashDirection.magnitude < 0.1f)
+        {
+            isDashingBetweenWindows = false;
+            yield break;
+        }
+        
+        // 현재 어느 창에 있는지 찾기 (가장 가까운 창)
+        int currentRow = 1, currentCol = 1; // 기본값: 중앙
+        float minDistance = float.MaxValue;
+        
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                GameObject window = splitWindows[row, col];
+                if (window != null)
+                {
+                    Transform windowTransform = window.transform;
+                    Vector3 pos = windowTransform.position;
+                    
+                    // 현재 위치와 창 중심 사이의 거리
+                    float distance = Vector3.Distance(currentPos, pos);
+                    
+                    if (distance < minDistance)
+                    {
+                        minDistance = distance;
+                        currentRow = row;
+                        currentCol = col;
+                    }
+                }
+            }
+        }
+        
+        Debug.Log($"[Player] 현재 창: ({currentRow},{currentCol})");
+        
+        // 대쉬 방향에 따라 목표 창 결정 (대각선 포함)
+        int targetRow = currentRow;
+        int targetCol = currentCol;
+        
+        // X축 방향
+        if (Mathf.Abs(dashDirection.x) > 0.3f) // 임계값 0.3
+        {
+            if (dashDirection.x > 0) targetCol = Mathf.Min(2, currentCol + 1);
+            else targetCol = Mathf.Max(0, currentCol - 1);
+        }
+        
+        // Y축 방향
+        if (Mathf.Abs(dashDirection.y) > 0.3f) // 임계값 0.3
+        {
+            if (dashDirection.y > 0) targetRow = Mathf.Max(0, currentRow - 1);
+            else targetRow = Mathf.Min(2, currentRow + 1);
+        }
+        
+        Debug.Log($"[Player] 창 이동: ({currentRow},{currentCol}) → ({targetRow},{targetCol})");
+        
+        // 원래 대쉬하려던 위치 계산
         Vector3 targetPos = currentPos + dashDirection * dashDistance;
         
-        // 경계 내로 제한
+        // 목표 창이 현재 창과 다르면, 목표 창의 경계로 업데이트
+        if (targetRow != currentRow || targetCol != currentCol)
+        {
+            GameObject targetWindow = splitWindows[targetRow, targetCol];
+            if (targetWindow == null)
+            {
+                Debug.LogWarning($"[Player] 목표 창({targetRow},{targetCol})이 없습니다. 대쉬 취소");
+                isDashingBetweenWindows = false;
+                yield break;
+            }
+            
+            // 목표 창의 경계로 업데이트
+            Transform targetTransform = targetWindow.transform;
+            Vector3 windowCenter = targetTransform.position;
+            
+            float newHalfWidth = (referenceMaxBounds.x - referenceMinBounds.x) * 0.5f;
+            float newHalfHeight = (referenceMaxBounds.y - referenceMinBounds.y) * 0.5f;
+            
+            minX = windowCenter.x - newHalfWidth;
+            maxX = windowCenter.x + newHalfWidth;
+            minY = windowCenter.y - newHalfHeight;
+            maxY = windowCenter.y + newHalfHeight;
+        }
+        
+        // 목표 위치를 새 경계 내로 제한
         targetPos.x = Mathf.Clamp(targetPos.x, minX, maxX);
         targetPos.y = Mathf.Clamp(targetPos.y, minY, maxY);
         
         // 순간이동 애니메이션 시작
         StartCoroutine(DashAnimation(currentPos, targetPos));
         
+        Debug.Log($"[Player] 창 간 대쉬! {currentPos} → {targetPos}, 새 경계: X({minX:F2}~{maxX:F2}), Y({minY:F2}~{maxY:F2})");
+        
         // 쿨타임 시작
         dashCooldownLeft = dashCooldown;
         
-        Debug.Log($"[Player] 대쉬! {currentPos} → {targetPos}");
+        // 짧은 시간 동안 경계 무시 상태 유지
+        yield return new WaitForSeconds(dashBoundaryIgnoreDuration);
+        
+        isDashingBetweenWindows = false;
     }
     
     IEnumerator DashAnimation(Vector3 startPos, Vector3 endPos)
     {
+        isDashing = true; // 대쉬 시작
+        
         Vector3 originalScale = transform.localScale;
         
         // 1. 시작 위치에 파티클 효과 + 플레이어 스케일 줄이기 (사라지는 효과)
@@ -261,6 +614,7 @@ public class Player : MonoBehaviour
         }
         
         transform.localScale = originalScale; // 원래 크기로 복원
+        isDashing = false; // 대쉬 종료
     }
     
     IEnumerator AnimateParticle(GameObject particle, Vector2 direction)

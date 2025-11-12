@@ -24,6 +24,12 @@ public class WindowSplitEffect : MonoBehaviour
     [Tooltip("오른쪽 아래 창 위치")]
     public Vector3 bottomRightPosition = new Vector3(380f, -360f, 0f);
     
+    [Tooltip("분열 전 원본 창 목표 크기")]
+    public Vector2 targetWindowSize = new Vector2(128f, 128f);
+    
+    [Tooltip("원본 창 크기 변경 애니메이션 시간 (초)")]
+    public float resizeDuration = 0.5f;
+    
     [Tooltip("분열 애니메이션 시간 (초)")]
     public float splitDuration = 0.3f;
     
@@ -33,6 +39,26 @@ public class WindowSplitEffect : MonoBehaviour
     
     private bool hasTriggered = false;
     private GameObject[,] splitWindows; // 3x3 창 배열
+    private Vector2 originalWindowSize; // 원본 창의 원래 크기
+    private Vector3 originalWindowScale; // 원본 창의 원래 스케일
+    private Vector3 originalWindowPosition; // 원본 창의 원래 위치
+    
+    [Header("플레이어 설정")]
+    [Tooltip("Window Split 알림을 받을 플레이어")]
+    public Player player;
+    
+    void Start()
+    {
+        // 플레이어 자동 찾기
+        if (player == null)
+        {
+            player = FindFirstObjectByType<Player>();
+            if (player != null)
+            {
+                Debug.Log("[WindowSplitEffect] 플레이어 자동 발견");
+            }
+        }
+    }
     
     void Update()
     {
@@ -67,26 +93,83 @@ public class WindowSplitEffect : MonoBehaviour
         RectTransform originalRect = originalWindow.GetComponent<RectTransform>();
         Vector2 centerPosition;
         Vector3 originalScale;
+        Vector2 originalSize;
         
         if (originalRect != null)
         {
             // UI Canvas 오브젝트인 경우
             centerPosition = originalRect.anchoredPosition;
             originalScale = originalRect.localScale;
-            Debug.Log($"[WindowSplitEffect] 원본 창 (UI) anchoredPosition: {centerPosition}, scale: {originalScale}");
+            originalSize = originalRect.sizeDelta;
+            
+            // 원본 크기 저장 (복원용)
+            originalWindowSize = originalSize;
+            originalWindowScale = originalScale;
+            originalWindowPosition = originalRect.position;
+            
+            Debug.Log($"[WindowSplitEffect] 원본 창 (UI) anchoredPosition: {centerPosition}, scale: {originalScale}, sizeDelta: {originalSize}");
         }
         else
         {
             // 일반 Transform 오브젝트인 경우 (GameProgram 등)
             centerPosition = originalWindow.transform.localPosition;
             originalScale = originalWindow.transform.localScale;
+            originalSize = new Vector2(originalScale.x, originalScale.y);
+            
+            // 원본 크기 저장 (복원용)
+            originalWindowSize = originalSize;
+            originalWindowScale = originalScale;
+            originalWindowPosition = originalWindow.transform.position;
+            
             Debug.Log($"[WindowSplitEffect] 원본 창 (World) localPosition: {centerPosition}, scale: {originalScale}");
         }
         
-        // 2. 3x3 그리드 위치 계산
+        // 2. 원본 창 크기를 128x128로 부드럽게 변경
+        Debug.Log($"[WindowSplitEffect] 원본 창 크기 변경 시작: {originalSize} → {targetWindowSize}");
+        
+        float elapsed = 0f;
+        while (elapsed < resizeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / resizeDuration;
+            
+            // EaseInOutCubic
+            float smoothT = t < 0.5f 
+                ? 4f * t * t * t 
+                : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+            
+            if (originalRect != null)
+            {
+                // UI 오브젝트: sizeDelta 변경
+                Vector2 newSize = Vector2.Lerp(originalSize, targetWindowSize, smoothT);
+                originalRect.sizeDelta = newSize;
+            }
+            else
+            {
+                // World 오브젝트: localScale 변경
+                Vector3 newScale = Vector3.Lerp(originalScale, new Vector3(targetWindowSize.x, targetWindowSize.y, originalScale.z), smoothT);
+                originalWindow.transform.localScale = newScale;
+            }
+            
+            yield return null;
+        }
+        
+        // 최종 크기 정확히 설정
+        if (originalRect != null)
+        {
+            originalRect.sizeDelta = targetWindowSize;
+            Debug.Log($"[WindowSplitEffect] 원본 창 크기 변경 완료: sizeDelta = {originalRect.sizeDelta}");
+        }
+        else
+        {
+            originalWindow.transform.localScale = new Vector3(targetWindowSize.x, targetWindowSize.y, originalScale.z);
+            Debug.Log($"[WindowSplitEffect] 원본 창 크기 변경 완료: localScale = {originalWindow.transform.localScale}");
+        }
+        
+        // 3. 3x3 그리드 위치 계산
         Vector3[,] gridPositions = CalculateGridPositions();
         
-        // 3. 9개 창 생성 (중앙에서 시작)
+        // 4. 9개 창 생성 (중앙에서 시작)
         splitWindows = new GameObject[3, 3];
         
         // Canvas 찾기
@@ -113,27 +196,27 @@ public class WindowSplitEffect : MonoBehaviour
                 RectTransform rectTransform = window.GetComponent<RectTransform>();
                 if (rectTransform != null)
                 {
-                    // UI 프리팹이면 anchoredPosition 사용
-                    rectTransform.localScale = originalScale;
+                    // UI 프리팹이면 anchoredPosition만 중앙으로 설정
+                    // sizeDelta와 localScale은 프리팹 값 유지
                     rectTransform.anchoredPosition = centerPosition;
-                    Debug.Log($"[WindowSplitEffect] 창 생성: {window.name} anchoredPosition: {rectTransform.anchoredPosition}, scale: {rectTransform.localScale}");
+                    Debug.Log($"[WindowSplitEffect] 창 생성: {window.name} anchoredPosition: {rectTransform.anchoredPosition}, sizeDelta: {rectTransform.sizeDelta}, scale: {rectTransform.localScale}");
                 }
                 else
                 {
-                    // 일반 Transform 프리팹이면 localPosition 사용
-                    window.transform.localScale = originalScale;
+                    // 일반 Transform 프리팹이면 localPosition만 중앙으로 설정
+                    // localScale은 프리팹 값 유지
                     window.transform.localPosition = centerPosition;
                     Debug.Log($"[WindowSplitEffect] 창 생성: {window.name} localPosition: {window.transform.localPosition}, scale: {window.transform.localScale}");
                 }
             }
         }
         
-        // 4. 원본 창 숨기기
+        // 5. 원본 창 숨기기
         originalWindow.SetActive(false);
         Debug.Log("[WindowSplitEffect] 원본 창 비활성화");
         
-        // 5. 분열 애니메이션: 중앙에서 각자 위치로 이동
-        float elapsed = 0f;
+        // 6. 분열 애니메이션: 중앙에서 각자 위치로 이동
+        elapsed = 0f;
         
         while (elapsed < splitDuration)
         {
@@ -169,7 +252,7 @@ public class WindowSplitEffect : MonoBehaviour
             yield return null;
         }
         
-        // 6. 최종 위치 정확히 설정
+        // 7. 최종 위치 정확히 설정
         for (int row = 0; row < 3; row++)
         {
             for (int col = 0; col < 3; col++)
@@ -191,6 +274,13 @@ public class WindowSplitEffect : MonoBehaviour
         }
         
         Debug.Log("[WindowSplitEffect] 분열 애니메이션 완료!");
+        
+        // 플레이어에게 Window Split 알림
+        if (player != null)
+        {
+            player.OnWindowSplit(splitWindows);
+            Debug.Log("[WindowSplitEffect] 플레이어에게 Window Split 알림 완료");
+        }
     }
     
     /// <summary>
@@ -250,5 +340,37 @@ public class WindowSplitEffect : MonoBehaviour
         }
         
         return splitWindows[row, col];
+    }
+    
+    /// <summary>
+    /// 원본 창 가져오기
+    /// </summary>
+    public GameObject GetOriginalWindow()
+    {
+        return originalWindow;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 크기 가져오기
+    /// </summary>
+    public Vector2 GetOriginalWindowSize()
+    {
+        return originalWindowSize;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 스케일 가져오기
+    /// </summary>
+    public Vector3 GetOriginalWindowScale()
+    {
+        return originalWindowScale;
+    }
+    
+    /// <summary>
+    /// 원본 창의 원래 위치 가져오기
+    /// </summary>
+    public Vector3 GetOriginalWindowPosition()
+    {
+        return originalWindowPosition;
     }
 }

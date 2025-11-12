@@ -45,7 +45,10 @@ public class Game1SequenceManager : MonoBehaviour
     [Header("음악 설정")]
     [Tooltip("마우스 애니메이션 후 재생할 BGM")]
     public AudioClip bgmClip;
-    
+
+    [Tooltip("마우스 이동 사운드")]
+    public AudioClip mouseMove;
+
     private void Awake()
     {
         // 싱글톤 패턴
@@ -181,8 +184,10 @@ public class Game1SequenceManager : MonoBehaviour
         Vector3 targetWorldPos = new Vector3(targetPosition.x, targetPosition.y, isUIObject ? 0 : startPos.z);
         
         Debug.Log($"[Game1SequenceManager] 마우스 이동 시작 - {startPos} → {targetWorldPos}");
-        
+
         // 1단계: 위치 이동 (Ease-out 곡선)
+        SoundManager.Instance.PlaySFX(mouseMove);
+
         float elapsed = 0f;
         while (elapsed < moveDuration)
         {

@@ -24,11 +24,11 @@ public class WindowPush : MonoBehaviour
         // Player 스크립트가 없으면 실행하지 않음
         if (playerScript == null || player == null) return;
 
-        // Player.cs의 경계 값 사용
-        float minX = playerScript.minX;
-        float maxX = playerScript.maxX;
-        float minY = playerScript.minY;
-        float maxY = playerScript.maxY;
+        // Player.cs의 경계 값 가져오기 (public 메서드 사용)
+        float minX = playerScript.GetMinX();
+        float maxX = playerScript.GetMaxX();
+        float minY = playerScript.GetMinY();
+        float maxY = playerScript.GetMaxY();
 
         // 플레이어의 위치를 경계 안으로 제한
         Vector3 playerPos = player.position;

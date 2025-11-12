@@ -9,6 +9,7 @@ public class GameSequenceManager : MonoBehaviour
     public static GameSequenceManager Instance { get; private set; }
     public static bool ReturnFromGameOver = false; // GameOver에서 돌아왔는지 체크
 
+
     [Header("배경화면 설정")]
     [Tooltip("배경화면 게임오브젝트")]
     public GameObject backgroundObject;
@@ -45,7 +46,7 @@ public class GameSequenceManager : MonoBehaviour
     public float delayBeforeBlackScreen = 2f;
     
     [Tooltip("NO 글씨 표시 시간")]
-    public float noTextDisplayDuration = 2f;
+    public float noTextDisplayDuration = 4.8f;
 
     [Header("끌 오브젝트 설정")]
     [Tooltip("모스부호 시작 전 끌 오브젝트들")]
@@ -87,6 +88,22 @@ public class GameSequenceManager : MonoBehaviour
     [Range(0f, 2f)]
     [Tooltip("Error 최대 크기 배율")]
     public float errorMaxScale = 1.5f;
+
+    [Header("Audio Clips")]
+    [Tooltip("모스부호 사운드")]
+    public AudioClip morseClip;
+
+    [Tooltip("점프스퀘어 NO 사운드")]
+    public AudioClip JumpSquare_NO;
+
+    [Tooltip("에러 사운드")]
+    public AudioClip Error;
+
+    [Tooltip("글리치 화면전환 사운드")]
+    public AudioClip Glitch_disappear;
+
+    [Tooltip("알림 사운드")]
+    public AudioClip Alert;
 
     private TextMeshProUGUI morseTextTMP;
     private Text morseTextLegacy;
@@ -271,6 +288,7 @@ public class GameSequenceManager : MonoBehaviour
             Debug.Log("[GameSequenceManager] 테두리 활성화");
         }
 
+
         // 5. 모스부호 표시
         yield return StartCoroutine(ShowMorseCode());
 
@@ -299,19 +317,19 @@ public class GameSequenceManager : MonoBehaviour
 
         // ??? 표시
         SetMorseText(morseText);
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(3.2f);
 
         // SoundManager를 통해 오디오 재생 시작
-        if (SoundManager.Instance != null)
+        if (SoundManager.Instance != null && morseClip != null)
         {
-            SoundManager.Instance.PlayMorseSound();
+            SoundManager.Instance.PlaySFX(morseClip);
         }
 
         // 오디오 길이 가져오기 (없으면 기본 타이밍 사용)
         float audioDuration = 0f;
-        if (SoundManager.Instance != null)
+        if (morseClip != null)
         {
-            audioDuration = SoundManager.Instance.GetMorseClipLength();
+            audioDuration = morseClip.length;
         }
 
         // 모스부호 글자 수
@@ -330,13 +348,7 @@ public class GameSequenceManager : MonoBehaviour
             yield return new WaitForSeconds(charInterval);
         }
 
-        // 오디오가 끝날 때까지 대기 (아직 재생 중이면)
-        if (SoundManager.Instance != null && SoundManager.Instance.IsMorsePlaying())
-        {
-            yield return new WaitWhile(() => SoundManager.Instance.IsMorsePlaying());
-        }
-
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(4.3f);
     }
 
     private System.Collections.IEnumerator BlinkScreen()
@@ -354,14 +366,14 @@ public class GameSequenceManager : MonoBehaviour
                 else if (image != null) image.color = Color.white;
                 else if (rawImage != null) rawImage.color = Color.white;
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.3f);
 
                 // 검은색
                 if (spriteRenderer != null) spriteRenderer.color = Color.black;
                 else if (image != null) image.color = Color.black;
                 else if (rawImage != null) rawImage.color = Color.black;
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(0.3f);
             }
         }
 
@@ -374,6 +386,7 @@ public class GameSequenceManager : MonoBehaviour
         if (noTextObject != null)
         {
             noTextObject.SetActive(true);
+            SoundManager.Instance.PlaySFX(JumpSquare_NO);
             Debug.Log("[GameSequenceManager] NO 글씨 활성화");
         }
 
@@ -432,6 +445,7 @@ public class GameSequenceManager : MonoBehaviour
                 Vector3 originalScale = spawnedError.transform.localScale;
                 spawnedError.transform.localScale = originalScale * randomScale;
 
+                SoundManager.Instance.PlaySFX(Error);
                 spawnedError.SetActive(true);
             }
 
@@ -442,6 +456,8 @@ public class GameSequenceManager : MonoBehaviour
 
         // 1초 대기
         yield return new WaitForSeconds(1f);
+
+        SoundManager.Instance.PlaySFX(Glitch_disappear);
 
         // 현재 화면 캡처 후 Glitch 효과 (Error들이 보이는 상태에서)
         yield return StartCoroutine(ApplyGlitchEffect());
@@ -465,9 +481,13 @@ public class GameSequenceManager : MonoBehaviour
             Debug.Log("[GameSequenceManager] 백신 아이콘 활성화");
         }
 
+        // 4.6초 대기
+        yield return new WaitForSeconds(7f);
+
         // 백신 알람 애니메이션 시작
         if (vaccineAlarm != null)
         {
+            SoundManager.Instance.PlaySFX(Alert);
             vaccineAlarm.TriggerAnimation();
             Debug.Log("[GameSequenceManager] 백신 알람 애니메이션 트리거");
         }

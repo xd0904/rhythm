@@ -13,7 +13,7 @@ public class ErrorPatternManager : MonoBehaviour
     public int patternStartBeat = 96; // 32초 = 96박자 (180 BPM 기준)
     
     [Tooltip("패턴 종료 박자")]
-    public int patternEndBeat = 128; // 42.7초 ≈ 128박자
+    public int patternEndBeat = 159; // 53초 = 159박자 (180 BPM 기준)
     
     [Header("에러 프리팹")]
     [Tooltip("에러 프리팹 (느낌표 사각형)")]
@@ -67,14 +67,20 @@ public class ErrorPatternManager : MonoBehaviour
     
     private WindowSplitEffect windowSplitEffect;
     private bool hasStarted = false;
+    private bool hasEnded = false; // 패턴 종료 여부
     private int currentBeatIndex = 0;
     private int patternBeatIndex = 0; // 16박자 패턴 내 인덱스
+    private int patternRepeatCount = 0; // 패턴 반복 횟수 (0~3, 총 4회)
     private int errorCount = 0; // 현재 생성된 에러 개수
     private int lastProcessedBeat = -1; // 마지막으로 처리한 박자
     private List<GameObject> activeErrors = new List<GameObject>();
     private List<Coroutine> activeCoroutines = new List<Coroutine>();
     private HashSet<int> usedPositions = new HashSet<int>(); // 현재 사용 중인 위치들
     private List<GameObject> hiddenWindows = new List<GameObject>(); // 숨겨진 창들
+    
+    [Header("반복 설정")]
+    [Tooltip("16박자 패턴 반복 횟수")]
+    public int patternRepeatMax = 2; // 총 2번 반복 (32박자)
     
     void Start()
     {
@@ -97,11 +103,12 @@ public class ErrorPatternManager : MonoBehaviour
         int currentBeat = Mathf.FloorToInt((float)(musicTime / beatInterval));
         
         // 패턴 시작 체크
-        if (!hasStarted && currentBeat >= patternStartBeat)
+        if (!hasStarted && !hasEnded && currentBeat >= patternStartBeat)
         {
             hasStarted = true;
             currentBeatIndex = 1; // 패턴 내 박자는 1부터 시작
             patternBeatIndex = 0;
+            patternRepeatCount = 0;
             errorCount = 0;
             lastProcessedBeat = currentBeat - 1;
             
@@ -138,11 +145,12 @@ public class ErrorPatternManager : MonoBehaviour
                 currentBeatIndex++;
                 patternBeatIndex++;
                 
-                // 16박자 패턴 반복
+                // 16박자 패턴 반복 체크
                 if (patternBeatIndex >= beatPattern.Length)
                 {
                     patternBeatIndex = 0;
                     currentBeatIndex = 1; // 다시 1부터 시작
+                    patternRepeatCount++; // 반복 횟수 증가
                     
                     // 새 패턴 시작 시 숨겨진 창들 다시 활성화
                     foreach (GameObject window in hiddenWindows)
@@ -155,7 +163,17 @@ public class ErrorPatternManager : MonoBehaviour
                     }
                     hiddenWindows.Clear();
                     
-                    Debug.Log("[ErrorPatternManager] ========== 16박자 패턴 반복! ==========");
+                    Debug.Log($"[ErrorPatternManager] ========== 16박자 패턴 {patternRepeatCount}회 완료! ==========");
+                    
+                    // 설정된 반복 횟수에 도달하면 패턴 종료
+                    if (patternRepeatCount >= patternRepeatMax)
+                    {
+                        hasStarted = false;
+                        hasEnded = true;
+                        CleanupPattern();
+                        StartCoroutine(MergeWindowsAndRestore());
+                        Debug.Log($"[ErrorPatternManager] ========== 패턴 {patternRepeatMax}회 반복 완료! 창 합치기 시작 ==========");
+                    }
                 }
             }
         }
@@ -406,6 +424,196 @@ public class ErrorPatternManager : MonoBehaviour
         
         // 2. 유지 (펑 때까지 계속 유지)
         // ExplodeAllErrors에서 이 코루틴을 멈추고 폭발 애니메이션 실행
+    }
+    
+    /// <summary>
+    /// 패턴 종료 시 정리
+    /// </summary>
+    void CleanupPattern()
+    {
+        // 모든 활성 에러 제거
+        foreach (GameObject error in activeErrors)
+        {
+            if (error != null)
+            {
+                Destroy(error);
+            }
+        }
+        activeErrors.Clear();
+        
+        // 모든 활성 코루틴 중지
+        foreach (Coroutine coroutine in activeCoroutines)
+        {
+            if (coroutine != null)
+            {
+                StopCoroutine(coroutine);
+            }
+        }
+        activeCoroutines.Clear();
+        
+        // 숨겨진 창 복원
+        foreach (GameObject window in hiddenWindows)
+        {
+            if (window != null)
+            {
+                window.SetActive(true);
+            }
+        }
+        hiddenWindows.Clear();
+        
+        usedPositions.Clear();
+        
+        Debug.Log("[ErrorPatternManager] 패턴 정리 완료");
+    }
+    
+    /// <summary>
+    /// 창 합치기 및 원래 크기로 복원
+    /// </summary>
+    IEnumerator MergeWindowsAndRestore()
+    {
+        if (windowSplitEffect == null)
+        {
+            Debug.LogWarning("[ErrorPatternManager] windowSplitEffect가 없어 창 합치기를 할 수 없습니다.");
+            yield break;
+        }
+        
+        GameObject[,] windows = windowSplitEffect.GetSplitWindows();
+        GameObject originalWindow = windowSplitEffect.GetOriginalWindow();
+        Vector2 originalSize = windowSplitEffect.GetOriginalWindowSize();
+        Vector3 originalScale = windowSplitEffect.GetOriginalWindowScale();
+        Vector3 originalPosition = windowSplitEffect.GetOriginalWindowPosition();
+        
+        if (windows == null || originalWindow == null)
+        {
+            Debug.LogWarning("[ErrorPatternManager] 창 정보를 가져올 수 없습니다.");
+            yield break;
+        }
+        
+        Debug.Log($"[ErrorPatternManager] 창 합치기 시작! 원본 크기: {originalSize}, 스케일: {originalScale}, 위치: {originalPosition}");
+        
+        float mergeDuration = 0.5f; // 합치는 시간
+        float elapsed = 0f;
+        
+        // 모든 split 창들의 시작 위치 저장
+        Vector3[,] startPositions = new Vector3[3, 3];
+        Vector3[,] startScales = new Vector3[3, 3];
+        
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                GameObject window = windows[row, col];
+                if (window != null)
+                {
+                    startPositions[row, col] = window.transform.position;
+                    startScales[row, col] = window.transform.localScale;
+                }
+            }
+        }
+        
+        // 목표 위치 (중앙 창 위치 또는 원본 위치)
+        Vector3 targetPosition = windows[1, 1] != null ? windows[1, 1].transform.position : originalPosition;
+        
+        // 합치기 애니메이션
+        while (elapsed < mergeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / mergeDuration;
+            t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+            
+            // 모든 창을 중앙으로 모으면서 투명하게
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    GameObject window = windows[row, col];
+                    if (window != null)
+                    {
+                        window.transform.position = Vector3.Lerp(startPositions[row, col], targetPosition, t);
+                        window.transform.localScale = Vector3.Lerp(startScales[row, col], Vector3.zero, t);
+                    }
+                }
+            }
+            
+            yield return null;
+        }
+        
+        // 모든 split 창 제거
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                GameObject window = windows[row, col];
+                if (window != null)
+                {
+                    Destroy(window);
+                }
+            }
+        }
+        
+        // 원래 창 활성화 및 원래 크기로 복원
+        if (originalWindow != null)
+        {
+            originalWindow.SetActive(true);
+            originalWindow.transform.position = targetPosition;
+            
+            RectTransform originalRect = originalWindow.GetComponent<RectTransform>();
+            
+            if (originalRect != null)
+            {
+                // UI 오브젝트인 경우
+                originalRect.sizeDelta = Vector2.zero;
+                originalRect.localScale = Vector3.zero;
+                
+                // 원래 크기로 커지는 애니메이션
+                float restoreDuration = 0.5f;
+                elapsed = 0f;
+                
+                while (elapsed < restoreDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / restoreDuration;
+                    t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+                    
+                    originalRect.sizeDelta = Vector2.Lerp(Vector2.zero, originalSize, t);
+                    originalRect.localScale = Vector3.Lerp(Vector3.zero, originalScale, t);
+                    
+                    yield return null;
+                }
+                
+                originalRect.sizeDelta = originalSize;
+                originalRect.localScale = originalScale;
+                originalWindow.transform.position = originalPosition;
+                
+                Debug.Log($"[ErrorPatternManager] UI 창 복원 완료! sizeDelta: {originalRect.sizeDelta}, scale: {originalRect.localScale}");
+            }
+            else
+            {
+                // World 오브젝트인 경우
+                originalWindow.transform.localScale = Vector3.zero;
+                
+                float restoreDuration = 0.5f;
+                elapsed = 0f;
+                
+                while (elapsed < restoreDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / restoreDuration;
+                    t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+                    
+                    originalWindow.transform.localScale = Vector3.Lerp(Vector3.zero, originalScale, t);
+                    
+                    yield return null;
+                }
+                
+                originalWindow.transform.localScale = originalScale;
+                originalWindow.transform.position = originalPosition;
+                
+                Debug.Log($"[ErrorPatternManager] World 창 복원 완료! scale: {originalWindow.transform.localScale}");
+            }
+        }
+        
+        Debug.Log("[ErrorPatternManager] 창 합치기 및 복원 완료!");
     }
     
     /// <summary>

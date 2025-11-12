@@ -64,11 +64,13 @@ public class Percent : MonoBehaviour
     [Tooltip("게임 프로그램 뜬 후 씬 전환까지 대기 시간 (초)")]
     public float sceneTransitionDelay = 2f;
 
+    [Tooltip("에러 사운드")]
+    public AudioClip Error;
 
     public void OnStartButtonClicked()
     {
-        
-         StartCoroutine(FillGauge());
+
+        StartCoroutine(FillGauge());
 
          Object.SetActive(true);
          Object2.SetActive(true);
@@ -112,7 +114,9 @@ public class Percent : MonoBehaviour
         
         // 1초 대기 후 에러창 띄우기
         yield return new WaitForSeconds(errorWindowDelay);
-        
+
+        SoundManager.Instance.PlaySFX(Error);
+
         if (errorWindow != null)
         {
             errorWindow.SetActive(true);
