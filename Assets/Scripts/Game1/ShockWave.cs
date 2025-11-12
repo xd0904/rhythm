@@ -144,7 +144,7 @@ public class ShockWave : MonoBehaviour
             // 보스 현재 위치에서 충격파 발사
             Vector2 bossPos = Bossobj.transform.position;
 
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.2f);
 
             // 처음 4개
             for (int j = 0; j < 2; j++)
@@ -157,18 +157,18 @@ public class ShockWave : MonoBehaviour
                 yield return new WaitForSeconds(0.6f);
             }
 
-            yield return new WaitForSeconds(0.2f);
+            //yield return new WaitForSeconds(0.2f);
 
 
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
-            yield return new WaitForSeconds(1.3f);
+            yield return new WaitForSeconds(1.2f);
 
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
             yield return new WaitForSeconds(0.4f);
 
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
 
-
+            yield return new WaitForSeconds(0.2f);
             //yield return new WaitForSeconds(spawnInterval);
 
             // 다음 이동이 시작될 때까지 대기
