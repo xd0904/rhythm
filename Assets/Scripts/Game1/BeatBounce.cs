@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEditor.PackageManager;
 
 public class BeatBounce : MonoBehaviour
 {
@@ -91,6 +92,16 @@ public class BeatBounce : MonoBehaviour
     public float trailFadeDistance = 2f;        // 창에서 이 거리만큼 멀어지면 완전 투명
     public int triangleBeatsPerSpawn = 4;       // 4박자마다 삼각형 생성
     private int trianglePatternCounter = 0;     // 패턴 카운터
+
+    [Tooltip("튕기는 사운드")]
+    public AudioClip Bounce;
+
+    [Tooltip("박히는 사운드")]
+    public AudioClip Hit;
+
+    [Tooltip("창 날아가는 사운드")]
+    public AudioClip Spear;
+
 
     void Awake()
     {
@@ -1380,6 +1391,7 @@ public class BeatBounce : MonoBehaviour
             // X축 반사
             if (currentPos.x <= screenBounds.min.x || currentPos.x >= screenBounds.max.x)
             {
+                SoundManager.Instance.PlaySFX(Bounce);
                 velocity.x = -velocity.x;
                 currentPos.x = Mathf.Clamp(currentPos.x, screenBounds.min.x, screenBounds.max.x);
             }
@@ -1387,6 +1399,7 @@ public class BeatBounce : MonoBehaviour
             // Y축 반사
             if (currentPos.y <= screenBounds.min.y || currentPos.y >= screenBounds.max.y)
             {
+                SoundManager.Instance.PlaySFX(Bounce);
                 velocity.y = -velocity.y;
                 currentPos.y = Mathf.Clamp(currentPos.y, screenBounds.min.y, screenBounds.max.y);
             }
