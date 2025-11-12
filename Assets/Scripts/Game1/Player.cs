@@ -312,7 +312,7 @@ public class Player : MonoBehaviour
             }
         }
     }
-    
+
     /// <summary>
     /// Window Split 알림 받기 (WindowSplitEffect에서 호출)
     /// </summary>
@@ -321,8 +321,33 @@ public class Player : MonoBehaviour
         isWindowSplit = true;
         splitWindows = windows;
         canDashBetweenWindows = true;
-        
+
         Debug.Log("[Player] Window Split 감지! 대쉬로 창 간 이동 가능");
+    }
+    
+    /// <summary>
+    /// Window Merge 알림 받기 (WindowSplitEffect에서 호출)
+    /// </summary>
+    public void OnWindowMerge()
+    {
+        isWindowSplit = false;
+        splitWindows = null;
+        canDashBetweenWindows = false;
+        
+        // 원래 경계로 복원 (기본값 또는 초기값)
+        ResetBoundsToOriginal();
+        
+        Debug.Log("[Player] Window Merge 감지! 대쉬 비활성화, 경계 복원");
+    }
+    
+    /// <summary>
+    /// 경계를 원래대로 복원
+    /// </summary>
+    void ResetBoundsToOriginal()
+    {
+        // UpdateBounds()를 호출하여 gameWindow 기준으로 경계 재계산
+        UpdateBounds();
+        Debug.Log($"[Player] 경계 복원 완료: minX={minX}, maxX={maxX}, minY={minY}, maxY={maxY}");
     }
     
     /// <summary>
@@ -663,6 +688,29 @@ public class Player : MonoBehaviour
     {
         // 이미 죽었으면 무시
         if (isDead) return;
+
+        // 백신 충돌 처리 (죽기 전에 먼저 체크)
+        if (other.CompareTag("Vaccine"))
+        {
+            Debug.Log("[Player] 백신 먹음!");
+
+            // 백신 오브젝트 제거
+            Destroy(other.gameObject);
+
+            // FileToFolderPatternManager 찾아서 백신 효과 호출
+            FileToFolderPatternManager patternManager = FindFirstObjectByType<FileToFolderPatternManager>();
+            if (patternManager != null)
+            {
+                StartCoroutine(patternManager.ShowVaccineAlarmAndIncreasePercent());
+                Debug.Log("[Player] FileToFolderPatternManager 백신 효과 호출");
+            }
+            else
+            {
+                Debug.LogWarning("[Player] FileToFolderPatternManager를 찾을 수 없습니다!");
+            }
+
+            return; // 백신은 먹으면 끝
+        }
         
         // 무적 모드면 무시
         if (godMode)
