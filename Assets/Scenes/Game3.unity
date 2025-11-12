@@ -308,6 +308,67 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &185390405
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 185390406}
+  - component: {fileID: 185390407}
+  m_Layer: 0
+  m_Name: FileToFolderPatternManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &185390406
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 185390405}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 981275979}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &185390407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 185390405}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbe0239e15bf64d408572e632ddb21e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  patternStartBeat: 159
+  patternEndBeat: 272
+  filePrefab: {fileID: 7405539025172597702, guid: 53e14cca6421a2d46a9e028c06673621, type: 3}
+  vaccinePrefab: {fileID: 7912916156487168980, guid: c685d3d4a5466c7429e8479b38778f65, type: 3}
+  folderPrefab: {fileID: 5166138423174941299, guid: 9cf40e4d5d4cc104fa35c5c1c50568cb, type: 3}
+  targetCanvas: {fileID: 908137775}
+  centerPosition: {x: 0, y: 0}
+  startDistance: 400
+  gatherDuration: 4
+  vaccineProgram: {fileID: 1993024623}
+  redGaugeImage: {fileID: 796087953}
+  gaugeText: {fileID: 1961692109}
+  gaugeText2: {fileID: 1731053067}
+  gaugeText4: {fileID: 299626470}
+  percentIncrement: 0.08
+  vaccineProgramDisplayDuration: 0.8
+  patternRepeatMax: 7
 --- !u!1 &268206411
 GameObject:
   m_ObjectHideFlags: 0
@@ -695,6 +756,7 @@ MonoBehaviour:
   errorExplodeDuration: 0.2
   errorScaleX: 0.7479665
   errorScaleY: 0.6842404
+  patternRepeatMax: 2
 --- !u!1 &466994891
 GameObject:
   m_ObjectHideFlags: 0
@@ -872,6 +934,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
   doubleClickTime: 0.3
+  ClickSound: {fileID: 0}
 --- !u!212 &575792473
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -943,7 +1006,7 @@ MonoBehaviour:
   targetObject: {fileID: 0}
   targetObject2: {fileID: 0}
   Object: {fileID: 0}
-  animationDuration: 0.5
+  ClickSound: {fileID: 0}
 --- !u!1 &605433583
 GameObject:
   m_ObjectHideFlags: 0
@@ -1813,6 +1876,7 @@ MonoBehaviour:
   errorWindowDelay: 1
   nextSceneName: Game1
   sceneTransitionDelay: 0
+  Error: {fileID: 0}
 --- !u!212 &796087951
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2083,10 +2147,8 @@ MonoBehaviour:
   bgmSource: {fileID: 0}
   sfxSource: {fileID: 0}
   noteSource: {fileID: 0}
-  morseAudioSource: {fileID: 860055406}
   bgmVolume: 0.7
   sfxVolume: 0.7
-  morseVolume: 1
   musics: []
 --- !u!4 &860055408
 Transform:
@@ -2541,6 +2603,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetObject: {fileID: 0}
   doubleClickTime: 0.3
+  ClickSound: {fileID: 0}
 --- !u!212 &945507458
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2762,6 +2825,7 @@ Transform:
   - {fileID: 1596275603}
   - {fileID: 460341991}
   - {fileID: 268206412}
+  - {fileID: 185390406}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1097115110
@@ -3692,6 +3756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   splitTime: 32
+  mergeTime: 53
   originalWindow: {fileID: 3889870688755989322}
   splitWindowPrefab: {fileID: 9086485918756735427, guid: ffabab6a8de1fb840aedf6e9eb600f5d, type: 3}
   topLeftPosition: {x: -380, y: 360, z: 0}

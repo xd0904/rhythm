@@ -10,6 +10,9 @@ public class WindowSplitEffect : MonoBehaviour
     [Tooltip("분열 시작 시간 (초)")]
     public float splitTime = 32f;
     
+    [Tooltip("합치기 시작 시간 (초)")]
+    public float mergeTime = 53f;
+    
     [Header("창 오브젝트")]
     [Tooltip("원본 창 (분열 전)")]
     public GameObject originalWindow;
@@ -38,6 +41,7 @@ public class WindowSplitEffect : MonoBehaviour
     public Canvas targetCanvas;
     
     private bool hasTriggered = false;
+    private bool hasMerged = false;
     private GameObject[,] splitWindows; // 3x3 창 배열
     private Vector2 originalWindowSize; // 원본 창의 원래 크기
     private Vector3 originalWindowScale; // 원본 창의 원래 스케일
@@ -62,19 +66,25 @@ public class WindowSplitEffect : MonoBehaviour
     
     void Update()
     {
-        if (hasTriggered) return;
-        
         // Game3SequenceManager의 DSP 시간 사용
         if (Game3SequenceManager.Instance == null) return;
         
         double musicTime = Game3SequenceManager.Instance.GetMusicTime();
         
         // 32초에 분열 시작
-        if (musicTime >= splitTime)
+        if (!hasTriggered && musicTime >= splitTime)
         {
             hasTriggered = true;
             Debug.Log($"[WindowSplitEffect] ========== 분열 시작! ========== musicTime: {musicTime}");
             StartCoroutine(SplitWindowAnimation());
+        }
+        
+        // 53초에 합치기 시작
+        if (!hasMerged && hasTriggered && musicTime >= mergeTime)
+        {
+            hasMerged = true;
+            Debug.Log($"[WindowSplitEffect] ========== 합치기 시작! ========== musicTime: {musicTime}");
+            StartCoroutine(MergeWindowsAndRestore());
         }
     }
     
@@ -372,5 +382,150 @@ public class WindowSplitEffect : MonoBehaviour
     public Vector3 GetOriginalWindowPosition()
     {
         return originalWindowPosition;
+    }
+    
+    /// <summary>
+    /// 창 합치기 및 원래 크기로 복원
+    /// </summary>
+    IEnumerator MergeWindowsAndRestore()
+    {
+        if (splitWindows == null || originalWindow == null)
+        {
+            Debug.LogWarning("[WindowSplitEffect] 창 정보를 가져올 수 없습니다.");
+            yield break;
+        }
+        
+        Debug.Log($"[WindowSplitEffect] 창 합치기 시작! 원본 크기: {originalWindowSize}, 스케일: {originalWindowScale}, 위치: {originalWindowPosition}");
+        
+        float mergeDuration = 0.5f; // 합치는 시간
+        float elapsed = 0f;
+        
+        // 모든 split 창들의 시작 위치 저장
+        Vector3[,] startPositions = new Vector3[3, 3];
+        Vector3[,] startScales = new Vector3[3, 3];
+        
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                GameObject window = splitWindows[row, col];
+                if (window != null)
+                {
+                    startPositions[row, col] = window.transform.position;
+                    startScales[row, col] = window.transform.localScale;
+                }
+            }
+        }
+        
+        // 목표 위치 (중앙 창 위치 또는 원본 위치)
+        Vector3 targetPosition = splitWindows[1, 1] != null ? splitWindows[1, 1].transform.position : originalWindowPosition;
+        
+        // 합치기 애니메이션
+        while (elapsed < mergeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / mergeDuration;
+            t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+            
+            // 모든 창을 중앙으로 모으면서 투명하게
+            for (int row = 0; row < 3; row++)
+            {
+                for (int col = 0; col < 3; col++)
+                {
+                    GameObject window = splitWindows[row, col];
+                    if (window != null)
+                    {
+                        window.transform.position = Vector3.Lerp(startPositions[row, col], targetPosition, t);
+                        window.transform.localScale = Vector3.Lerp(startScales[row, col], Vector3.zero, t);
+                    }
+                }
+            }
+            
+            yield return null;
+        }
+        
+        // 모든 split 창 제거
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 3; col++)
+            {
+                GameObject window = splitWindows[row, col];
+                if (window != null)
+                {
+                    Destroy(window);
+                }
+            }
+        }
+        
+        // 원래 창 활성화 및 원래 크기로 복원
+        if (originalWindow != null)
+        {
+            originalWindow.SetActive(true);
+            originalWindow.transform.position = targetPosition;
+            
+            RectTransform originalRect = originalWindow.GetComponent<RectTransform>();
+            
+            if (originalRect != null)
+            {
+                // UI 오브젝트인 경우
+                originalRect.sizeDelta = Vector2.zero;
+                originalRect.localScale = Vector3.zero;
+                
+                // 원래 크기로 커지는 애니메이션
+                float restoreDuration = 0.5f;
+                elapsed = 0f;
+                
+                while (elapsed < restoreDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / restoreDuration;
+                    t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+                    
+                    originalRect.sizeDelta = Vector2.Lerp(Vector2.zero, originalWindowSize, t);
+                    originalRect.localScale = Vector3.Lerp(Vector3.zero, originalWindowScale, t);
+                    
+                    yield return null;
+                }
+                
+                originalRect.sizeDelta = originalWindowSize;
+                originalRect.localScale = originalWindowScale;
+                originalWindow.transform.position = originalWindowPosition;
+                
+                Debug.Log($"[WindowSplitEffect] UI 창 복원 완료! sizeDelta: {originalRect.sizeDelta}, scale: {originalRect.localScale}");
+            }
+            else
+            {
+                // World 오브젝트인 경우
+                originalWindow.transform.localScale = Vector3.zero;
+                
+                float restoreDuration = 0.5f;
+                elapsed = 0f;
+                
+                while (elapsed < restoreDuration)
+                {
+                    elapsed += Time.deltaTime;
+                    float t = elapsed / restoreDuration;
+                    t = 1f - (1f - t) * (1f - t); // EaseOutQuad
+                    
+                    originalWindow.transform.localScale = Vector3.Lerp(Vector3.zero, originalWindowScale, t);
+                    
+                    yield return null;
+                }
+                
+                originalWindow.transform.localScale = originalWindowScale;
+                originalWindow.transform.position = originalWindowPosition;
+                
+                Debug.Log($"[WindowSplitEffect] World 창 복원 완료! scale: {originalWindow.transform.localScale}");
+            }
+        }
+        
+        // 플레이어에게 창 합쳐짐 알림
+        if (player != null)
+        {
+            player.OnWindowMerge();
+            Debug.Log("[WindowSplitEffect] 플레이어에게 Window Merge 알림 완료");
+        }
+        
+        Debug.Log("[WindowSplitEffect] 창 합치기 및 복원 완료!");
     }
 }
