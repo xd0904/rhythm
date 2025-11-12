@@ -8,10 +8,12 @@ public class Boom : MonoBehaviour
     [Header("프리팹")]
     public GameObject miniWindowPrefab; // 작은 창 프리팹
     public GameObject eyeBulletPrefab; // 보스 눈 모양 탄막 프리팹
-    public GameObject cannonObject; // 대포 오브젝트
+    public GameObject cannonObject1; // 대포 오브젝트 1
+    public GameObject cannonObject2; // 대포 오브젝트 2 (깜빡임)
 
     [Header("설정")]
     public Transform spawnPoint; // 창 생성 위치
+    public Transform player; // 플레이어 Transform
     public float windowSpawnRadius = 3f; // 창이 생성될 반경
     public int windowPositionCount = 8; // 창 위치 개수 (원형으로 배치)
     public float bulletSpeed = 5f; // 탄막 속도
@@ -33,6 +35,16 @@ public class Boom : MonoBehaviour
         InitializeBeatTimings();
         InitializeWindowPositions();
         spawnedWindowCount = 0; // 초기화
+
+        // 플레이어가 할당되지 않았다면 자동으로 찾기
+        if (player == null)
+        {
+            GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+            if (playerObj != null)
+            {
+                player = playerObj.transform;
+            }
+        }
     }
     void InitializeWindowPositions()
     {
@@ -61,10 +73,10 @@ public class Boom : MonoBehaviour
         beatTimings.Add(24.3);
         beatTimings.Add(25.0);
         beatTimings.Add(25.5);
-        beatTimings.Add(26.0);
-        beatTimings.Add(26.2);
-        beatTimings.Add(26.3);
-        beatTimings.Add(26.5);
+        //beatTimings.Add(26.0);
+        //beatTimings.Add(26.2);
+        //beatTimings.Add(26.3);
+        //beatTimings.Add(26.5);
 
         // 두 번째 사이클 (+5.3초)
         beatTimings.Add(27.0);
@@ -74,10 +86,10 @@ public class Boom : MonoBehaviour
         beatTimings.Add(29.7);
         beatTimings.Add(30.3);
         beatTimings.Add(30.8);
-        beatTimings.Add(31.3);
-        beatTimings.Add(31.5);
-        beatTimings.Add(31.7);
-        beatTimings.Add(31.8);
+        //beatTimings.Add(31.3);
+        //beatTimings.Add(31.5);
+        //beatTimings.Add(31.7);
+        //beatTimings.Add(31.8);
     }
 
     void Update()
@@ -91,9 +103,13 @@ public class Boom : MonoBehaviour
         {
             patternActive = true;
 
-            if (cannonObject != null)
+            if (cannonObject1 != null)
             {
-                cannonObject.SetActive(true);
+                cannonObject1.SetActive(true);
+            }
+            if (cannonObject2 != null)
+            {
+                cannonObject2.SetActive(true);
             }
         }
 
@@ -120,6 +136,9 @@ public class Boom : MonoBehaviour
         // 창 소환
         SpawnMiniWindow();
 
+        // cannonObject2 깜빡임 효과
+        StartCoroutine(BlinkCannon2());
+
         // 대포 회전 (1번째, 3번째, 5번째 비트 = 인덱스 0, 2, 4)
         if (beatIndex == 0 || beatIndex == 2 || beatIndex == 4 ||
             beatIndex == 11 || beatIndex == 13 || beatIndex == 15) // 두 번째 사이클도 포함
@@ -135,6 +154,16 @@ public class Boom : MonoBehaviour
             float delay = (float)(nextBeatTime - currentTime);
 
             StartCoroutine(FireBulletAfterDelay(delay));
+        }
+    }
+
+    IEnumerator BlinkCannon2()
+    {
+        if (cannonObject2 != null)
+        {
+            cannonObject2.SetActive(false);
+            yield return new WaitForSeconds(0.2f);
+            cannonObject2.SetActive(true);
         }
     }
 
@@ -165,16 +194,6 @@ public class Boom : MonoBehaviour
 
     IEnumerator FireBulletAfterDelay(float delay)
     {
-        // 발사 전 대포 애니메이션 (발사 준비)
-        if (cannonObject != null)
-        {
-            Animator cannonAnimator = cannonObject.GetComponent<Animator>();
-            if (cannonAnimator != null)
-            {
-                cannonAnimator.SetTrigger("Prepare");
-            }
-        }
-
         yield return new WaitForSeconds(delay);
 
         // 모든 활성 창에서 탄막 발사
@@ -184,16 +203,8 @@ public class Boom : MonoBehaviour
             {
                 FireEyeBullet(window.transform.position);
             }
-        }
 
-        // 발사 후 대포 애니메이션 (원래 상태)
-        if (cannonObject != null)
-        {
-            Animator cannonAnimator = cannonObject.GetComponent<Animator>();
-            if (cannonAnimator != null)
-            {
-                cannonAnimator.SetTrigger("Idle");
-            }
+            yield return new WaitForSeconds(0.6f);
         }
     }
 
@@ -203,28 +214,34 @@ public class Boom : MonoBehaviour
 
         GameObject bullet = Instantiate(eyeBulletPrefab, startPosition, Quaternion.identity);
 
-        // 탄막 스크립트 설정
+        // 탄막 스크립트 설정 (플레이어 위치 전달)
         EyeBullet bulletScript = bullet.GetComponent<EyeBullet>();
         if (bulletScript != null)
         {
-            bulletScript.Initialize(bulletSpeed, bulletRotationSpeed);
+            Vector3 targetPosition = player != null ? player.position : Vector3.zero;
+            bulletScript.Initialize(bulletSpeed, bulletRotationSpeed, targetPosition);
         }
     }
 
     void RotateCannon()
     {
-        if (cannonObject == null) return;
-
         cannonRotationCount++;
         float targetRotation = cannonRotationCount * 90f;
 
-        // 부드러운 회전
-        StartCoroutine(RotateCannonSmooth(targetRotation));
+        // 두 대포 모두 부드럽게 회전
+        if (cannonObject1 != null)
+        {
+            StartCoroutine(RotateCannonSmooth(cannonObject1, targetRotation));
+        }
+        if (cannonObject2 != null)
+        {
+            StartCoroutine(RotateCannonSmooth(cannonObject2, targetRotation));
+        }
     }
 
-    IEnumerator RotateCannonSmooth(float targetAngle)
+    IEnumerator RotateCannonSmooth(GameObject cannon, float targetAngle)
     {
-        float startAngle = cannonObject.transform.eulerAngles.z;
+        float startAngle = cannon.transform.eulerAngles.z;
         float elapsed = 0f;
         float duration = 0.3f; // 회전 시간
 
@@ -233,11 +250,11 @@ public class Boom : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = elapsed / duration;
             float angle = Mathf.LerpAngle(startAngle, targetAngle, t);
-            cannonObject.transform.rotation = Quaternion.Euler(0, 0, angle);
+            cannon.transform.rotation = Quaternion.Euler(0, 0, angle);
             yield return null;
         }
 
-        cannonObject.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+        cannon.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
     }
 
     // MiniWindow에서 호출할 public 메서드
@@ -254,10 +271,14 @@ public class Boom : MonoBehaviour
     {
         patternActive = false;
 
-        // ↓↓↓ 이 부분 추가 ↓↓↓
-        if (cannonObject != null)
+        // 두 대포 모두 비활성화
+        if (cannonObject1 != null)
         {
-            cannonObject.SetActive(false);
+            cannonObject1.SetActive(false);
+        }
+        if (cannonObject2 != null)
+        {
+            cannonObject2.SetActive(false);
         }
 
         // 모든 창 제거

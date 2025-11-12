@@ -7,13 +7,12 @@ public class EyeBullet : MonoBehaviour
     private Vector2 direction;
     private float currentAngle;
 
-    public void Initialize(float bulletSpeed, float bulletRotationSpeed)
+    public void Initialize(float bulletSpeed, float bulletRotationSpeed, Vector3 targetPosition)
     {
         speed = bulletSpeed;
         rotationSpeed = bulletRotationSpeed;
 
-        // 중앙(0, 0) 방향으로 초기 방향 설정
-        Vector3 targetPosition = Vector3.zero;
+        // 전달받은 targetPosition(플레이어 위치) 방향으로 초기 방향 설정
         direction = (targetPosition - transform.position).normalized;
         currentAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
 
@@ -27,7 +26,7 @@ public class EyeBullet : MonoBehaviour
         currentAngle += rotationSpeed * Time.deltaTime;
         transform.rotation = Quaternion.Euler(0, 0, currentAngle);
 
-        // 이동은 항상 중앙(0,0) 방향으로 직진
+        // 이동은 발사 시점의 방향으로 직진
         transform.position += (Vector3)direction * speed * Time.deltaTime;
     }
 
@@ -36,8 +35,6 @@ public class EyeBullet : MonoBehaviour
         // 플레이어와 충돌 시
         if (collision.CompareTag("Player"))
         {
-           
-
             Destroy(gameObject);
         }
 
