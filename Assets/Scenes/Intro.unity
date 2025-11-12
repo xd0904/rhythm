@@ -728,8 +728,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: -9720}
   m_LocalScale: {x: 120, y: 120, z: 120}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 852845284}
+  m_Children: []
   m_Father: {fileID: 1657310632}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &316386255
@@ -1106,7 +1105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f278400b7880e374298cfe030bf6f338, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 404285096}
+  targetObject: {fileID: 162484856}
   doubleClickTime: 0.3
   ClickSound: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
 --- !u!212 &462323434
@@ -1179,7 +1178,7 @@ MonoBehaviour:
   doubleClickTime: 0.3
   targetObject: {fileID: 162484856}
   targetObject2: {fileID: 0}
-  Object: {fileID: 1138422031}
+  Object: {fileID: 0}
   ClickSound: {fileID: 0}
 --- !u!1 &474301806
 GameObject:
@@ -4063,6 +4062,7 @@ RectTransform:
   - {fileID: 1923342999}
   - {fileID: 861044115}
   - {fileID: 1186537697}
+  - {fileID: 316386254}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}

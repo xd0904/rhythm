@@ -31,6 +31,10 @@ public class MissileLauncher : MonoBehaviour
     private Transform playerTransform;      // 플레이어의 위치를 저장할 변수
     private bool bossDeactivated = false;   // 보스 비활성화 여부
 
+    [Tooltip("빔이 벽에 박히는 사운드")]
+    public AudioClip Hit;
+
+
     void Start()
     {
         // "Player" 태그를 가진 오브젝트를 찾습니다. (씬에 플레이어 오브젝트가 "Player" 태그를 가졌다고 가정)
@@ -744,6 +748,8 @@ public class MissileLauncher : MonoBehaviour
     // 벽에 닿을 때 파티클 생성
     private void SpawnBeamHitParticles(Vector3 position)
     {
+        SoundManager.Instance.PlaySFX(Hit);
+
         // 화면 흔들림 효과 추가
         if (Camera.main != null)
         {

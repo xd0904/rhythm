@@ -100,9 +100,6 @@ public class BeatBounce : MonoBehaviour
     [Tooltip("튕기는 사운드")]
     public AudioClip Bounce;
 
-    [Tooltip("박히는 사운드")]
-    public AudioClip Hit;
-
     [Tooltip("창 날아가는 사운드")]
     public AudioClip Spear;
 

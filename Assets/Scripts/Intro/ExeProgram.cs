@@ -19,12 +19,6 @@ public class ExeProgram : MonoBehaviour
 
     void Awake()
     {
-        // VaccineIcon 비활성화
-        if (VaccineIcon != null)
-        {
-            VaccineIcon.SetActive(false);
-        }
-
         Initialize();
     }
 
