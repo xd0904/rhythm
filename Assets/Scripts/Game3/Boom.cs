@@ -13,12 +13,17 @@ public class Boom : MonoBehaviour
     [Header("설정")]
     public Transform spawnPoint; // 창 생성 위치
     public float windowSpawnRadius = 3f; // 창이 생성될 반경
+    public int windowPositionCount = 8; // 창 위치 개수 (원형으로 배치)
     public float bulletSpeed = 5f; // 탄막 속도
     public float bulletRotationSpeed = 180f; // 탄막 회전 속도 (도/초)
 
     private List<double> beatTimings = new List<double>(); // 짝 타이밍들
     private List<GameObject> activeWindows = new List<GameObject>(); // 활성 창 리스트
+    private List<Vector3> windowPositions = new List<Vector3>(); // 미리 계산된 창 위치들
+    private int currentWindowPositionIndex = 0; // 현재 사용할 창 위치 인덱스
     private int cannonRotationCount = 0; // 대포 회전 횟수
+
+    private int spawnedWindowCount = 0; // 생성된 창 개수 추적
 
     private bool patternActive = false;
     private int currentBeatIndex = 0;
@@ -26,8 +31,26 @@ public class Boom : MonoBehaviour
     void Start()
     {
         InitializeBeatTimings();
+        InitializeWindowPositions();
+        spawnedWindowCount = 0; // 초기화
     }
+    void InitializeWindowPositions()
+    {
+        // 원형으로 균등하게 배치된 위치들 계산
+        windowPositions.Clear();
+        float angleStep = 360f / windowPositionCount;
 
+        for (int i = 0; i < windowPositionCount; i++)
+        {
+            float angle = i * angleStep * Mathf.Deg2Rad;
+            Vector3 offset = new Vector3(
+                Mathf.Cos(angle) * windowSpawnRadius,
+                Mathf.Sin(angle) * windowSpawnRadius,
+                0
+            );
+            windowPositions.Add(spawnPoint.position + offset);
+        }
+    }
     void InitializeBeatTimings()
     {
         // 첫 번째 사이클 (21.7 ~ 26.5)
@@ -119,14 +142,25 @@ public class Boom : MonoBehaviour
     {
         if (miniWindowPrefab == null) return;
 
-        // 랜덤 위치에 창 생성 (원형 범위 내)
-        Vector2 randomOffset = Random.insideUnitCircle * windowSpawnRadius;
-        Vector3 spawnPosition = spawnPoint.position + new Vector3(randomOffset.x, randomOffset.y, 0);
+        // 스폰 가능한 화면 범위 설정
+        float minX = -8f, maxX = 8f;
+        float minY = -4f, maxY = 4f;
+
+        Vector3 spawnPosition;
+
+        // 창이 있는 중앙 구역은 제외 (-4~4, -3.6~3.6)
+        do
+        {
+            float randomX = Random.Range(minX, maxX);
+            float randomY = Random.Range(minY, maxY);
+            spawnPosition = new Vector3(randomX, randomY, 0);
+        }
+        while (spawnPosition.x >= -4f && spawnPosition.x <= 4f &&
+               spawnPosition.y >= -3.6f && spawnPosition.y <= 3.6f);
 
         GameObject window = Instantiate(miniWindowPrefab, spawnPosition, Quaternion.identity);
         activeWindows.Add(window);
-
-        
+        spawnedWindowCount++;
     }
 
     IEnumerator FireBulletAfterDelay(float delay)

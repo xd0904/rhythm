@@ -2146,6 +2146,7 @@ MonoBehaviour:
   cannonObject: {fileID: 1306149589}
   spawnPoint: {fileID: 879839452}
   windowSpawnRadius: 3
+  windowPositionCount: 8
   bulletSpeed: 5
   bulletRotationSpeed: 180
 --- !u!4 &879839452
