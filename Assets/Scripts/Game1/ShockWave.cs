@@ -19,7 +19,7 @@ public class ShockWave : MonoBehaviour
     [Header("활성화 시간 구간 (초 단위)")]
     public float startTime = 72.7f;
     public float endTime = 83.2f;
-    public float fadeOutDuration = 1f; // 페이드아웃 시간
+    public float fadeOutDuration = 1f;
 
     private bool isActive = false;
     private bool bossSpawned = false;
@@ -29,8 +29,9 @@ public class ShockWave : MonoBehaviour
     public GameObject Bossobj;
     public float moveSpeed = 3f;
     public float minMoveDistance = 3f;
+    public float moveWaitTime = 1.5f; // 이동 후 대기 시간 (일정하게)
 
-    private List<GameObject> activeShockwaves = new List<GameObject>(); // 활성 충격파 추적
+    private List<GameObject> activeShockwaves = new List<GameObject>();
 
     void Update()
     {
@@ -61,11 +62,9 @@ public class ShockWave : MonoBehaviour
     {
         float elapsed = 0f;
 
-        // 보스 SpriteRenderer 가져오기
         SpriteRenderer bossSr = Bossobj.GetComponent<SpriteRenderer>();
         Color bossOriginalColor = bossSr != null ? bossSr.color : Color.white;
 
-        // 모든 활성 충격파의 SpriteRenderer 가져오기
         List<SpriteRenderer> shockwaveSrs = new List<SpriteRenderer>();
         List<Color> shockwaveOriginalColors = new List<Color>();
 
@@ -82,14 +81,12 @@ public class ShockWave : MonoBehaviour
             }
         }
 
-        // 페이드아웃
         while (elapsed < fadeOutDuration)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / fadeOutDuration;
             float alpha = Mathf.Lerp(1f, 0f, t);
 
-            // 보스 페이드
             if (bossSr != null)
             {
                 Color c = bossOriginalColor;
@@ -97,7 +94,6 @@ public class ShockWave : MonoBehaviour
                 bossSr.color = c;
             }
 
-            // 충격파들 페이드
             for (int i = 0; i < shockwaveSrs.Count; i++)
             {
                 if (shockwaveSrs[i] != null)
@@ -111,7 +107,6 @@ public class ShockWave : MonoBehaviour
             yield return null;
         }
 
-        // 정리
         foreach (GameObject shockwave in activeShockwaves)
         {
             if (shockwave != null)
@@ -123,7 +118,6 @@ public class ShockWave : MonoBehaviour
 
         Bossobj.SetActive(false);
 
-        // 보스 알파값 원래대로 복구 (다음 사용을 위해)
         if (bossSr != null)
         {
             Color c = bossOriginalColor;
@@ -134,19 +128,26 @@ public class ShockWave : MonoBehaviour
 
     IEnumerator ShockwaveRoutine()
     {
-        // 첫 이동이 시작될 때까지 대기
         yield return new WaitUntil(() => isMoving);
-        // 첫 이동이 완료될 때까지 대기
         yield return new WaitUntil(() => !isMoving);
 
-        while (true)
+        while (isActive)
         {
-            // 보스 현재 위치에서 충격파 발사
+            double currentTime = beatBounce.GetMusicTime();
+
+            // endTime에 가까워지면 루틴 종료
+            if (currentTime > endTime - 0.5f) // 종료 0.5초 전에 중단
+            {
+                yield return null;
+                continue;
+            }
+
+            // 보스 현재 위치에서 충격파 발사 (이동 완료 직후)
             Vector2 bossPos = Bossobj.transform.position;
 
-            yield return new WaitForSeconds(0.2f);
+            yield return new WaitForSeconds(0.3f);
 
-            // 처음 4개
+            // 처음 4개의 충격파
             for (int j = 0; j < 2; j++)
             {
                 for (int i = 0; i < 2; i++)
@@ -157,23 +158,19 @@ public class ShockWave : MonoBehaviour
                 yield return new WaitForSeconds(0.6f);
             }
 
-            //yield return new WaitForSeconds(0.2f);
-
-
+            // 마지막 3개의 충격파
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
-            yield return new WaitForSeconds(1.2f);
+            yield return new WaitForSeconds(1.1f);
 
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
             yield return new WaitForSeconds(0.4f);
 
             StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
 
-            yield return new WaitForSeconds(0.2f);
-            //yield return new WaitForSeconds(spawnInterval);
+            yield return new WaitForSeconds(0.4f);
 
-            // 다음 이동이 시작될 때까지 대기
+            // 다음 이동 완료까지 대기
             yield return new WaitUntil(() => isMoving);
-            // 다음 이동이 완료될 때까지 대기
             yield return new WaitUntil(() => !isMoving);
         }
     }
@@ -190,6 +187,7 @@ public class ShockWave : MonoBehaviour
             float duration = distance / moveSpeed;
             float elapsed = 0f;
 
+            // 이동 실행
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
@@ -201,7 +199,8 @@ public class ShockWave : MonoBehaviour
             obj.position = targetPos;
             isMoving = false;
 
-            yield return new WaitForSeconds(5f);
+            // 일정한 대기 시간
+            yield return new WaitForSeconds(moveWaitTime);
         }
     }
 
@@ -237,14 +236,13 @@ public class ShockWave : MonoBehaviour
             return pos;
         }
 
-        // 최대 시도 후에도 못 찾으면 현재 위치에서 minMoveDistance만큼 떨어진 곳
         return currentPos + Random.insideUnitCircle.normalized * minMoveDistance;
     }
 
     IEnumerator SpawnAndExpandShockwave(Vector2 pos, GameObject prefab, float expandSpeed, float lifetime, float maxScale)
     {
         GameObject obj = Instantiate(prefab, pos, Quaternion.identity);
-        activeShockwaves.Add(obj); // 리스트에 추가
+        activeShockwaves.Add(obj);
 
         SpriteRenderer sr = obj.GetComponent<SpriteRenderer>();
         Vector3 startScale = obj.transform.localScale;
@@ -267,7 +265,7 @@ public class ShockWave : MonoBehaviour
             yield return null;
         }
 
-        activeShockwaves.Remove(obj); // 리스트에서 제거
+        activeShockwaves.Remove(obj);
         Destroy(obj);
     }
 }

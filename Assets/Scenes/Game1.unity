@@ -3982,11 +3982,12 @@ MonoBehaviour:
   spawnInterval: 2
   beatBounce: {fileID: 1740529744}
   startTime: 69.7
-  endTime: 83.2
+  endTime: 82
   fadeOutDuration: 1
   Bossobj: {fileID: 49575115}
   moveSpeed: 9.63
   minMoveDistance: 3
+  moveWaitTime: 5
 --- !u!1 &1438955273
 GameObject:
   m_ObjectHideFlags: 0
