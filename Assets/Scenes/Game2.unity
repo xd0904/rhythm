@@ -1861,7 +1861,7 @@ MonoBehaviour:
   textWindow: {fileID: 1755390713}
   gameWindow: {fileID: 1823772141}
   bossTargetPosition: {x: 300, y: 0, z: 0}
-  bossTargetScale: 0.5
+  bossTargetScale: {x: 68.5, y: 67.73889, z: 1}
   bossMoveTime: 1.5
   textFadeTime: 1
   gameWindowStartPos: {x: -800, y: 0, z: 0}
