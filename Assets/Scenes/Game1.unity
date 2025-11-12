@@ -2487,7 +2487,7 @@ MonoBehaviour:
   scaleDuration: 1
   shakeIntensity: 10
   rotationAmount: 15
-  bgmClip: {fileID: 8300000, guid: 7321abbdcaa830a40bf426fd98cd9436, type: 3}
+  bgmClip: {fileID: 8300000, guid: 820720869b7274c4d91d213b50d15dea, type: 3}
   mouseMove: {fileID: 8300000, guid: 301e16743c27d0143bb0c220c6825bda, type: 3}
 --- !u!4 &856689019
 Transform:
