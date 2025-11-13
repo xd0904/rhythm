@@ -85,8 +85,7 @@ public class FilePatternManager : MonoBehaviour
         beatTimings = new float[][]
         {
             // ========== 1회차 (박자 2~15) ==========
-            // 박자 2: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 2, 0 },
+            // 박자 2: 쉬는 박자 (제거)
             
             // 박자 3.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 3.5f, 0 },
@@ -94,8 +93,7 @@ public class FilePatternManager : MonoBehaviour
             // 박자 4.5: 큰 파일 탄막
             new float[] { patternStartTime + beatInterval * 4.5f, 1 },
             
-            // 박자 6: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 6, 0 },
+            // 박자 6: 쉬는 박자 (제거)
             
             // 박자 7.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 7.5f, 0 },
@@ -103,8 +101,7 @@ public class FilePatternManager : MonoBehaviour
             // 박자 8.5: 큰 파일 탄막
             new float[] { patternStartTime + beatInterval * 8.5f, 1 },
             
-            // 박자 10: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 10, 0 },
+            // 박자 10: 쉬는 박자 (제거)
             
             // 박자 11.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 11.5f, 0 },
@@ -119,8 +116,7 @@ public class FilePatternManager : MonoBehaviour
             new float[] { patternStartTime + beatInterval * 15, 0 },
             
             // ========== 2회차 (박자 18~31) - 16박자 후부터 시작 ==========
-            // 박자 18: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 18, 0 },
+            // 박자 18: 쉬는 박자 (제거)
             
             // 박자 19.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 19.5f, 0 },
@@ -128,8 +124,7 @@ public class FilePatternManager : MonoBehaviour
             // 박자 20.5: 큰 파일 탄막
             new float[] { patternStartTime + beatInterval * 20.5f, 1 },
             
-            // 박자 22: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 22, 0 },
+            // 박자 22: 쉬는 박자 (제거)
             
             // 박자 23.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 23.5f, 0 },
@@ -137,8 +132,7 @@ public class FilePatternManager : MonoBehaviour
             // 박자 24.5: 큰 파일 탄막
             new float[] { patternStartTime + beatInterval * 24.5f, 1 },
             
-            // 박자 26: 작은 파일 탄막
-            new float[] { patternStartTime + beatInterval * 26, 0 },
+            // 박자 26: 쉬는 박자 (제거)
             
             // 박자 27.5: 작은 파일 탄막
             new float[] { patternStartTime + beatInterval * 27.5f, 0 },
