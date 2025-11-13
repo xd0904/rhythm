@@ -12,6 +12,8 @@ public class Stage2Tutorial : MonoBehaviour
     public Button xButton; // X 버튼
     public GameObject clickHereText; // "Click Here" 텍스트
     public GameObject arrow; // 화살표
+    public Canvas targetCanvas; // 비활성화할 Canvas
+    public float canvasDisableDuration = 0.2f; // Canvas 비활성화 시간
     
     [Header("Drug 오브젝트")]
     public GameObject drug; // 0.2초 후 활성화할 Drug 오브젝트
@@ -23,17 +25,6 @@ public class Stage2Tutorial : MonoBehaviour
     {
         Debug.Log("[Stage2Tutorial] Start() 호출됨");
         
-        // EventSystem 확인
-        UnityEngine.EventSystems.EventSystem eventSystem = FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
-        if (eventSystem == null)
-        {
-            Debug.LogError("[Stage2Tutorial] ★★★ EventSystem이 없습니다! UI 클릭이 작동하지 않습니다! ★★★");
-        }
-        else
-        {
-            Debug.Log($"[Stage2Tutorial] EventSystem 찾음: {eventSystem.name}");
-        }
-        
         // Player 찾기
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
@@ -44,6 +35,17 @@ public class Stage2Tutorial : MonoBehaviour
         else
         {
             Debug.LogWarning("[Stage2Tutorial] Player를 찾을 수 없습니다!");
+        }
+        
+        // EventSystem 확인 (UI 클릭 이벤트에 필수!)
+        UnityEngine.EventSystems.EventSystem eventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+        if (eventSystem == null)
+        {
+            Debug.LogError("[Stage2Tutorial] ★★★ EventSystem이 없습니다! UI 클릭이 작동하지 않습니다! ★★★");
+        }
+        else
+        {
+            Debug.Log($"[Stage2Tutorial] EventSystem 찾음: {eventSystem.name}");
         }
         
         // 시작 시 아이콘 2개 비활성화
@@ -71,45 +73,72 @@ public class Stage2Tutorial : MonoBehaviour
         {
             Debug.Log($"[Stage2Tutorial] X 버튼 찾음: {xButton.name}");
             Debug.Log($"[Stage2Tutorial] X 버튼 Interactable: {xButton.interactable}");
+            Debug.Log($"[Stage2Tutorial] X 버튼 GameObject 활성: {xButton.gameObject.activeInHierarchy}");
+            
+            // Button이 Interactable인지 확인
+            if (!xButton.interactable)
+            {
+                Debug.LogWarning("[Stage2Tutorial] X 버튼이 Interactable=false입니다! true로 설정합니다.");
+                xButton.interactable = true;
+            }
             
             xButton.onClick.AddListener(OnXButtonClick);
-            Debug.Log("[Stage2Tutorial] X 버튼 onClick 리스너 등록 완료");
+            Debug.Log("[Stage2Tutorial] X 버튼 클릭 이벤트 등록 완료");
             
-            // X 버튼의 부모 Canvas Sorting Order 설정 (X가 보이도록)
-            Canvas parentCanvas = xButton.GetComponentInParent<Canvas>();
-            if (parentCanvas != null)
+            // X 버튼 자체에 Image가 있다면 확인
+            Image xButtonImage = xButton.GetComponent<Image>();
+            if (xButtonImage != null)
             {
-                parentCanvas.sortingOrder = 100;
-                Debug.Log($"[Stage2Tutorial] {parentCanvas.name} Canvas sortingOrder = 100 설정");
-                
-                // GraphicRaycaster 확인 (클릭 감지에 필수)
-                GraphicRaycaster raycaster = parentCanvas.GetComponent<GraphicRaycaster>();
-                if (raycaster == null)
-                {
-                    raycaster = parentCanvas.gameObject.AddComponent<GraphicRaycaster>();
-                    Debug.Log("[Stage2Tutorial] GraphicRaycaster 추가");
-                }
-                Debug.Log($"[Stage2Tutorial] GraphicRaycaster enabled: {raycaster.enabled}");
+                xButtonImage.raycastTarget = true;
+                Debug.Log($"[Stage2Tutorial] X 버튼 자체 Image Raycast Target: {xButtonImage.raycastTarget}");
             }
             
-            // X 버튼과 자식들의 Image Raycast Target 확인
-            Image btnImage = xButton.GetComponent<Image>();
-            if (btnImage != null)
-            {
-                btnImage.raycastTarget = true;
-                Debug.Log($"[Stage2Tutorial] X 버튼 자체 Image raycastTarget = true");
-            }
-            
+            // X 버튼의 자식 Image들도 모두 raycastTarget 활성화
             Image[] childImages = xButton.GetComponentsInChildren<Image>();
             foreach (Image img in childImages)
             {
                 img.raycastTarget = true;
-                Debug.Log($"[Stage2Tutorial] {img.gameObject.name} Image raycastTarget = true");
+                Debug.Log($"[Stage2Tutorial] {img.gameObject.name} Image Raycast Target 활성화");
+            }
+            
+            // X 버튼의 부모 Canvas 찾기 (먼저)
+            Canvas parentCanvas = xButton.GetComponentInParent<Canvas>();
+            if (parentCanvas != null)
+            {
+                Debug.Log($"[Stage2Tutorial] X 버튼의 부모 Canvas: {parentCanvas.name}, sortingOrder: {parentCanvas.sortingOrder}");
+                
+                // 부모 Canvas에 GraphicRaycaster가 있는지 확인
+                GraphicRaycaster raycaster = parentCanvas.GetComponent<GraphicRaycaster>();
+                if (raycaster == null)
+                {
+                    Debug.LogWarning("[Stage2Tutorial] 부모 Canvas에 GraphicRaycaster가 없습니다! 추가합니다.");
+                    raycaster = parentCanvas.gameObject.AddComponent<GraphicRaycaster>();
+                }
+                raycaster.enabled = true; // 강제로 활성화
+                Debug.Log($"[Stage2Tutorial] GraphicRaycaster 강제 활성화: enabled={raycaster.enabled}");
+                
+                // 부모 Canvas의 sortingOrder를 높게 설정
+                parentCanvas.overrideSorting = true;
+                parentCanvas.sortingOrder = 5;
+                Debug.Log("[Stage2Tutorial] 부모 Canvas Sorting Order 설정: 5");
+            }
+            else
+            {
+                Debug.LogError("[Stage2Tutorial] X 버튼의 부모 Canvas를 찾을 수 없습니다!");
             }
         }
         else
         {
             Debug.LogWarning("[Stage2Tutorial] X 버튼이 할당되지 않았습니다!");
+        }
+        
+        if (targetCanvas != null)
+        {
+            Debug.Log($"[Stage2Tutorial] Target Canvas: {targetCanvas.name}");
+        }
+        else
+        {
+            Debug.LogWarning("[Stage2Tutorial] Target Canvas가 할당되지 않았습니다!");
         }
     }
     
@@ -118,6 +147,31 @@ public class Stage2Tutorial : MonoBehaviour
         Debug.Log("========================================");
         Debug.Log("[Stage2Tutorial] ★★★ X 버튼 클릭됨! ★★★");
         Debug.Log("========================================");
+        
+        // Canvas enabled만 비활성화 후 재활성화 코루틴 시작
+        if (targetCanvas != null)
+        {
+            Debug.Log($"[Stage2Tutorial] 코루틴 시작 전 - Canvas: {targetCanvas.name}, enabled: {targetCanvas.enabled}");
+            StartCoroutine(DisableCanvasTemporarily());
+        }
+        else
+        {
+            Debug.LogError("[Stage2Tutorial] targetCanvas가 null입니다!");
+        }
+    }
+    
+    IEnumerator DisableCanvasTemporarily()
+    {
+        // Canvas GameObject SetActive(false)
+        targetCanvas.gameObject.SetActive(false);
+        Debug.Log("[Stage2Tutorial] Canvas SetActive(false)");
+        
+        // 0.2초 대기 (실시간 대기)
+        yield return new WaitForSecondsRealtime(canvasDisableDuration);
+        
+        // Canvas GameObject SetActive(true)
+        targetCanvas.gameObject.SetActive(true);
+        Debug.Log("[Stage2Tutorial] Canvas SetActive(true)");
         
         // X 버튼 비활성화
         if (xButton != null)
@@ -150,26 +204,25 @@ public class Stage2Tutorial : MonoBehaviour
 
     void Update()
     {
-        // X 버튼 클릭 감지 (Update에서 직접)
+        // X 버튼 마우스 클릭 직접 감지 (Button 컴포넌트가 작동 안 할 때를 위한 백업)
         if (xButton != null && xButton.gameObject.activeSelf && Input.GetMouseButtonDown(0))
         {
-            // 마우스가 X 버튼 위에 있는지 확인
-            RectTransform rectTransform = xButton.GetComponent<RectTransform>();
-            if (rectTransform != null)
+            // 마우스 위치가 X 버튼 영역 안에 있는지 확인
+            RectTransform xButtonRect = xButton.GetComponent<RectTransform>();
+            Canvas canvas = xButton.GetComponentInParent<Canvas>();
+            Camera cam = null;
+            
+            // Canvas의 Render Mode에 따라 Camera 설정
+            if (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
             {
-                Vector2 localMousePosition;
-                if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                    rectTransform, 
-                    Input.mousePosition, 
-                    null, 
-                    out localMousePosition))
-                {
-                    if (rectTransform.rect.Contains(localMousePosition))
-                    {
-                        Debug.Log("[Stage2Tutorial] Update에서 X 버튼 클릭 감지!");
-                        OnXButtonClick();
-                    }
-                }
+                cam = canvas.worldCamera;
+                if (cam == null) cam = Camera.main;
+            }
+            
+            if (xButtonRect != null && RectTransformUtility.RectangleContainsScreenPoint(xButtonRect, Input.mousePosition, cam))
+            {
+                Debug.Log("[Stage2Tutorial] ★★★ Update에서 X 버튼 클릭 감지! ★★★");
+                OnXButtonClick();
             }
         }
         
@@ -185,10 +238,5 @@ public class Stage2Tutorial : MonoBehaviour
                 Debug.Log("[Stage2Tutorial] Drug SetActive(false)");
             }
         }
-    }
-
-    public void PrintClick()
-    {
-        print("Click received in Stage2Tutorial");
     }
 }
