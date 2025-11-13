@@ -1,2 +1,19 @@
 fileFormatVersion: 2
 guid: cda0d6b3f33ece945be32468676727d1
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - beatBounce: {instanceID: 0}
+  - missilePrefab: {instanceID: 0}
+  - outerObjectPrefab: {instanceID: 0}
+  - smallCirclePrefab: {instanceID: 0}
+  - beamPrefab: {instanceID: 0}
+  - beamHitParticlePrefab: {instanceID: 0}
+  - bossObject: {instanceID: 0}
+  - Hit: {fileID: 8300000, guid: f6a160aebe4332a4695137ffbc27b9b4, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

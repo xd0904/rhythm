@@ -25,9 +25,11 @@ public class MouseFade : MonoBehaviour
         
     }
 
-    public void SibalClick()
+    // Percent에서 호출할 공개 함수
+    public void StartFade()
     {
         StartCoroutine(FadeCoroutine());
+        Debug.Log("[MouseFade] StartFade에서 코루틴 시작");
     }
 
     void SetAlpha(SpriteRenderer spr, float alpha)

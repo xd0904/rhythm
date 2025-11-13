@@ -1,2 +1,20 @@
 fileFormatVersion: 2
 guid: 1570f1518a6cc5b4a812df3e9054d112
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - bossObject: {instanceID: 0}
+  - mouseCursor: {instanceID: 0}
+  - mainCamera: {instanceID: 0}
+  - gameWindow: {instanceID: 0}
+  - bossHead: {instanceID: 0}
+  - bossMouse: {instanceID: 0}
+  - player: {instanceID: 0}
+  - backgroundMousePrefab: {instanceID: 0}
+  - Spare: {fileID: 8300000, guid: 8eee68a1fe7e4ab4ea84dd4aed013587, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

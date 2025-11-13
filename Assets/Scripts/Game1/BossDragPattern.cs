@@ -27,7 +27,10 @@ public class BossDragPattern : MonoBehaviour
     private Bounds gameWindowBounds;
     private Color originalBackgroundColor;
     private Vector3 originalCameraPosition; // 카메라 원래 위치 저장
-    
+
+    [Tooltip("에러 사운드")]
+    public AudioClip Error;
+
     void Start()
     {
         if (mainCamera == null)
@@ -273,7 +276,9 @@ public class BossDragPattern : MonoBehaviour
         Vector3 explosionCenter = dragArea.transform.position;
         
         Debug.Log($"[BossDragPattern] 폭발 시작! 위치: {explosionCenter}");
-        
+
+        SoundManager.Instance.PlaySFX(Error);
+
         // 1. 드래그 영역 이미지를 폭발 이미지로 변경
         if (explosionSprite != null)
         {

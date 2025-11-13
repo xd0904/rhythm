@@ -50,7 +50,10 @@ public class BossRectanglePattern : MonoBehaviour
     private bool bossTagReverted1 = false; // 2분 1.6초 태그 복원 플래그
     private bool bossTagChanged2 = false; // 2분 14.4초 태그 변경 플래그
     private bool bossTagReverted2 = false; // 2분 27.2초 태그 복원 플래그
-    
+
+    [Tooltip("대쉬 사운드")]
+    public AudioClip Dash;
+
     void Start()
     {
         // 게임 창 정보 가져오기
@@ -516,7 +519,9 @@ public class BossRectanglePattern : MonoBehaviour
                 bossRenderer = bossHead.GetComponent<SpriteRenderer>();
             }
         }
-        
+
+        SoundManager.Instance.PlaySFX(Dash);
+
         if (bossRenderer != null)
         {
             Color originalColor = bossRenderer.color;
