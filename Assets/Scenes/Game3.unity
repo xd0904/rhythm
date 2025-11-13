@@ -319,7 +319,7 @@ GameObject:
   - component: {fileID: 129454179}
   - component: {fileID: 129454178}
   m_Layer: 0
-  m_Name: BlueBoss
+  m_Name: BlueBoss!
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3608,7 +3608,7 @@ GameObject:
   - component: {fileID: 1080351519}
   - component: {fileID: 1080351518}
   m_Layer: 0
-  m_Name: FileBoss
+  m_Name: FileBoss!
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
