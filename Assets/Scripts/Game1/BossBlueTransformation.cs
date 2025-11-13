@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine.SceneManagement;
 
 public class BossBlueTransformation : MonoBehaviour
 {
@@ -448,8 +447,6 @@ public class BossBlueTransformation : MonoBehaviour
         }
         
         Debug.Log("[BossBlueTransformation] 3단계 완료 - 변신 완료");
-        yield return new WaitForSeconds(3f);
-        SceneManager.LoadScene("Game2");
     }
     
     IEnumerator FadeInBlueBoss(float duration)
