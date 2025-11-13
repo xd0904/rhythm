@@ -523,6 +523,14 @@ public class Player : MonoBehaviour
                 yield break;
             }
             
+            // 목표 창이 "Error" 태그면 순간이동 불가 (사라진 창)
+            if (targetWindow.CompareTag("Error"))
+            {
+                Debug.LogWarning($"[Player] Error 창({targetRow},{targetCol})으로는 순간이동 불가!");
+                isDashingBetweenWindows = false;
+                yield break;
+            }
+            
             // 목표 창의 경계로 업데이트
             Transform targetTransform = targetWindow.transform;
             Vector3 windowCenter = targetTransform.position;
@@ -724,13 +732,17 @@ public class Player : MonoBehaviour
         {
             if (other.CompareTag(dangerousTag))
             {
+                Debug.LogError($"[Player] ⚠️⚠️⚠️ 위험한 오브젝트 충돌! 태그: {dangerousTag}, 오브젝트: {other.gameObject.name}");
                 Die();
                 return;
             }
         }
+        
+        // 감지되지 않은 충돌 로그
+        Debug.Log($"[Player] 충돌 감지 (위험하지 않음): {other.gameObject.name}, 태그: {other.tag}");
     }
     
-    void Die()
+    public void Die()
     {
         isDead = true;
         
@@ -937,6 +949,13 @@ public class Player : MonoBehaviour
         
         // 5단계: 시간 복원 후 GameOver 씬으로 이동
         Time.timeScale = 1f;
+        
+        // 현재 씬 이름 저장 (GameOver에서 돌아올 씬 결정)
+        string currentScene = SceneManager.GetActiveScene().name;
+        PlayerPrefs.SetString("DeathScene", currentScene);
+        PlayerPrefs.Save();
+        Debug.Log($"[Player] 사망 씬 저장: {currentScene}");
+        
         SceneManager.LoadScene(gameOverSceneName);
     }
 }
