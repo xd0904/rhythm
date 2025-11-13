@@ -4469,6 +4469,8 @@ MonoBehaviour:
   arrow: {fileID: 459091227}
   drug: {fileID: 1676088324}
   collectDistance: 0.5
+  tutorial: {fileID: 1319789443}
+  tutorialDuration: 10
 --- !u!1 &1676088324
 GameObject:
   m_ObjectHideFlags: 0

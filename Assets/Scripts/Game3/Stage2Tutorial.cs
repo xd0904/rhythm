@@ -17,6 +17,10 @@ public class Stage2Tutorial : MonoBehaviour
     public GameObject drug; // 0.2초 후 활성화할 Drug 오브젝트
     public float collectDistance = 0.5f; // Player와 Drug 사이 수집 거리
     
+    [Header("Tutorial 설정")]
+    public GameObject tutorial; // 10초 후 비활성화할 Tutorial GameObject
+    public float tutorialDuration = 10f; // Tutorial 표시 시간 (초)
+    
     private Transform playerTransform; // Player Transform
     
     void Start()
@@ -110,6 +114,24 @@ public class Stage2Tutorial : MonoBehaviour
         else
         {
             Debug.LogWarning("[Stage2Tutorial] X 버튼이 할당되지 않았습니다!");
+        }
+        
+        // 10초 후 Tutorial 비활성화
+        if (tutorial != null)
+        {
+            StartCoroutine(DisableTutorialAfterDelay());
+        }
+    }
+    
+    IEnumerator DisableTutorialAfterDelay()
+    {
+        Debug.Log($"[Stage2Tutorial] {tutorialDuration}초 후 Tutorial 비활성화 예약");
+        yield return new WaitForSeconds(tutorialDuration);
+        
+        if (tutorial != null)
+        {
+            tutorial.SetActive(false);
+            Debug.Log("[Stage2Tutorial] Tutorial SetActive(false)");
         }
     }
     
