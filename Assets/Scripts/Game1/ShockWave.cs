@@ -5,96 +5,238 @@ using System.Collections.Generic;
 public class ShockWave : MonoBehaviour
 {
     [Header("충격파 프리팹")]
-    public GameObject shockwavePrefab;    // '빠'
-    public GameObject shockwavePrefab2;   // '따'
+    public GameObject shockwavePrefab;
+    public GameObject shockwavePrefab2;
+
+    [Header("충격파 생성 간격")]
+    public float firstTwoDelay = 0.5f;
+    public float lastDelay = 0.2f;
+    public float spawnInterval = 2f;
 
     [Header("음악 시간 정보")]
     public BeatBounce beatBounce;
 
     [Header("활성화 시간 구간 (초 단위)")]
-    public float startTime = 70f;  // 1:10
-    public float endTime = 83.2f;  // 1:23.2
+    public float startTime = 72.7f;
+    public float endTime = 83.2f;
+    public float fadeOutDuration = 1f;
+
+    private bool isActive = false;
+    private bool bossSpawned = false;
+    private bool isMoving = false;
 
     [Header("보스 관련")]
     public GameObject Bossobj;
+    public float moveSpeed = 3f;
+    public float minMoveDistance = 3f;
+    public float moveWaitTime = 1.5f; // 이동 후 대기 시간 (일정하게)
 
-    private List<double> beatTimings = new List<double>();
-    private int nextBeatIndex = 0;
     private List<GameObject> activeShockwaves = new List<GameObject>();
-    private bool bossSpawned = false;
-
-    void Start()
-    {
-        InitializeBeatTimings();
-        Bossobj.SetActive(false);
-    }
 
     void Update()
     {
         double currentTime = beatBounce.GetMusicTime();
 
-        // 활성 구간 밖이면 리턴
-        if (currentTime < startTime || currentTime > endTime) return;
+        if (!isActive && currentTime >= startTime && currentTime <= endTime)
+        {
+            isActive = true;
+            StartCoroutine(ShockwaveRoutine());
+        }
 
-        // 보스 활성화
+        if (isActive && currentTime > endTime)
+        {
+            isActive = false;
+            StopAllCoroutines();
+            StartCoroutine(FadeOutEverything());
+        }
+
         if (!bossSpawned && currentTime >= startTime)
         {
             bossSpawned = true;
             Bossobj.SetActive(true);
-        }
-
-        // 다음 비트 타이밍 체크
-        if (nextBeatIndex < beatTimings.Count && currentTime >= beatTimings[nextBeatIndex])
-        {
-            SpawnShockwaveForBeat(nextBeatIndex);
-            nextBeatIndex++;
+            StartCoroutine(MoveRandomly(Bossobj.transform));
         }
     }
 
-    void InitializeBeatTimings()
+    IEnumerator FadeOutEverything()
     {
-        // '빠'와 '따'만 충격파, 초 단위로 변환
-        double[] baseTimes = new double[]
-        {
-            70.8, 72.4,    // 빠
-            73.6, 74.8, 75.2 // 따
-        };
+        float elapsed = 0f;
 
-        // +6.4초씩 2회 반복
-        for (int cycle = 0; cycle < 2; cycle++)
+        SpriteRenderer bossSr = Bossobj.GetComponent<SpriteRenderer>();
+        Color bossOriginalColor = bossSr != null ? bossSr.color : Color.white;
+
+        List<SpriteRenderer> shockwaveSrs = new List<SpriteRenderer>();
+        List<Color> shockwaveOriginalColors = new List<Color>();
+
+        foreach (GameObject shockwave in activeShockwaves)
         {
-            double offset = 6.4 * cycle;
-            foreach (var t in baseTimes)
-                beatTimings.Add(t + offset);
+            if (shockwave != null)
+            {
+                SpriteRenderer sr = shockwave.GetComponent<SpriteRenderer>();
+                if (sr != null)
+                {
+                    shockwaveSrs.Add(sr);
+                    shockwaveOriginalColors.Add(sr.color);
+                }
+            }
         }
-        // 최종 beatTimings: 70.8,72.4,73.6,74.8,75.2, 77.2,78.8,80.0,81.2,81.6
+
+        while (elapsed < fadeOutDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / fadeOutDuration;
+            float alpha = Mathf.Lerp(1f, 0f, t);
+
+            if (bossSr != null)
+            {
+                Color c = bossOriginalColor;
+                c.a = alpha;
+                bossSr.color = c;
+            }
+
+            for (int i = 0; i < shockwaveSrs.Count; i++)
+            {
+                if (shockwaveSrs[i] != null)
+                {
+                    Color c = shockwaveOriginalColors[i];
+                    c.a = alpha;
+                    shockwaveSrs[i].color = c;
+                }
+            }
+
+            yield return null;
+        }
+
+        foreach (GameObject shockwave in activeShockwaves)
+        {
+            if (shockwave != null)
+            {
+                Destroy(shockwave);
+            }
+        }
+        activeShockwaves.Clear();
+
+        Bossobj.SetActive(false);
+
+        if (bossSr != null)
+        {
+            Color c = bossOriginalColor;
+            c.a = 1f;
+            bossSr.color = c;
+        }
     }
 
-    void SpawnShockwaveForBeat(int index)
+    IEnumerator ShockwaveRoutine()
     {
-        Vector2 bossPos = Bossobj.transform.position;
+        yield return new WaitUntil(() => isMoving);
+        yield return new WaitUntil(() => !isMoving);
 
-        GameObject prefab;
-        float expandSpeed, lifetime, maxScale;
-
-        // 인덱스 기준: 0,1,5,6 → 빠 → 소형
-        //             2,3,4,7,8,9 → 따 → 대형
-        if (index == 0 || index == 1 || index == 5 || index == 6)
+        while (isActive)
         {
-            prefab = shockwavePrefab;
-            expandSpeed = 1f;
-            lifetime = 1.2f;
-            maxScale = 5f;
+            double currentTime = beatBounce.GetMusicTime();
+
+            // endTime에 가까워지면 루틴 종료
+            if (currentTime > endTime - 0.5f) // 종료 0.5초 전에 중단
+            {
+                yield return null;
+                continue;
+            }
+
+            // 보스 현재 위치에서 충격파 발사 (이동 완료 직후)
+            Vector2 bossPos = Bossobj.transform.position;
+
+            yield return new WaitForSeconds(0.3f);
+
+            // 처음 4개의 충격파
+            for (int j = 0; j < 2; j++)
+            {
+                for (int i = 0; i < 2; i++)
+                {
+                    StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab, 1f, 1.2f, 5f));
+                    yield return new WaitForSeconds(firstTwoDelay);
+                }
+                yield return new WaitForSeconds(0.6f);
+            }
+
+            // 마지막 3개의 충격파
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            yield return new WaitForSeconds(1.1f);
+
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            yield return new WaitForSeconds(0.4f);
+
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+
+            yield return new WaitForSeconds(0.4f);
+
+            // 다음 이동 완료까지 대기
+            yield return new WaitUntil(() => isMoving);
+            yield return new WaitUntil(() => !isMoving);
         }
-        else
+    }
+
+    IEnumerator MoveRandomly(Transform obj)
+    {
+        while (true)
         {
-            prefab = shockwavePrefab2;
-            expandSpeed = 1.5f;
-            lifetime = 1.6f;
-            maxScale = 5f;
+            isMoving = true;
+            Vector2 targetPos = GetRandomPosition();
+
+            Vector3 startPos = obj.position;
+            float distance = Vector2.Distance(startPos, targetPos);
+            float duration = distance / moveSpeed;
+            float elapsed = 0f;
+
+            // 이동 실행
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / duration;
+                obj.position = Vector3.Lerp(startPos, targetPos, t);
+                yield return null;
+            }
+
+            obj.position = targetPos;
+            isMoving = false;
+
+            // 일정한 대기 시간
+            yield return new WaitForSeconds(moveWaitTime);
+        }
+    }
+
+    Vector2 GetRandomPosition()
+    {
+        Vector2 pos;
+        Vector2 currentPos = Bossobj.transform.position;
+
+        int maxAttempts = 100;
+        int attempts = 0;
+
+        while (attempts < maxAttempts)
+        {
+            float x = Random.Range(-8f, 8f);
+            float y = Random.Range(-4f, 4f);
+
+            bool inCenterX = (x > -4f && x < 4f);
+            bool inCenterY = (y > -3.6f && y < 3.6f);
+            pos = new Vector2(x, y);
+
+            if (inCenterX && inCenterY)
+            {
+                attempts++;
+                continue;
+            }
+
+            if (Vector2.Distance(currentPos, pos) < minMoveDistance)
+            {
+                attempts++;
+                continue;
+            }
+
+            return pos;
         }
 
-        StartCoroutine(SpawnAndExpandShockwave(bossPos, prefab, expandSpeed, lifetime, maxScale));
+        return currentPos + Random.insideUnitCircle.normalized * minMoveDistance;
     }
 
     IEnumerator SpawnAndExpandShockwave(Vector2 pos, GameObject prefab, float expandSpeed, float lifetime, float maxScale)
@@ -110,7 +252,8 @@ public class ShockWave : MonoBehaviour
         {
             elapsed += Time.deltaTime;
             float t = elapsed / lifetime;
-            obj.transform.localScale = startScale * Mathf.Lerp(1f, maxScale, t * expandSpeed);
+            float scale = Mathf.Lerp(1f, maxScale, t * expandSpeed);
+            obj.transform.localScale = startScale * scale;
 
             if (sr != null)
             {
