@@ -112,12 +112,11 @@ public class GameOver : MonoBehaviour
         targetImage.localScale = scaredScale;
         targetImage.localRotation = originalRotation;
         
-        // 일정 시간 후 Game1 씬으로 돌아가기 (44초부터 시작)
+        // 일정 시간 후 죽었던 씬으로 돌아가기
         yield return new WaitForSeconds(returnDelay);
         
-        // Game1의 44초(마우스 커지는 부분)부터 시작하도록 플래그 설정
-        PlayerPrefs.SetFloat("StartTime", 44f);
-        PlayerPrefs.Save();
+        // 죽기 전 씬 정보 가져오기 (기본값: Game1)
+        string previousScene = PlayerPrefs.GetString("DeathScene", "Game1");
         
         // BGM 피치 초기화 (죽었을 때 낮아진 피치 복구)
         if (SoundManager.Instance != null && SoundManager.Instance.BGMSource != null)
@@ -126,6 +125,20 @@ public class GameOver : MonoBehaviour
             Debug.Log("[GameOver] BGM 피치 초기화: 1.0");
         }
         
-        SceneManager.LoadScene("Game1");
+        // 씬별 시작 시간 설정
+        if (previousScene == "Game1")
+        {
+            // Game1의 44초(마우스 커지는 부분)부터 시작
+            PlayerPrefs.SetFloat("StartTime", 44f);
+            PlayerPrefs.Save();
+        }
+        else if (previousScene == "Game3")
+        {
+            // Game3은 처음부터 시작
+            PlayerPrefs.DeleteKey("StartTime");
+        }
+        
+        Debug.Log($"[GameOver] {previousScene} 씬으로 돌아갑니다.");
+        SceneManager.LoadScene(previousScene);
     }
 }

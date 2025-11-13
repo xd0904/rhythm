@@ -156,13 +156,33 @@ public class ErrorPatternManager : MonoBehaviour
                     currentBeatIndex = 1; // 다시 1부터 시작
                     patternRepeatCount++; // 반복 횟수 증가
                     
-                    // 새 패턴 시작 시 숨겨진 창들 다시 활성화
+                    // 새 패턴 시작 시 숨겨진 창들 복원 (투명도 복구 및 Error 태그 제거)
                     foreach (GameObject window in hiddenWindows)
                     {
                         if (window != null)
                         {
-                            window.SetActive(true);
-                            Debug.Log($"[ErrorPatternManager] 창 다시 활성화: {window.name}");
+                            // 창의 모든 Image 컴포넌트 투명도 복구
+                            UnityEngine.UI.Image[] images = window.GetComponentsInChildren<UnityEngine.UI.Image>(true);
+                            foreach (UnityEngine.UI.Image img in images)
+                            {
+                                Color color = img.color;
+                                color.a = 1f; // 투명도 100%
+                                img.color = color;
+                            }
+                            
+                            // SpriteRenderer 투명도 복구
+                            SpriteRenderer[] sprites = window.GetComponentsInChildren<SpriteRenderer>(true);
+                            foreach (SpriteRenderer sprite in sprites)
+                            {
+                                Color color = sprite.color;
+                                color.a = 1f; // 투명도 100%
+                                sprite.color = color;
+                            }
+                            
+                            // "Error" 태그 제거 (Untagged로)
+                            window.tag = "Untagged";
+                            
+                            Debug.Log($"[ErrorPatternManager] 창 복원 완료 (투명도 100%, Error 태그 제거): {window.name}");
                         }
                     }
                     hiddenWindows.Clear();
@@ -287,13 +307,57 @@ public class ErrorPatternManager : MonoBehaviour
     {
         Debug.Log($"[ErrorPatternManager] 펑! 모든 에러 폭발 - 총 {activeErrors.Count}개");
         
-        // 에러가 있던 창들을 비활성화
+        // Player 찾기
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        
+        // 에러가 있던 창들을 투명하게 만들고 "Error" 태그 추가
         foreach (GameObject window in hiddenWindows)
         {
             if (window != null)
             {
-                window.SetActive(false);
-                Debug.Log($"[ErrorPatternManager] 창 비활성화: {window.name}");
+                // 창의 모든 Image 컴포넌트 찾아서 투명도 낮추기
+                UnityEngine.UI.Image[] images = window.GetComponentsInChildren<UnityEngine.UI.Image>(true);
+                foreach (UnityEngine.UI.Image img in images)
+                {
+                    Color color = img.color;
+                    color.a = 0.1f; // 투명도 10%
+                    img.color = color;
+                }
+                
+                // SpriteRenderer도 찾아서 투명도 낮추기
+                SpriteRenderer[] sprites = window.GetComponentsInChildren<SpriteRenderer>(true);
+                foreach (SpriteRenderer sprite in sprites)
+                {
+                    Color color = sprite.color;
+                    color.a = 0.1f; // 투명도 10%
+                    sprite.color = color;
+                }
+                
+                // "Error" 태그 추가
+                window.tag = "Error";
+                Debug.Log($"[ErrorPatternManager] 창 투명화 및 Error 태그 추가: {window.name}");
+                
+                // 플레이어가 이 창 위에 있는지 체크
+                if (player != null)
+                {
+                    Collider2D windowCollider = window.GetComponent<Collider2D>();
+                    Collider2D playerCollider = player.GetComponent<Collider2D>();
+                    
+                    if (windowCollider != null && playerCollider != null)
+                    {
+                        // 두 콜라이더가 겹치는지 확인
+                        if (windowCollider.IsTouching(playerCollider))
+                        {
+                            Debug.LogError($"[ErrorPatternManager] 💀 플레이어가 Error 창 위에 있음! {window.name} - 플레이어 죽임!");
+                            // Player의 Die() 메서드 호출
+                            Player playerScript = player.GetComponent<Player>();
+                            if (playerScript != null)
+                            {
+                                playerScript.Die();
+                            }
+                        }
+                    }
+                }
             }
         }
         
@@ -455,12 +519,33 @@ public class ErrorPatternManager : MonoBehaviour
         }
         activeCoroutines.Clear();
         
-        // 숨겨진 창 복원
+        // 숨겨진 창 복원 (투명도 복구 및 Error 태그 제거)
         foreach (GameObject window in hiddenWindows)
         {
             if (window != null)
             {
-                window.SetActive(true);
+                // 창의 모든 Image 컴포넌트 투명도 복구
+                UnityEngine.UI.Image[] images = window.GetComponentsInChildren<UnityEngine.UI.Image>(true);
+                foreach (UnityEngine.UI.Image img in images)
+                {
+                    Color color = img.color;
+                    color.a = 1f; // 투명도 100%
+                    img.color = color;
+                }
+                
+                // SpriteRenderer 투명도 복구
+                SpriteRenderer[] sprites = window.GetComponentsInChildren<SpriteRenderer>(true);
+                foreach (SpriteRenderer sprite in sprites)
+                {
+                    Color color = sprite.color;
+                    color.a = 1f; // 투명도 100%
+                    sprite.color = color;
+                }
+                
+                // "Error" 태그 제거 (Untagged로)
+                window.tag = "Untagged";
+                
+                Debug.Log($"[ErrorPatternManager] 창 복원 완료: {window.name}");
             }
         }
         hiddenWindows.Clear();
@@ -618,6 +703,59 @@ public class ErrorPatternManager : MonoBehaviour
         }
         
         Debug.Log("[ErrorPatternManager] 창 합치기 및 복원 완료!");
+    }
+    
+    /// <summary>
+    /// 플레이어가 특정 창 위에 있는지 체크
+    /// </summary>
+    bool IsPlayerOnWindow(Player player, GameObject window)
+    {
+        if (player == null || window == null) return false;
+        
+        // 창의 RectTransform 또는 Collider 경계 확인
+        RectTransform windowRect = window.GetComponent<RectTransform>();
+        
+        if (windowRect != null)
+        {
+            // UI 오브젝트인 경우 - 월드 좌표로 변환하여 체크
+            Vector3[] worldCorners = new Vector3[4];
+            windowRect.GetWorldCorners(worldCorners);
+            
+            // worldCorners: [0]=좌하, [1]=좌상, [2]=우상, [3]=우하
+            float minX = worldCorners[0].x;
+            float maxX = worldCorners[2].x;
+            float minY = worldCorners[0].y;
+            float maxY = worldCorners[2].y;
+            
+            Vector3 playerPos = player.transform.position;
+            
+            bool isInside = playerPos.x >= minX && playerPos.x <= maxX &&
+                           playerPos.y >= minY && playerPos.y <= maxY;
+            
+            if (isInside)
+            {
+                Debug.Log($"[ErrorPatternManager] 플레이어 위치: {playerPos}, 창 경계: X[{minX:F2}~{maxX:F2}], Y[{minY:F2}~{maxY:F2}]");
+            }
+            
+            return isInside;
+        }
+        else
+        {
+            // World 오브젝트인 경우 - Collider 또는 Transform 기반 체크
+            Collider2D windowCollider = window.GetComponent<Collider2D>();
+            
+            if (windowCollider != null)
+            {
+                // Collider 경계 내에 플레이어가 있는지 체크
+                return windowCollider.bounds.Contains(player.transform.position);
+            }
+            else
+            {
+                // Collider도 없으면 대략적인 거리로 체크 (반경 3f 이내)
+                float distance = Vector3.Distance(player.transform.position, window.transform.position);
+                return distance < 3f;
+            }
+        }
     }
     
     /// <summary>
