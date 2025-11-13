@@ -512,7 +512,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 2.81, y: 2.63}
+    oldSize: {x: 2.75, y: 2.58}
     newSize: {x: 8.48, y: 6.59}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -4287,8 +4287,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   shockwavePrefab: {fileID: 1718665349294500448, guid: 7683e3ac43990564d8977b827389e0c1, type: 3}
   shockwavePrefab2: {fileID: 5438504059502255942, guid: 46bbf1ea21fff9d4f9d92dbfe329e45f, type: 3}
-  firstTwoDelay: 0.5
-  lastDelay: 0.2
+  firstTwoDelay: 1.6
+  lastDelay: 1.6
   spawnInterval: 2
   beatBounce: {fileID: 1740529744}
   startTime: 69.7
