@@ -39,7 +39,7 @@ public class EyeBullet : MonoBehaviour
         }
 
         // 화면 밖으로 나가면 삭제
-        if (collision.CompareTag("Border"))
+        if (collision.CompareTag("Border") || collision.CompareTag("Wall"))
         {
             Destroy(gameObject);
         }
