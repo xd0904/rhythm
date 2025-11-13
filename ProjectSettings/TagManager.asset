@@ -17,6 +17,8 @@ TagManager:
   - Rectangle
   - RectangleBoss
   - Vaccine
+  - File
+  - Error
   layers:
   - Default
   - TransparentFX

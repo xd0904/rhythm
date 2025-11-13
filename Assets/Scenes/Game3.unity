@@ -1983,6 +1983,8 @@ MonoBehaviour:
   - WaveAlt
   - BounceWave
   - IsoscelesTriangle
+  - File
+  - Error
   gameWindow: {fileID: 1585253187417900643}
   referenceWindowSize: {x: 128, y: 128}
   referenceMinBounds: {x: -1.47, y: -1.33}
