@@ -25,7 +25,10 @@ public class BossTransformation : MonoBehaviour
     
     [Header("마우스 성장")]
     public float mouseMaxScale = 2.0f; // 마우스 최대 크기
-    
+
+    [Tooltip("변신 사운드")]
+    public AudioClip Transformation;
+
     private bool transformationStarted = false;
     private List<GameObject> orbs = new List<GameObject>();
     private int orbsCollected = 0;
@@ -343,7 +346,9 @@ public class BossTransformation : MonoBehaviour
         StartCoroutine(CreateShockwaveRing(mouseCursor.position, 0.1f));
         yield return new WaitForSeconds(0.2f);
         StartCoroutine(CreateShockwaveRing(mouseCursor.position, 0.2f));
-        
+
+        SoundManager.Instance.PlaySFX(Transformation);
+
         // 3. 화면 흔들림 (1초)
         if (Camera.main != null)
         {

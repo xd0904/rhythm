@@ -30,6 +30,9 @@ public class Boom : MonoBehaviour
     private bool patternActive = false;
     private int currentBeatIndex = 0;
 
+    [Tooltip("에러 사운드")]
+    public AudioClip Error;
+
     void Start()
     {
         InitializeBeatTimings();
@@ -170,6 +173,8 @@ public class Boom : MonoBehaviour
     void SpawnMiniWindow()
     {
         if (miniWindowPrefab == null) return;
+
+        SoundManager.Instance.PlaySFX(Error);
 
         // 스폰 가능한 화면 범위 설정
         float minX = -8f, maxX = 8f;

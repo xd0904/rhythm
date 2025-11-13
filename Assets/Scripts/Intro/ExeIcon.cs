@@ -21,6 +21,12 @@ public class Exe : MonoBehaviour
     private float lastClickTime = 0f;
     private int clickCount = 0;
 
+    [Header("조건부 창 관리")]
+    public GameObject ExeProgram;      // Exe 프로그램 창
+    public GameObject VaccineProgram;  // 백신 프로그램 창
+
+    public Percent percentScript;
+
     void Start()
     {
         // 컴포넌트 찾기
@@ -74,10 +80,26 @@ public class Exe : MonoBehaviour
     // 더블클릭 시 실행되는 함수
     private void OnDoubleClick()
     {
-        if (targetObject != null)
+        // EXE 창이 켜져 있으면 백신은 켜지지 않도록
+        if (targetObject == VaccineProgram && ExeProgram != null && ExeProgram.activeSelf)
         {
-            targetObject.SetActive(true);
+            Debug.Log("[ExeIcon] EXE가 켜져 있어 백신 창은 열리지 않습니다.");
+            return;
         }
+
+        // EXE 클릭 시 백신 끄기, 백신 클릭 시 EXE 끄기
+        if (targetObject == ExeProgram && VaccineProgram != null)
+            VaccineProgram.SetActive(false);
+
+        if (targetObject == VaccineProgram && ExeProgram != null)
+        {
+            ExeProgram.SetActive(false);
+            percentScript.ResetGauge();  // 초기화
+        }
+
+        // 현재 창 켜기
+        if (targetObject != null)
+            targetObject.SetActive(true);
     }
 
     private void SetColor(Color color)

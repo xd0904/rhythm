@@ -105,6 +105,10 @@ public class GameSequenceManager : MonoBehaviour
     [Tooltip("알림 사운드")]
     public AudioClip Alert;
 
+    [Header("Percent 프로그램")]
+    [Tooltip("백신 Percent 프로그램")]
+    public Percent percentScript;
+
     private TextMeshProUGUI morseTextTMP;
     private Text morseTextLegacy;
     private GameObject morseTextObject; // ExitButton에서 받아옴
@@ -121,6 +125,16 @@ public class GameSequenceManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        // percentScript 자동 연결 (Inspector에 안 넣었을 경우)
+        if (percentScript == null && percentProgram != null)
+        {
+            percentScript = percentProgram.GetComponent<Percent>();
+            if (percentScript == null)
+            {
+                Debug.LogError("[GameSequenceManager] percentProgram에 Percent 스크립트 없음!");
+            }
+        }
     }
 
     void Start()
@@ -130,6 +144,7 @@ public class GameSequenceManager : MonoBehaviour
         {
             SaveBackgroundTexture();
         }
+
     }
 
     private void SaveBackgroundTexture()
@@ -474,6 +489,16 @@ public class GameSequenceManager : MonoBehaviour
         // 배경화면 복구
         ChangeBackgroundColor(Color.white);
 
+        if (percentScript != null)
+        {
+            percentScript.beforeProduction = false;
+            Debug.Log("[GameSequenceManager] percentScript.beforeProduction = false; 적용 완료");
+        }
+        else
+        {
+            Debug.LogWarning("[GameSequenceManager] percentScript가 null이라 beforeProduction을 바꿀 수 없음");
+        }
+
         // 백신 아이콘 활성화
         if (vaccineIcon != null)
         {
@@ -481,12 +506,13 @@ public class GameSequenceManager : MonoBehaviour
             Debug.Log("[GameSequenceManager] 백신 아이콘 활성화");
         }
 
-        // 4.6초 대기
+        // 7초 대기
         yield return new WaitForSeconds(7f);
 
         // 백신 알람 애니메이션 시작
         if (vaccineAlarm != null)
-        {
+        { 
+
             SoundManager.Instance.PlaySFX(Alert);
             vaccineAlarm.TriggerAnimation();
             Debug.Log("[GameSequenceManager] 백신 알람 애니메이션 트리거");

@@ -62,6 +62,12 @@ public class VaccineIcon : MonoBehaviour
             // 더블클릭!
             clickCount++;
 
+            if (clickCount >= 2 && trueCount == 0 && sceneName == "Intro")
+            {
+                OnDoubleClick_Intro();
+                clickCount = 0;
+            }
+
             if (clickCount >= 2 && trueCount == 0 && sceneName == "Game2")
             {
                 OnDoubleClick();
@@ -90,6 +96,12 @@ public class VaccineIcon : MonoBehaviour
         
         lastClickTime = Time.time;
     }
+
+    private void OnDoubleClick_Intro()
+    {
+        
+    }
+
     private void OnDoubleClick()
     {
         if (sceneName == "Game2")

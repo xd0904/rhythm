@@ -357,9 +357,12 @@ MonoBehaviour:
   filePrefab: {fileID: 7405539025172597702, guid: 53e14cca6421a2d46a9e028c06673621, type: 3}
   vaccinePrefab: {fileID: 7912916156487168980, guid: c685d3d4a5466c7429e8479b38778f65, type: 3}
   folderPrefab: {fileID: 5166138423174941299, guid: 9cf40e4d5d4cc104fa35c5c1c50568cb, type: 3}
+  bossFilePrefab: {fileID: 0}
+  darkBossFilePrefab: {fileID: 0}
   targetCanvas: {fileID: 908137775}
   centerPosition: {x: 0, y: 0}
   startDistance: 400
+  bossFileDistance: 600
   gatherDuration: 4
   vaccineProgram: {fileID: 1993024623}
   redGaugeImage: {fileID: 796087953}
@@ -1134,6 +1137,8 @@ MonoBehaviour:
   errorExplodeDuration: 0.2
   errorScaleX: 0.7479665
   errorScaleY: 0.6842404
+  Error: {fileID: 8300000, guid: de5f4e8788c3c514cb26bfde77bde549, type: 3}
+  Disappear: {fileID: 8300000, guid: c9f82e99206efe44284e3f983d8d23a5, type: 3}
   patternRepeatMax: 2
 --- !u!1 &466994891
 GameObject:
@@ -1313,6 +1318,8 @@ MonoBehaviour:
   targetObject: {fileID: 0}
   doubleClickTime: 0.3
   ClickSound: {fileID: 0}
+  ExeProgram: {fileID: 0}
+  VaccineProgram: {fileID: 0}
 --- !u!212 &575792473
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2342,6 +2349,7 @@ MonoBehaviour:
   nextSceneName: Game1
   sceneTransitionDelay: 0
   Error: {fileID: 0}
+  beforeProduction: 1
 --- !u!212 &796087951
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -2610,7 +2618,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgmSource: {fileID: 0}
-  sfxSource: {fileID: 0}
+  sfxSource: {fileID: 860055406}
   noteSource: {fileID: 0}
   bgmVolume: 0.7
   sfxVolume: 0.7
@@ -3124,6 +3132,8 @@ MonoBehaviour:
   targetObject: {fileID: 0}
   doubleClickTime: 0.3
   ClickSound: {fileID: 0}
+  ExeProgram: {fileID: 0}
+  VaccineProgram: {fileID: 0}
 --- !u!212 &945507458
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4415,6 +4425,7 @@ MonoBehaviour:
   splitDuration: 0.3
   targetCanvas: {fileID: 908137775}
   player: {fileID: 0}
+  Expend: {fileID: 0}
 --- !u!1 &1646205539
 GameObject:
   m_ObjectHideFlags: 0

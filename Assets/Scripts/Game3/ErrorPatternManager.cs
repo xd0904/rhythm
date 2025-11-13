@@ -42,7 +42,10 @@ public class ErrorPatternManager : MonoBehaviour
     [Header("패턴 설정")]
     [Tooltip("랜덤 생성할 그리드 위치들 (중앙 포함 9개 위치 모두)")]
     private int[] availablePositions = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-    
+
+    [Tooltip("사라지는 사운드")]
+    public AudioClip Disappear;
+
     // 16박자 패턴 정의
     // 0 = 쉬기, 1 = 에러 생성, 2 = 펑 (모든 에러 터뜨리기)
     private int[] beatPattern = new int[]
@@ -285,6 +288,8 @@ public class ErrorPatternManager : MonoBehaviour
     /// </summary>
     void ExplodeAllErrors()
     {
+        SoundManager.Instance.PlaySFX(Disappear);
+
         Debug.Log($"[ErrorPatternManager] 펑! 모든 에러 폭발 - 총 {activeErrors.Count}개");
         
         // 에러가 있던 창들을 비활성화

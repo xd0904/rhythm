@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.PackageManager;
 
 public class BossBlueTransformation : MonoBehaviour
 {
@@ -50,6 +51,9 @@ public class BossBlueTransformation : MonoBehaviour
     private SpriteRenderer bossHeadRenderer; // BossHead의 SpriteRenderer
     private SpriteRenderer bossMouseRenderer; // BossMouse의 SpriteRenderer
     private GameObject blueBossGhost; // 페이드 인용 파란 보스 이미지
+
+    [Tooltip("에러 사운드")]
+    public AudioClip Explosion;
 
     void Start()
     {
@@ -408,12 +412,15 @@ public class BossBlueTransformation : MonoBehaviour
         
         // 2. 파란 보스 페이드 인 시작 (탄막이 계속 모이는 동안)
         StartCoroutine(FadeInBlueBoss(fadeInDuration));
-        
+
         // 3. 탄막들 중앙으로 계속 모임 (페이드 인과 동시에)
+        SoundManager.Instance.PlaySFX(Explosion);
+
         yield return new WaitForSeconds(explosionDelay);
         
         // 4. 하얀 폭발 효과
         Debug.Log("[BossBlueTransformation] 하얀 폭발 효과!");
+
         yield return StartCoroutine(WhiteExplosion());
         
         // 5. 모든 탄막 제거

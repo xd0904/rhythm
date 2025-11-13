@@ -67,49 +67,138 @@ public class Percent : MonoBehaviour
     [Tooltip("에러 사운드")]
     public AudioClip Error;
 
+    public bool beforeProduction = true;
+
+    public MouseFade mouseFade;
+
     public void OnStartButtonClicked()
     {
+        Debug.Log("[Percent] OnStartButtonClicked 호출됨, beforeProduction: " + beforeProduction);
 
-        StartCoroutine(FillGauge());
+        Object.SetActive(true);
+        Object2.SetActive(true);
+        Object3.SetActive(false);
 
-         Object.SetActive(true);
-         Object2.SetActive(true);
-         Object3.SetActive(false);
-        
-        
+        if (beforeProduction == true)
+        {
+            StartCoroutine(FillGaugeIntro());
+            Debug.Log("1");
+        }
+        else if (beforeProduction == false)
+        {
+            StartCoroutine(FillGauge());
+            Debug.Log("2");
+        }
     }
+
+    IEnumerator FillGaugeIntro()
+    {
+
+        isFilling = true;
+
+        if (redMouse != null) redMouse.SetActive(false);
+        if (normalMouse != null) normalMouse.SetActive(true);
+
+        float maxScannedObjects = 624189;
+        int currentScanned = 0;
+
+        while (gaugeImage.fillAmount < 1f)
+        {
+            // 게이지 증가
+            float speedMultiplier = 1f;
+            string stageText = "1단계";
+
+            if (gaugeImage.fillAmount < 0.05f) { speedMultiplier = 0.5f; stageText = "1단계"; }
+            else if (gaugeImage.fillAmount < 0.3f) { speedMultiplier = 1f; stageText = "2단계"; }
+            else if (gaugeImage.fillAmount < 0.8f) { speedMultiplier = 2f; stageText = "3단계"; }
+            else if (gaugeImage.fillAmount < 0.95f) { speedMultiplier = 0.5f; stageText = "4단계"; }
+            else { speedMultiplier = 0.2f; stageText = "5단계"; }
+
+            gaugeImage.fillAmount += Time.deltaTime * fillSpeed * speedMultiplier;
+
+            // 현재 퍼센트 계산 후 업데이트
+            float percent = gaugeImage.fillAmount * 100f;
+            gaugeText.text = Mathf.RoundToInt(percent) + "%";
+
+            // 스캔된 개체 수 증가
+            float targetScanned = maxScannedObjects * gaugeImage.fillAmount;
+            currentScanned = Mathf.RoundToInt(Mathf.Lerp(currentScanned, targetScanned, Time.deltaTime * 5f));
+
+            // 텍스트 업데이트
+            gaugeText2.text = currentScanned.ToString("N0");
+            gaugeText4.text = stageText;
+
+            yield return null;
+        }
+
+        // 최종 값
+        gaugeImage.fillAmount = 1f;
+        gaugeText.text = "100%";
+        gaugeText2.text = maxScannedObjects.ToString("N0");
+        gaugeText3.text = "0";
+        gaugeText4.text = "5";
+
+        isFilling = false;
+    }
+
 
     IEnumerator FillGauge()
     {
         isFilling = true;
 
-      
-        while (gaugeImage.fillAmount < 0.05f)
+        // 게이지 초기화
+        gaugeImage.fillAmount = 0f;
+        gaugeText.text = "0%";
+        gaugeText2.text = "0";
+        gaugeText3.text = "0";
+        gaugeText4.text = "1단계";
+
+        float maxScannedObjects = 624189f;
+        float targetFill = 0.05f; // 5%
+        int currentScanned = 0;
+        int scannedAt5Percent = Mathf.RoundToInt(maxScannedObjects * targetFill); // 약 31,209
+
+        while (gaugeImage.fillAmount < targetFill)
         {
+            // 게이지 증가
             gaugeImage.fillAmount += Time.deltaTime * fillSpeed;
+
+            // 현재 스캔 개체 수 계산
+            float targetScanned = scannedAt5Percent * (gaugeImage.fillAmount / targetFill);
+            currentScanned = Mathf.RoundToInt(Mathf.Lerp(currentScanned, targetScanned, Time.deltaTime * 5f));
+
+            // 퍼센트 계산
             float percent = gaugeImage.fillAmount * 100f;
+
+            // 텍스트 업데이트
             gaugeText.text = Mathf.RoundToInt(percent) + "%";
-            gaugeText2.text = Mathf.RoundToInt(percent) + "%";
-            gaugeText3.text = Mathf.RoundToInt(percent) + "%";
-            gaugeText4.text = Mathf.RoundToInt(percent) + "%";
+            gaugeText2.text = currentScanned.ToString("N0");
+            gaugeText3.text = "0"; // 발견된 위험 요소는 0
+            gaugeText4.text = "1단계";
+
             yield return null;
         }
 
-        gaugeImage.fillAmount = 0.05f;
+
+
+        // 최종값 강제 설정
+        gaugeImage.fillAmount = targetFill;
         gaugeText.text = "5%";
-        gaugeText2.text = "1024";
+        gaugeText2.text = scannedAt5Percent.ToString("N0");
+        gaugeText3.text = "0";
         gaugeText4.text = "1단계";
+
         isFilling = false;
 
         Debug.Log("게이지가 5%에 도달했습니다!");
 
-        // 마우스 커서 빨간색으로 변경 (먼저 실행)
+
         ChangeToRedCursor();
+
         
         // "발견된 위험 요소" 텍스트 글리치 효과 (이미지 변경 전에 시작)
         yield return ApplyTextGlitch();
         
-        // 이미지들 빨간색으로 변경
         ChangeToRedImages();
         
         // 1초 대기 후 에러창 띄우기
@@ -159,6 +248,25 @@ public class Percent : MonoBehaviour
         //Object4.SetActive(true);
     }
 
+    public void ResetGauge()
+    {
+        StopAllCoroutines();
+        isFilling = false;
+
+        // 게이지 초기화
+        gaugeImage.fillAmount = 0f;
+        gaugeText.text = "0%";
+        gaugeText2.text = "0";
+        gaugeText3.text = "0";
+        gaugeText4.text = "1단계";
+
+        // 관련 오브젝트 상태 초기화
+        if (Object != null) Object.SetActive(false);
+        if (Object2 != null) Object2.SetActive(false);
+        if (Object3 != null) Object3.SetActive(true);
+
+        Debug.Log("[Percent] 초기화 완료");
+    }
     private void ChangeToRedImages()
     {
         // 초록색 게이지바 숨기고 빨간색 게이지바 켜기
@@ -196,10 +304,17 @@ public class Percent : MonoBehaviour
         {
             // 정상 마우스의 현재 위치 저장
             Vector3 lastMousePosition = normalMouse.transform.position;
-            
+
             normalMouse.SetActive(false);
             redMouse.SetActive(true);
-            
+
+
+            if (mouseFade != null)
+            {
+                mouseFade.StartFade(); // OnEnable 대신 이걸 호출
+                Debug.Log("[Percent] MouseFade 코루틴 시작");
+            }
+
             // 빨간 마우스를 마지막 위치로 설정
             redMouse.transform.position = lastMousePosition;
             
