@@ -6517,7 +6517,7 @@ MonoBehaviour:
   gaugeText2: {fileID: 1731053067}
   gaugeText4: {fileID: 299626470}
   percentIncrement: 0.08
-  vaccineProgramDisplayDuration: 1.6
+  vaccineProgramDisplayDuration: 0.7
   topRectangles:
   - {fileID: 8861441649813185161, guid: c98db5a645467d949b59e649e5e98212, type: 3}
   - {fileID: 6135274680598175947, guid: 4bbe6d086768ec849b898f34c34ceb0f, type: 3}
