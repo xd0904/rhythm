@@ -28,6 +28,9 @@ public class Game4SequenceManager : MonoBehaviour
         if (backgroundObject != null)
             SaveBackgroundTexture();
 
+        if (vaccineAlarm != null)
+            vaccineAlarm.gameObject.SetActive(false);
+
         // 시퀀스 시작
         StartCoroutine(ScreenSequence());
     }
