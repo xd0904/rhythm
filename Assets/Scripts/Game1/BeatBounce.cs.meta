@@ -1,2 +1,32 @@
 fileFormatVersion: 2
 guid: ab04dc65cf95c5141b4e7c1f22ffa739
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - diamondPrefab: {instanceID: 0}
+  - spawnPoint: {instanceID: 0}
+  - topShadow: {instanceID: 0}
+  - bottomShadow: {instanceID: 0}
+  - ballPrefab: {instanceID: 0}
+  - trianglePrefab: {instanceID: 0}
+  - circlePrefab: {instanceID: 0}
+  - mousePosition: {instanceID: 0}
+  - centerPoint: {instanceID: 0}
+  - mouseObject: {instanceID: 0}
+  - background: {instanceID: 0}
+  - wavePrefab: {instanceID: 0}
+  - wavePrefabAlt: {instanceID: 0}
+  - bigWavePrefab: {instanceID: 0}
+  - bounceWavePrefab: {instanceID: 0}
+  - waveParent: {instanceID: 0}
+  - isoscelesTrianglePrefab: {instanceID: 0}
+  - gameWindow: {instanceID: 0}
+  - icon1: {instanceID: 0}
+  - icon2: {instanceID: 0}
+  - Bounce: {fileID: 8300000, guid: c17f2d31259ed874792a919dc0a2430c, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

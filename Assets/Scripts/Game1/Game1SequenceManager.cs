@@ -49,6 +49,9 @@ public class Game1SequenceManager : MonoBehaviour
     [Tooltip("마우스 이동 사운드")]
     public AudioClip mouseMove;
 
+    [Tooltip("마우스 이동 사운드")]
+    public AudioClip expend;
+
     private void Awake()
     {
         // 싱글톤 패턴
@@ -231,7 +234,8 @@ public class Game1SequenceManager : MonoBehaviour
         // 2단계: 공포스럽게 크기 키우기 (SpriteRenderer는 localScale 사용)
         Vector3 targetScale = new Vector3(finalSize, finalSize, 1f);
         elapsed = 0f;
-        
+
+        SoundManager.Instance.PlaySFX(expend);
         Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 시작 - {startScale} → {targetScale}");
         
         // 시작 회전 저장
@@ -295,7 +299,7 @@ public class Game1SequenceManager : MonoBehaviour
             redMouseScript.enabled = false;
             Debug.Log("[Game1SequenceManager] 마우스 움직임 스크립트 비활성화 완료");
         }
-        
+
         Debug.Log($"[Game1SequenceManager] 공포스러운 크기 변경 완료 - 최종 크기: {targetScale}");
         
         // 애니메이션 완료 후 음악 시작

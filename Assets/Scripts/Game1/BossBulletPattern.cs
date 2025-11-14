@@ -42,6 +42,9 @@ public class BossBulletPattern : MonoBehaviour
     private bool bossMouseTagChanged = false; // 태그 변경 여부
     private bool bossMouseTagReverted = false; // 태그 복원 여부
 
+    [Tooltip("창 탄막 사운드")]
+    public AudioClip Spare;
+
     void Start()
     {
         if (mainCamera == null)
@@ -508,7 +511,9 @@ public class BossBulletPattern : MonoBehaviour
         // 부모에서 분리 (독립적으로 날아가도록)
         Transform originalParent = bossMouse.parent;
         bossMouse.SetParent(null);
-        
+
+        SoundManager.Instance.PlaySFX(Spare);
+
         // 배경 마우스 생성 (이펙트)
         StartCoroutine(CreateBackgroundMice(direction, startPos));
         

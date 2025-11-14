@@ -33,6 +33,9 @@ public class ShockWave : MonoBehaviour
 
     private List<GameObject> activeShockwaves = new List<GameObject>();
 
+    [Tooltip("클릭 사운드")]
+    public AudioClip Shock;
+
     void Update()
     {
         double currentTime = beatBounce.GetMusicTime();
@@ -241,6 +244,8 @@ public class ShockWave : MonoBehaviour
 
     IEnumerator SpawnAndExpandShockwave(Vector2 pos, GameObject prefab, float expandSpeed, float lifetime, float maxScale)
     {
+        SoundManager.Instance.PlaySFX(Shock);
+
         GameObject obj = Instantiate(prefab, pos, Quaternion.identity);
         activeShockwaves.Add(obj);
 

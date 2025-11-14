@@ -50,7 +50,10 @@ public class WindowSplitEffect : MonoBehaviour
     [Header("플레이어 설정")]
     [Tooltip("Window Split 알림을 받을 플레이어")]
     public Player player;
-    
+
+    [Tooltip("확장 사운드")]
+    public AudioClip Expend;
+
     void Start()
     {
         // 플레이어 자동 찾기
@@ -136,6 +139,8 @@ public class WindowSplitEffect : MonoBehaviour
         
         // 2. 원본 창 크기를 128x128로 부드럽게 변경
         Debug.Log($"[WindowSplitEffect] 원본 창 크기 변경 시작: {originalSize} → {targetWindowSize}");
+
+        SoundManager.Instance.PlaySFX(Expend);
         
         float elapsed = 0f;
         while (elapsed < resizeDuration)
