@@ -2,7 +2,9 @@
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.PackageManager.UI;
+#if UNITY_EDITOR
+using UnityEditor.PackageManager;
+#endif
 
 public class FileAni : MonoBehaviour
 {
