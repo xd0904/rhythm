@@ -26,6 +26,12 @@ public class FileToFolderPatternManager : MonoBehaviour
     [Tooltip("집 파일 프리팹 (중앙 변신용)")]
     public GameObject folderPrefab;
     
+    [Tooltip("보스 파일 프리팹 - 원래 색상 (5방향 고정 배치용)")]
+    public GameObject bossNormalPrefab;
+    
+    [Tooltip("보스 파일 프리팹 - 빨간색 (깜빡일 때)")]
+    public GameObject bossRedPrefab;
+    
     [Header("Canvas 설정")]
     [Tooltip("오브젝트가 생성될 Canvas")]
     public Canvas targetCanvas;
@@ -36,6 +42,9 @@ public class FileToFolderPatternManager : MonoBehaviour
     
     [Tooltip("파일 시작 거리 (중앙에서)")]
     public float startDistance = 400f;
+    
+    [Tooltip("보스 배치 거리 (화면 밖 배경에서)")]
+    public float bossDistance = 800f;
     
     [Tooltip("파일 이동 시간 (박자 1에서 시작 → 박자 12에 도착, 총 11박자 이동)")]
     public float gatherDuration = 3.67f; // 11박자 = 3.67초 (180 BPM, 60/180 * 11 = 3.67)
@@ -80,6 +89,7 @@ public class FileToFolderPatternManager : MonoBehaviour
     private int lastProcessedBeat = -1;
     private List<GameObject> currentFiles = new List<GameObject>(); // 현재 활성 파일들
     private GameObject currentFolder = null; // 현재 활성 폴더
+    private List<GameObject> bossFiles = new List<GameObject>(); // 5방향 고정 보스들
     
     void Update()
     {
@@ -99,6 +109,9 @@ public class FileToFolderPatternManager : MonoBehaviour
             patternBeatIndex = 0; // 0에서 시작, Update에서 1로 증가
             patternRepeatCount = 0;
             lastProcessedBeat = currentBeat - 1; // 현재 박자를 처리하기 위해
+            
+            // 패턴 시작 시 보스 5개 소환 (고정 위치)
+            SpawnBossFiles();
             
             Debug.Log($"[FileToFolderPattern] ========== 패턴 시작! 박자: {currentBeat}, 음악시간: {musicTime:F2}초 ==========");
         }
@@ -148,6 +161,54 @@ public class FileToFolderPatternManager : MonoBehaviour
     }
     
     /// <summary>
+    /// 패턴 시작 시 보스 5개를 5방향에 고정 소환
+    /// </summary>
+    void SpawnBossFiles()
+    {
+        if (bossNormalPrefab == null)
+        {
+            Debug.LogError("[FileToFolderPattern] bossNormalPrefab이 없습니다!");
+            return;
+        }
+        
+        if (targetCanvas == null)
+        {
+            Debug.LogError("[FileToFolderPattern] targetCanvas가 없습니다!");
+            return;
+        }
+        
+        Debug.Log($"[FileToFolderPattern] 보스 5개 소환 (5방향 고정)");
+        
+        // 5방향에 보스 소환 (원래 색상으로)
+        for (int i = 0; i < fileAngles.Length; i++)
+        {
+            float angle = fileAngles[i];
+            
+            // 보스 위치 계산 (중앙에서 bossDistance만큼 떨어진 위치 - 화면 밖)
+            float rad = angle * Mathf.Deg2Rad;
+            Vector2 bossPos = centerPosition + new Vector2(Mathf.Cos(rad), Mathf.Sin(rad)) * bossDistance;
+            
+            // 보스 생성 (원래 색상)
+            GameObject boss = Instantiate(bossNormalPrefab, targetCanvas.transform);
+            RectTransform bossRect = boss.GetComponent<RectTransform>();
+            
+            if (bossRect != null)
+            {
+                bossRect.anchoredPosition = bossPos;
+                boss.name = $"BossFile_{i}_{angle}deg";
+            }
+            else
+            {
+                boss.transform.localPosition = bossPos;
+                boss.name = $"BossFile_{i}_{angle}deg";
+            }
+            
+            bossFiles.Add(boss);
+            Debug.Log($"[FileToFolderPattern] 보스 {i} 생성: {angle}도 방향, 위치: {bossPos}");
+        }
+    }
+    
+    /// <summary>
     /// 파일 4개 + 백신 1개 소환 및 중앙으로 모으기 시작
     /// </summary>
     void SpawnAndGatherFiles()
@@ -172,6 +233,9 @@ public class FileToFolderPatternManager : MonoBehaviour
         
         // 기존 파일/폴더 정리
         CleanupCurrentObjects();
+        
+        // 보스들 깜빡이기 (파일이 날아갈 때)
+        StartCoroutine(FlashBossFiles());
         
         Debug.Log($"[FileToFolderPattern] 파일 4개 + 백신 1개 소환 시작");
         
@@ -268,6 +332,127 @@ public class FileToFolderPatternManager : MonoBehaviour
                 obj.transform.localPosition = endPos;
             }
         }
+    }
+    
+    /// <summary>
+    /// 보스 파일들을 잠깐 빨간 프리팹으로 교체
+    /// </summary>
+    IEnumerator FlashBossFiles()
+    {
+        if (bossRedPrefab == null)
+        {
+            Debug.LogWarning("[FileToFolderPattern] bossRedPrefab이 없어서 깜빡임 스킵!");
+            yield break;
+        }
+        
+        float flashDuration = 0.1f; // 0.1초 깜빡임
+        
+        // 각 보스의 위치와 정보 저장
+        List<Vector2> bossPositions = new List<Vector2>();
+        List<string> bossNames = new List<string>();
+        
+        foreach (GameObject boss in bossFiles)
+        {
+            if (boss != null)
+            {
+                RectTransform bossRect = boss.GetComponent<RectTransform>();
+                if (bossRect != null)
+                {
+                    bossPositions.Add(bossRect.anchoredPosition);
+                }
+                else
+                {
+                    bossPositions.Add(boss.transform.localPosition);
+                }
+                bossNames.Add(boss.name);
+            }
+        }
+        
+        // 기존 보스들 제거
+        foreach (GameObject boss in bossFiles)
+        {
+            if (boss != null)
+            {
+                Destroy(boss);
+            }
+        }
+        bossFiles.Clear();
+        
+        // 빨간 보스로 교체
+        for (int i = 0; i < bossPositions.Count; i++)
+        {
+            GameObject redBoss = Instantiate(bossRedPrefab, targetCanvas.transform);
+            RectTransform redRect = redBoss.GetComponent<RectTransform>();
+            
+            if (redRect != null)
+            {
+                redRect.anchoredPosition = bossPositions[i];
+            }
+            else
+            {
+                redBoss.transform.localPosition = bossPositions[i];
+            }
+            
+            redBoss.name = bossNames[i] + "_Red";
+            bossFiles.Add(redBoss);
+        }
+        
+        Debug.Log($"[FileToFolderPattern] 보스 {bossFiles.Count}개 빨간색으로 교체!");
+        
+        // 잠깐 대기
+        yield return new WaitForSeconds(flashDuration);
+        
+        // 원래 보스로 복구
+        bossPositions.Clear();
+        bossNames.Clear();
+        
+        foreach (GameObject boss in bossFiles)
+        {
+            if (boss != null)
+            {
+                RectTransform bossRect = boss.GetComponent<RectTransform>();
+                if (bossRect != null)
+                {
+                    bossPositions.Add(bossRect.anchoredPosition);
+                }
+                else
+                {
+                    bossPositions.Add(boss.transform.localPosition);
+                }
+                bossNames.Add(boss.name.Replace("_Red", ""));
+            }
+        }
+        
+        // 빨간 보스들 제거
+        foreach (GameObject boss in bossFiles)
+        {
+            if (boss != null)
+            {
+                Destroy(boss);
+            }
+        }
+        bossFiles.Clear();
+        
+        // 원래 보스로 복구
+        for (int i = 0; i < bossPositions.Count; i++)
+        {
+            GameObject normalBoss = Instantiate(bossNormalPrefab, targetCanvas.transform);
+            RectTransform normalRect = normalBoss.GetComponent<RectTransform>();
+            
+            if (normalRect != null)
+            {
+                normalRect.anchoredPosition = bossPositions[i];
+            }
+            else
+            {
+                normalBoss.transform.localPosition = bossPositions[i];
+            }
+            
+            normalBoss.name = bossNames[i];
+            bossFiles.Add(normalBoss);
+        }
+        
+        Debug.Log($"[FileToFolderPattern] 보스 원래 색상으로 복구!");
     }
     
     /// <summary>
@@ -411,7 +596,18 @@ public class FileToFolderPatternManager : MonoBehaviour
     void CleanupPattern()
     {
         CleanupCurrentObjects();
-        Debug.Log("[FileToFolderPattern] 패턴 정리 완료");
+        
+        // 보스들 제거
+        foreach (GameObject boss in bossFiles)
+        {
+            if (boss != null)
+            {
+                Destroy(boss);
+            }
+        }
+        bossFiles.Clear();
+        
+        Debug.Log("[FileToFolderPattern] 패턴 정리 완료 (보스 포함)");
     }
     
     /// <summary>
