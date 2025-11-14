@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor.PackageManager;
@@ -10,6 +11,10 @@ public class BossBlueTransformation : MonoBehaviour
     public float bulletStartTime = 150.4f; // 2:30.4초 - 2단계 탄막 시작
     public float fadeStartTime = 156.8f; // 2:36.8초 - 3단계 페이드 시작
     public float transformEndTime = 160f; // 2:40초 - 변신 완료
+    
+    [Header("씬 전환 설정")]
+    public float sceneTransitionDelay = 1f; // 변신 완료 후 대기 시간
+    public float sceneTransitionFadeDuration = 2f; // 페이드 아웃 시간
     
     [Header("대상 오브젝트")]
     public Transform boss; // 보스 오브젝트 (Boss)
@@ -51,6 +56,7 @@ public class BossBlueTransformation : MonoBehaviour
     private SpriteRenderer bossHeadRenderer; // BossHead의 SpriteRenderer
     private SpriteRenderer bossMouseRenderer; // BossMouse의 SpriteRenderer
     private GameObject blueBossGhost; // 페이드 인용 파란 보스 이미지
+    private GameObject sceneTransitionFade; // 씬 전환용 페이드 오브젝트
 
     [Tooltip("에러 사운드")]
     public AudioClip Explosion;
@@ -166,6 +172,10 @@ public class BossBlueTransformation : MonoBehaviour
         stage3Complete = true;
         
         Debug.Log("[BossBlueTransformation] 변신 연출 완료!");
+        
+        // === 4단계: 페이드 아웃 후 Game2 씬 전환 ===
+        yield return new WaitForSeconds(sceneTransitionDelay);
+        yield return StartCoroutine(FadeOutAndLoadScene());
     }
 
     // === 1단계: 보스 중앙 이동, 윈도우/플레이어 퇴장 ===
@@ -219,13 +229,16 @@ public class BossBlueTransformation : MonoBehaviour
         if (gameWindow != null)
         {
             gameWindow.position = windowTargetPos;
+            // 게임창 완전히 비활성화 (다시 올라오지 않도록)
+            gameWindow.gameObject.SetActive(false);
+            Debug.Log("[BossBlueTransformation] 게임창 비활성화됨 - 다시 올라오지 않음");
         }
         if (player != null)
         {
             player.position = playerTargetPos;
         }
         
-        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 완료 (Y=-20으로 고정)");
+        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 완료 (Y=-20으로 고정, 창 비활성화)");
     }
 
     // === 2단계: 빨간 보스 페이드 아웃 + 파란 탄막 집중 ===
@@ -639,5 +652,60 @@ public class BossBlueTransformation : MonoBehaviour
         
         texture.Apply();
         return texture;
+    }
+
+    /// <summary>
+    /// 페이드 아웃 후 Game2 씬 전환
+    /// </summary>
+    IEnumerator FadeOutAndLoadScene()
+    {
+        Debug.Log("[BossBlueTransformation] 페이드 아웃 시작 - Game2로 전환 준비");
+        
+        // 페이드 오브젝트 생성 (검은 화면)
+        sceneTransitionFade = new GameObject("SceneTransitionFade");
+        SpriteRenderer fadeRenderer = sceneTransitionFade.AddComponent<SpriteRenderer>();
+        
+        // 검은색 사각형 텍스처 생성
+        Texture2D fadeTexture = new Texture2D(1, 1);
+        fadeTexture.SetPixel(0, 0, Color.black);
+        fadeTexture.Apply();
+        
+        Sprite fadeSprite = Sprite.Create(fadeTexture, new Rect(0, 0, 1, 1), new Vector2(0.5f, 0.5f), 1f);
+        fadeRenderer.sprite = fadeSprite;
+        fadeRenderer.sortingOrder = 1000; // 최상단
+        
+        // 카메라 중앙에 배치
+        sceneTransitionFade.transform.position = Camera.main.transform.position + new Vector3(0f, 0f, 10f);
+        sceneTransitionFade.transform.localScale = new Vector3(50f, 50f, 1f); // 화면 전체 덮기
+        
+        // 초기 색상 (완전 투명)
+        Color fadeColor = fadeRenderer.color;
+        fadeColor.a = 0f;
+        fadeRenderer.color = fadeColor;
+        
+        // 페이드 아웃 (투명 → 불투명)
+        float elapsed = 0f;
+        
+        while (elapsed < sceneTransitionFadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / sceneTransitionFadeDuration;
+            
+            fadeColor = fadeRenderer.color;
+            fadeColor.a = Mathf.Lerp(0f, 1f, t);
+            fadeRenderer.color = fadeColor;
+            
+            yield return null;
+        }
+        
+        // 완전히 불투명하게
+        fadeColor = fadeRenderer.color;
+        fadeColor.a = 1f;
+        fadeRenderer.color = fadeColor;
+        
+        Debug.Log("[BossBlueTransformation] 페이드 아웃 완료 - Game2 씬 로드");
+        
+        // Game2 씬 로드
+        SceneManager.LoadScene("Game2");
     }
 }
