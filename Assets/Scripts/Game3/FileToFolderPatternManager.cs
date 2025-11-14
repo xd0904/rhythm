@@ -78,7 +78,7 @@ public class FileToFolderPatternManager : MonoBehaviour
     // 5방향 각도 (위, 오른쪽 위, 오른쪽 아래, 왼쪽 아래, 왼쪽 위)
     private float[] fileAngles = new float[] { 90f, 45f, -45f, -135f, 135f };
     
-    private float currentPercent = 0.05f; // 현재 퍼센트
+    private float currentPercent = 0.37f; // 현재 퍼센트 (37%에서 시작)
     private int scannedCount = 1024; // 스캔된 개수
     
     private bool hasStarted = false;
@@ -628,7 +628,18 @@ public class FileToFolderPatternManager : MonoBehaviour
         // 퍼센트 증가 애니메이션
         if (redGaugeImage != null)
         {
-            float targetPercent = Mathf.Min(currentPercent + percentIncrement, 1f);
+            // 마지막 백신이면 100%까지, 아니면 8%씩 증가
+            float targetPercent;
+            if (patternRepeatCount >= patternRepeatMax - 1) // 마지막 패턴 (7번째)
+            {
+                targetPercent = 1f; // 100%
+                Debug.Log("[FileToFolderPattern] 마지막 백신! 100%까지 올립니다!");
+            }
+            else
+            {
+                targetPercent = Mathf.Min(currentPercent + percentIncrement, 1f);
+            }
+            
             float startPercent = currentPercent;
             float elapsed = 0f;
             float duration = 0.5f;
