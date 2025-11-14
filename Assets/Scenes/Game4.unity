@@ -229,6 +229,8 @@ MonoBehaviour:
   targetObject: {fileID: 861044114}
   targetObject2: {fileID: 162484856}
   Exit: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
+  fadeBackground: {fileID: 1937137125}
+  fadeDuration: 1
 --- !u!114 &8547964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4183,9 +4185,6 @@ SceneRoots:
   - {fileID: 811777308}
   - {fileID: 1744075994}
   - {fileID: 971802539}
-  - {fileID: 1989230200}
-  - {fileID: 612045600}
   - {fileID: 376608312}
-  - {fileID: 852845284}
-  - {fileID: 1000491920}
   - {fileID: 435180355}
+  - {fileID: 1240036397}
