@@ -2,7 +2,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor.PackageManager;
+#endif
 
 public class BossBlueTransformation : MonoBehaviour
 {

@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
+#if UNITY_EDITOR
 using UnityEditor.PackageManager;
-
+#endif
 public class BeatBounce : MonoBehaviour
 {
     // 싱글톤 인스턴스
