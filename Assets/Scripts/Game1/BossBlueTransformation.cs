@@ -236,9 +236,12 @@ public class BossBlueTransformation : MonoBehaviour
         if (player != null)
         {
             player.position = playerTargetPos;
+            // 플레이어도 완전히 비활성화
+            player.gameObject.SetActive(false);
+            Debug.Log("[BossBlueTransformation] 플레이어 비활성화됨");
         }
         
-        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 완료 (Y=-20으로 고정, 창 비활성화)");
+        Debug.Log("[BossBlueTransformation] 1단계 완료 - 보스 중앙, 창/플레이어 퇴장 완료 (Y=-20으로 고정, 창&플레이어 비활성화)");
     }
 
     // === 2단계: 빨간 보스 페이드 아웃 + 파란 탄막 집중 ===
