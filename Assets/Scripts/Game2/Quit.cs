@@ -21,8 +21,23 @@ public class Quit : MonoBehaviour
 
     public void QuitButton()
     {
-        // 페이드아웃 후 Menu 씬으로 이동
-        StartCoroutine(FadeOutAndLoadMenu());
+        // Game4 씬에서만 페이드아웃 후 Menu 씬으로 이동
+        string currentScene = SceneManager.GetActiveScene().name;
+        
+        if (currentScene == "Game4")
+        {
+            StartCoroutine(FadeOutAndLoadMenu());
+        }
+        else
+        {
+            // Game4가 아닌 경우 기존 동작 (오브젝트 비활성화만)
+            if (targetObject != null)
+            {
+                SoundManager.Instance.PlaySFX(Exit);
+                targetObject.SetActive(false);
+                Debug.Log($"[Quit] {targetObject.name} 꺼짐");
+            }
+        }
     }
 
     private IEnumerator FadeOutAndLoadMenu()
