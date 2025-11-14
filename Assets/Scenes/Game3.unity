@@ -357,9 +357,12 @@ MonoBehaviour:
   filePrefab: {fileID: 7405539025172597702, guid: 53e14cca6421a2d46a9e028c06673621, type: 3}
   vaccinePrefab: {fileID: 7912916156487168980, guid: c685d3d4a5466c7429e8479b38778f65, type: 3}
   folderPrefab: {fileID: 5166138423174941299, guid: 9cf40e4d5d4cc104fa35c5c1c50568cb, type: 3}
+  bossNormalPrefab: {fileID: 4115663416269512516, guid: 5b007cc2be7baf04faa726940e16bf6d, type: 3}
+  bossRedPrefab: {fileID: 196780088685133618, guid: 92cd1a66e47c52a4d8c4de5e7281a81e, type: 3}
   targetCanvas: {fileID: 908137775}
   centerPosition: {x: 0, y: 0}
   startDistance: 400
+  bossDistance: 600
   gatherDuration: 4
   vaccineProgram: {fileID: 1993024623}
   redGaugeImage: {fileID: 796087953}
