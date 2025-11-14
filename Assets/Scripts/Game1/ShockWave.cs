@@ -155,20 +155,20 @@ public class ShockWave : MonoBehaviour
             {
                 for (int i = 0; i < 2; i++)
                 {
-                    StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab, 1f, 1.2f, 5f));
+                    StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab, 1f, 1.2f, 3f));
                     yield return new WaitForSeconds(firstTwoDelay);
                 }
                 yield return new WaitForSeconds(0.6f);
             }
 
             // 마지막 3개의 충격파
-            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 3f));
             yield return new WaitForSeconds(1.1f);
 
-            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 3f));
             yield return new WaitForSeconds(0.4f);
 
-            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 5f));
+            StartCoroutine(SpawnAndExpandShockwave(bossPos, shockwavePrefab2, 1.5f, 1.6f, 3f));
 
             yield return new WaitForSeconds(0.4f);
 
