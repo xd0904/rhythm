@@ -1135,6 +1135,8 @@ MonoBehaviour:
   scaleUpFactor: 1.1
   speed: 8
   hoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  fadeBackground: {fileID: 1616233988}
+  fadeDuration: 1
 --- !u!114 &1960030153
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1367,6 +1369,8 @@ MonoBehaviour:
   scaleUpFactor: 1.1
   speed: 8
   hoverColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  fadeBackground: {fileID: 1616233988}
+  fadeDuration: 1
 --- !u!114 &2142466289
 MonoBehaviour:
   m_ObjectHideFlags: 0
