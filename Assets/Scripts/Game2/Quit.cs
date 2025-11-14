@@ -1,3 +1,4 @@
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 public class Quit : MonoBehaviour
@@ -7,10 +8,14 @@ public class Quit : MonoBehaviour
     public GameObject targetObject;
     public GameObject targetObject2;
 
+    [Tooltip("나감 사운드")]
+    public AudioClip Exit;
+
     public void QuitButton()
     {
         if (targetObject != null)
         {
+            SoundManager.Instance.PlaySFX(Exit);
             targetObject.SetActive(false);
             Debug.Log($"[VaccineIcon] {targetObject.name} 꺼짐");
         }

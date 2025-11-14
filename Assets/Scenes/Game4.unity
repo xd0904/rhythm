@@ -156,7 +156,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.051, y: -1.44}
+  m_AnchoredPosition: {x: -0.065, y: -2.058}
   m_SizeDelta: {x: 1.78, y: 0.54}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!212 &8547962
@@ -228,6 +228,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   targetObject: {fileID: 861044114}
   targetObject2: {fileID: 162484856}
+  Exit: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
 --- !u!114 &8547964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -448,7 +449,7 @@ RectTransform:
   m_GameObject: {fileID: 162484856}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1.1, y: 1.1, z: 1.1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1149482106}
@@ -592,14 +593,14 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 293750557}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.00097652676, w: 0.9999995}
   m_LocalPosition: {x: 0, y: 0, z: -9720}
   m_LocalScale: {x: 63.176758, y: 63.176758, z: 63.176758}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 691612966}
   m_Father: {fileID: 1657310632}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -0.112}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 667, y: -438.00003}
@@ -665,7 +666,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -9000185970575035165, guid: aebf3dd5d59657046aa2dc21f2740c7a, type: 3}
+  m_Sprite: {fileID: 4032570352254763382, guid: 6010b0d830e0ea349897de7a4ead0ee8, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -988,6 +989,53 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &435180354
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 435180355}
+  - component: {fileID: 435180356}
+  m_Layer: 0
+  m_Name: GameSequenceManager4
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &435180355
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435180354}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.28604946, y: 2.1477895, z: -10.106985}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &435180356
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 435180354}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7adc498e432517e4eb191d15382069df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  backgroundObject: {fileID: 270407642}
+  vaccineIcon: {fileID: 462323430}
+  vaccineAlarm: {fileID: 293750559}
 --- !u!1 &462323430
 GameObject:
   m_ObjectHideFlags: 0
@@ -1084,9 +1132,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f278400b7880e374298cfe030bf6f338, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  targetObject: {fileID: 0}
+  targetObject: {fileID: 861044114}
   doubleClickTime: 0.3
-  ClickSound: {fileID: 0}
+  ClickSound: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
   ExeProgram: {fileID: 0}
   VaccineProgram: {fileID: 0}
   percentScript: {fileID: 0}
@@ -2590,7 +2638,7 @@ GameObject:
   - component: {fileID: 861044115}
   - component: {fileID: 861044116}
   m_Layer: 0
-  m_Name: VaccineError2
+  m_Name: VaccineComplete
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2657,7 +2705,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: -6087755412541321716, guid: 9581af330ac8fa943a50c8add5d33b43, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -2665,7 +2713,7 @@ SpriteRenderer:
   m_Size: {x: 8.48, y: 6.59}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
 --- !u!1 &880927371
@@ -4191,7 +4239,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bgmSource: {fileID: 0}
-  sfxSource: {fileID: 0}
+  sfxSource: {fileID: 1744075995}
   noteSource: {fileID: 0}
   bgmVolume: 0.7
   sfxVolume: 0.7
@@ -4580,7 +4628,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1937137126
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -5578,3 +5626,4 @@ SceneRoots:
   - {fileID: 376608312}
   - {fileID: 852845284}
   - {fileID: 1000491920}
+  - {fileID: 435180355}
