@@ -49,7 +49,7 @@ public class Game4SequenceManager : MonoBehaviour
     IEnumerator ScreenSequence()
     {
         // 7초 대기
-        yield return new WaitForSeconds(7f);
+        yield return new WaitForSecondsRealtime(7f);
 
         // 알림창 표시
         if (vaccineAlarm != null)
