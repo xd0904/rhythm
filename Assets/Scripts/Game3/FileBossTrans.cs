@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 
 public class FileBossTrans : MonoBehaviour
 {
@@ -36,64 +37,6 @@ public class FileBossTrans : MonoBehaviour
     {
 
         Debug.Log($"[FileBossTrans] 타이밍: Stage1={stage1StartTime}초, Stage2={stage2StartTime}초, Stage3={stage3StartTime}초");
-
-        // 플레이어 창 자동 찾기
-        if (playerWindow == null)
-        {
-            playerWindow = GameObject.Find("PlayerWindow");
-
-            // 초기 설정
-            if (playerWindow != null)
-            {
-                Debug.Log("[FileBossTrans] PlayerWindow 자동 찾기 완료");
-            }
-        }
-
-        // 보스 창 자동 찾기
-        if (bossWindow == null)
-        {
-            bossWindow = GameObject.Find("BossWindow");
-            if (bossWindow != null)
-            {
-                Debug.Log("[FileBossTrans] BossWindow 자동 찾기 완료");
-            }
-        }
-
-        // 보스 자동 찾기
-        if (boss == null)
-        {
-            boss = GameObject.Find("Boss");
-            if (boss != null)
-            {
-                Debug.Log("[FileBossTrans] Boss 자동 찾기 완료");
-
-                SpriteRenderer sr = boss.GetComponent<SpriteRenderer>();
-                if (sr != null)
-                {
-                    bossOriginalColor = sr.color;
-                }
-            }
-        }
-
-        // 초기 상태: 보스 OFF
-        if (boss != null)
-        {
-            boss.SetActive(false);
-            Debug.Log("[FileBossTrans] Boss 초기 상태: 비활성화");
-        }
-        {
-            playerOriginalPos = playerWindow.transform.position;
-        }
-
-        if (bossWindow != null)
-        {
-            bossWindow.SetActive(false);
-        }
-
-        if (notificationObject != null)
-        {
-            notificationObject.SetActive(false);
-        }
 
         // 페이드 오버레이 생성
         CreateFadeOverlay();
@@ -162,7 +105,7 @@ public class FileBossTrans : MonoBehaviour
         // 플레이어 창을 왼쪽으로 이동
         if (playerWindow != null)
         {
-            Vector3 targetPos = playerOriginalPos + new Vector3(-3f, 0f, 0f);
+            Vector3 targetPos = playerOriginalPos + new Vector3(-4f, 0f, 0f);
             float elapsed = 0f;
 
             while (elapsed < stage1Duration)
@@ -255,6 +198,10 @@ public class FileBossTrans : MonoBehaviour
             }
 
             Debug.Log("[FileBossTrans] 화면 밝아짐 완료");
+
+            yield return new WaitForSeconds(2.5f);
+
+            SceneManager.LoadScene("Game4");
         }
 
         // 알림 표시 - 남은 시간 동안
