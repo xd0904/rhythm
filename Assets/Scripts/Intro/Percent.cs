@@ -64,6 +64,12 @@ public class Percent : MonoBehaviour
     [Tooltip("게임 프로그램 뜬 후 씬 전환까지 대기 시간 (초)")]
     public float sceneTransitionDelay = 2f;
 
+    [Header("백신 창")]
+    public GameObject VaccineProgram;
+
+    [Header("완료 창")]
+    public GameObject completionWindow;
+
     [Tooltip("에러 사운드")]
     public AudioClip Error;
 
@@ -139,6 +145,24 @@ public class Percent : MonoBehaviour
         gaugeText4.text = "5";
 
         isFilling = false;
+
+        // 1초 대기
+        yield return new WaitForSeconds(1f);
+
+        // 완료 창 켜기
+        if (completionWindow != null)
+        {
+            completionWindow.SetActive(true);
+            Debug.Log("[Percent] 완료 창 활성화");
+        }
+
+        // 기존 창 끄기
+        if (VaccineProgram != null)
+        {
+            VaccineProgram.SetActive(false);
+            Debug.Log("[Percent] VaccineProgram 비활성화 완료");
+        }
+
     }
 
 
