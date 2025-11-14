@@ -42,7 +42,7 @@ public class Stage2Tutorial : MonoBehaviour
         }
         
         // EventSystem 확인 (UI 클릭 이벤트에 필수!)
-        UnityEngine.EventSystems.EventSystem eventSystem = FindObjectOfType<UnityEngine.EventSystems.EventSystem>();
+        UnityEngine.EventSystems.EventSystem eventSystem = FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>();
         if (eventSystem == null)
         {
             Debug.LogError("[Stage2Tutorial] ★★★ EventSystem이 없습니다! UI 클릭이 작동하지 않습니다! ★★★");
@@ -145,13 +145,27 @@ public class Stage2Tutorial : MonoBehaviour
     
     IEnumerator DisableTutorialAfterDelay()
     {
-        Debug.Log($"[Stage2Tutorial] {tutorialDuration}초 후 Tutorial 비활성화 예약");
-        yield return new WaitForSeconds(tutorialDuration);
+        Debug.Log($"[Stage2Tutorial] {tutorialDuration}초 후 Tutorial 비활성화 예약 시작");
         
-        if (tutorial != null)
+        float elapsedTime = 0f;
+        while (elapsedTime < tutorialDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        if (tutorial != null && tutorial.activeSelf)
         {
             tutorial.SetActive(false);
-            Debug.Log("[Stage2Tutorial] Tutorial SetActive(false)");
+            Debug.Log($"[Stage2Tutorial] {tutorialDuration}초 경과 - Tutorial SetActive(false) 완료");
+        }
+        else if (tutorial == null)
+        {
+            Debug.LogWarning("[Stage2Tutorial] Tutorial GameObject가 null입니다!");
+        }
+        else
+        {
+            Debug.Log("[Stage2Tutorial] Tutorial이 이미 비활성화 상태입니다.");
         }
     }
     
