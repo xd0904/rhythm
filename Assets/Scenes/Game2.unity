@@ -980,6 +980,7 @@ MonoBehaviour:
   ClickSound: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
   ExeProgram: {fileID: 0}
   VaccineProgram: {fileID: 0}
+  percentScript: {fileID: 0}
 --- !u!212 &462323434
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4382,7 +4383,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!212 &1937137126
 SpriteRenderer:
   m_ObjectHideFlags: 0

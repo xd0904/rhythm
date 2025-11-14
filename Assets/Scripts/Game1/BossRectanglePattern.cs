@@ -31,7 +31,7 @@ public class BossRectanglePattern : MonoBehaviour
     public Text gaugeText; // 퍼센트 텍스트
     public Text gaugeText2; // 스캔된 개수 텍스트
     public Text gaugeText4; // 진행 단계 텍스트
-    public float percentIncrement = 0.08f; // 8% 증가
+    public float percentIncrement = 0.04f; // 4% 증가 (8번 → 37% 도달)
     private float currentPercent = 0.05f; // 현재 퍼센트 (0.05부터 시작 = 5%)
     private int scannedCount = 1024; // 스캔된 개수
     

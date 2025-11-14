@@ -1285,7 +1285,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &575792470
 Transform:
   m_ObjectHideFlags: 0
@@ -6203,6 +6203,8 @@ MonoBehaviour:
   bulletStartTime: 150.4
   fadeStartTime: 156.8
   transformEndTime: 160
+  sceneTransitionDelay: 1
+  sceneTransitionFadeDuration: 2
   boss: {fileID: 1075201704}
   gameWindow: {fileID: 238816903}
   player: {fileID: 696100253}
@@ -6240,7 +6242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2026007673
 Transform:
   m_ObjectHideFlags: 0
