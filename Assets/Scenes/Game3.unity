@@ -2610,7 +2610,7 @@ MonoBehaviour:
   bgmSource: {fileID: 0}
   sfxSource: {fileID: 0}
   noteSource: {fileID: 0}
-  bgmVolume: 0.3
+  bgmVolume: 0.46666667
   sfxVolume: 0.7
   musics: []
 --- !u!4 &860055408
