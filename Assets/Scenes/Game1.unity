@@ -6063,7 +6063,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1993024624
 RectTransform:
   m_ObjectHideFlags: 0
@@ -6377,7 +6377,7 @@ MonoBehaviour:
   vaccineProgram: {fileID: 1993024623}
   redGaugeImage: {fileID: 796087953}
   gaugeText: {fileID: 1961692109}
-  gaugeText2: {fileID: 1731053067}
+  gaugeText2: {fileID: 1376137059}
   gaugeText4: {fileID: 299626470}
   percentIncrement: 0.08
   vaccineProgramDisplayDuration: 0.7
