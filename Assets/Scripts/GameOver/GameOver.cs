@@ -29,7 +29,10 @@ public class GameOver : MonoBehaviour
     [Header("씬 전환 설정")]
     [Tooltip("GameOver 후 Intro로 돌아가는 대기 시간")]
     public float returnDelay = 1.5f;
-    
+
+    [Header("비명 소리(AudioClip)")]
+    public AudioClip screamClip;
+
     private Vector3 originalPosition;
     private Vector3 originalScale;
     private Quaternion originalRotation;

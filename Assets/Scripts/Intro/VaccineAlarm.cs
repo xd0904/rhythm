@@ -22,7 +22,9 @@ public class VaccineAlarm : MonoBehaviour
     void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
-        
+
+        this.gameObject.SetActive(false);
+
         if (rectTransform != null)
         {
             // 목표 위치 저장

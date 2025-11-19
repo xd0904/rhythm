@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: aebf3dd5d59657046aa2dc21f2740c7a
+guid: 6010b0d830e0ea349897de7a4ead0ee8
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -9000185970575035165
-    second: vaccinealarm_0
+      213: 4032570352254763382
+    second: "\uBC31\uC2E0 \uC54C\uB78C (1)_0"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -96,24 +96,11 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: WebGL
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: vaccinealarm_0
+      name: "\uBC31\uC2E0 \uC54C\uB78C (1)_0"
       rect:
         serializedVersion: 2
         x: 0
@@ -128,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3e4bb677b8ae81380800000000000000
-      internalID: -9000185970575035165
+      spriteID: 671cae1be5196f730800000000000000
+      internalID: 4032570352254763382
       vertices: []
       indices: 
       edges: []
@@ -148,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      vaccinealarm_0: -9000185970575035165
+      "\uBC31\uC2E0 \uC54C\uB78C (1)_0": 4032570352254763382
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -20,6 +20,10 @@ public class Mouse : MonoBehaviour
     [Tooltip("시작 시 기본 마우스 커서 숨기기")]
     public bool hideDefaultCursor = true;
 
+    [Header("오프셋 설정")]
+    [Tooltip("마우스 위치 오프셋 (X: 오른쪽+, Y: 위+)")]
+    public Vector2 cursorOffset = new Vector2(10f, -10f);
+
     private Camera mainCamera;
     private Vector3 targetPosition;
 
@@ -57,6 +61,10 @@ public class Mouse : MonoBehaviour
 
         // 마우스 위치를 월드 좌표로 변환
         Vector3 mousePos = Input.mousePosition;
+        
+        // 오프셋 적용
+        mousePos.x += cursorOffset.x;
+        mousePos.y += cursorOffset.y;
         
         // Canvas UI를 사용하는 경우와 World Space를 사용하는 경우 구분
         if (cursorObject.GetComponent<RectTransform>() != null)

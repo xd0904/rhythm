@@ -266,7 +266,7 @@ MonoBehaviour:
   vaccineProgram: {fileID: 1993024623}
   redGaugeImage: {fileID: 796087953}
   gaugeText: {fileID: 1961692109}
-  gaugeText2: {fileID: 1731053067}
+  gaugeText2: {fileID: 1376137059}
   gaugeText4: {fileID: 299626470}
   percentIncrement: 0.08
   vaccineProgramDisplayDuration: 0.8
@@ -2335,6 +2335,8 @@ MonoBehaviour:
   errorWindowDelay: 1
   nextSceneName: Game1
   sceneTransitionDelay: 0
+  VaccineProgram: {fileID: 0}
+  completionWindow: {fileID: 0}
   Error: {fileID: 0}
   beforeProduction: 1
   mouseFade: {fileID: 0}
@@ -2936,6 +2938,7 @@ MonoBehaviour:
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
+  cursorOffset: {x: 12, y: -20}
 --- !u!224 &924480924
 RectTransform:
   m_ObjectHideFlags: 0

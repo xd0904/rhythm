@@ -10,6 +10,38 @@ public class Fadein : MonoBehaviour
     [Tooltip("페이드인 지속 시간 (초)")]
     public float fadeInDuration = 1f;
 
+    void Awake()
+    {
+        // 초기 알파값을 0으로 설정 (투명)
+        RawImage rawImage = GetComponent<RawImage>();
+        Image image = GetComponent<Image>();
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 0f;
+        }
+        else if (rawImage != null)
+        {
+            Color color = rawImage.color;
+            color.a = 0f;
+            rawImage.color = color;
+        }
+        else if (image != null)
+        {
+            Color color = image.color;
+            color.a = 0f;
+            image.color = color;
+        }
+        else if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = 0f;
+            spriteRenderer.color = color;
+        }
+    }
+
     void Start()
     {
         StartCoroutine(FadeIn());
@@ -28,8 +60,7 @@ public class Fadein : MonoBehaviour
 
         if (canvasGroup != null)
         {
-            // CanvasGroup 페이드인
-            canvasGroup.alpha = 0f;
+            // CanvasGroup 페이드인 (이미 Awake에서 0으로 설정됨)
             float elapsedTime = 0f;
             while (elapsedTime < fadeInDuration)
             {
@@ -41,10 +72,8 @@ public class Fadein : MonoBehaviour
         }
         else if (rawImage != null)
         {
-            // RawImage 페이드인
+            // RawImage 페이드인 (이미 Awake에서 0으로 설정됨)
             Color color = rawImage.color;
-            color.a = 0f;
-            rawImage.color = color;
 
             float elapsedTime = 0f;
             while (elapsedTime < fadeInDuration)
@@ -59,10 +88,8 @@ public class Fadein : MonoBehaviour
         }
         else if (image != null)
         {
-            // Image 페이드인
+            // Image 페이드인 (이미 Awake에서 0으로 설정됨)
             Color color = image.color;
-            color.a = 0f;
-            image.color = color;
 
             float elapsedTime = 0f;
             while (elapsedTime < fadeInDuration)
@@ -77,10 +104,8 @@ public class Fadein : MonoBehaviour
         }
         else if (spriteRenderer != null)
         {
-            // SpriteRenderer 페이드인
+            // SpriteRenderer 페이드인 (이미 Awake에서 0으로 설정됨)
             Color color = spriteRenderer.color;
-            color.a = 0f;
-            spriteRenderer.color = color;
 
             float elapsedTime = 0f;
             while (elapsedTime < fadeInDuration)

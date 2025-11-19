@@ -23,12 +23,9 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private bool isHovered = false;
     private bool isTransitioning = false;
 
-    void Start()
+    void Awake()
     {
-        originalScale = transform.localScale;
-        originalColor = textComponent.color;
-        
-        // 페이드 배경 초기화 (완전 투명)
+        // 페이드 배경 초기화 (완전 불투명)
         if (fadeBackground != null)
         {
             // Image 컴포넌트 체크
@@ -36,7 +33,7 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             if (fadeImage != null)
             {
                 Color c = fadeImage.color;
-                c.a = 0f;
+                c.a = 1f;
                 fadeImage.color = c;
             }
             
@@ -45,10 +42,87 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             if (fadeSprite != null)
             {
                 Color c = fadeSprite.color;
-                c.a = 0f;
+                c.a = 1f;
                 fadeSprite.color = c;
             }
+
+            fadeBackground.SetActive(true);
         }
+    }
+
+    void Start()
+    {
+        originalScale = transform.localScale;
+        originalColor = textComponent.color;
+        
+        // 페이드인 시작
+        if (fadeBackground != null)
+        {
+            StartCoroutine(FadeInAtStart());
+        }
+    }
+
+    /// <summary>
+    /// 씬 시작 시 페이드인
+    /// </summary>
+    IEnumerator FadeInAtStart()
+    {
+        if (fadeBackground == null)
+        {
+            yield break;
+        }
+
+        // Image 또는 SpriteRenderer 찾기
+        Image fadeImage = fadeBackground.GetComponent<Image>();
+        SpriteRenderer fadeSprite = fadeBackground.GetComponent<SpriteRenderer>();
+
+        if (fadeImage == null && fadeSprite == null)
+        {
+            yield break;
+        }
+
+        // 페이드 인 (불투명 → 투명)
+        float elapsed = 0f;
+
+        while (elapsed < fadeDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / fadeDuration;
+
+            // Image 사용
+            if (fadeImage != null)
+            {
+                Color c = fadeImage.color;
+                c.a = Mathf.Lerp(1f, 0f, t);
+                fadeImage.color = c;
+            }
+
+            // SpriteRenderer 사용
+            if (fadeSprite != null)
+            {
+                Color c = fadeSprite.color;
+                c.a = Mathf.Lerp(1f, 0f, t);
+                fadeSprite.color = c;
+            }
+
+            yield return null;
+        }
+
+        // 최종 색상 설정 (완전 투명)
+        if (fadeImage != null)
+        {
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
+        }
+        if (fadeSprite != null)
+        {
+            Color c = fadeSprite.color;
+            c.a = 0f;
+            fadeSprite.color = c;
+        }
+
+        fadeBackground.SetActive(false);
     }
 
     void Update()
@@ -108,6 +182,20 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             Debug.LogWarning("[Menu] fadeBackground에 Image나 SpriteRenderer 컴포넌트가 없어서 바로 씬 전환합니다.");
             SceneManager.LoadScene(sceneName);
             yield break;
+        }
+
+        // 초기 색상을 투명하게 설정
+        if (fadeImage != null)
+        {
+            Color c = fadeImage.color;
+            c.a = 0f;
+            fadeImage.color = c;
+        }
+        if (fadeSprite != null)
+        {
+            Color c = fadeSprite.color;
+            c.a = 0f;
+            fadeSprite.color = c;
         }
 
         // 페이드 배경 활성화

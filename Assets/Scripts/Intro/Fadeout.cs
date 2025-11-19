@@ -10,6 +10,38 @@ public class Fadeout : MonoBehaviour
     [Tooltip("페이드아웃 지속 시간 (초)")]
     public float fadeOutDuration = 1f;
 
+    void Awake()
+    {
+        // 초기 알파값을 1로 설정 (불투명)
+        RawImage rawImage = GetComponent<RawImage>();
+        Image image = GetComponent<Image>();
+        SpriteRenderer spriteRenderer = GetComponent<SpriteRenderer>();
+        CanvasGroup canvasGroup = GetComponent<CanvasGroup>();
+
+        if (canvasGroup != null)
+        {
+            canvasGroup.alpha = 1f;
+        }
+        else if (rawImage != null)
+        {
+            Color color = rawImage.color;
+            color.a = 1f;
+            rawImage.color = color;
+        }
+        else if (image != null)
+        {
+            Color color = image.color;
+            color.a = 1f;
+            image.color = color;
+        }
+        else if (spriteRenderer != null)
+        {
+            Color color = spriteRenderer.color;
+            color.a = 1f;
+            spriteRenderer.color = color;
+        }
+    }
+
     void Start()
     {
         StartCoroutine(FadeOut());
