@@ -64,11 +64,29 @@ public class MousePositionData : MonoBehaviour
     }
     
     /// <summary>
+    /// 저장된 마우스 위치 가져오기 (static 메서드)
+    /// </summary>
+    public static Vector3 GetSavedMousePositionStatic()
+    {
+        Debug.Log($"[MousePositionData] Static 위치 가져오기 호출 - static 값: {_savedMousePosition}");
+        return _savedMousePosition;
+    }
+    
+    /// <summary>
     /// 빨간 마우스 상태 확인
     /// </summary>
     public bool IsRedMouse()
     {
         Debug.Log($"[MousePositionData] 빨간마우스 상태 확인 - static 값: {_hasRedMouse}");
+        return _hasRedMouse;
+    }
+    
+    /// <summary>
+    /// 빨간 마우스 상태 확인 (static 메서드)
+    /// </summary>
+    public static bool IsRedMouseStatic()
+    {
+        Debug.Log($"[MousePositionData] Static 빨간마우스 상태 확인 - static 값: {_hasRedMouse}");
         return _hasRedMouse;
     }
     

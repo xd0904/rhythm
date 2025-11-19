@@ -726,7 +726,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &353205614
 Transform:
   m_ObjectHideFlags: 0
@@ -2446,8 +2446,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: -7244808124949040004, guid: 3e0fb5a5965275b4dab26fd79ab7235f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 6279833274323165469, guid: 4026fb002080b554e9a50ca2ccc12f63, type: 3}
+  m_Color: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2975,7 +2975,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!222 &924480921
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -3654,8 +3654,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 10
-  m_Sprite: {fileID: 7911465215855169385, guid: 5672441fe18f2e34eb053f41e16f32ae, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 6437915969965752970, guid: 154bacea74255ad4dbba4deaffaa8eac, type: 3}
+  m_Color: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -6371,8 +6371,8 @@ MonoBehaviour:
   bossRushSpeed: 15
   bossWaitPosition: {x: 8, y: 0, z: 0}
   bossRushTargetPosition: {x: -8, y: 0, z: 0}
-  vaccineColor: {r: 0, g: 1, b: 0, a: 1}
-  originalBossColor: {r: 1, g: 0, b: 0, a: 1}
+  vaccineColor: {r: 0.21568628, g: 1, b: 0.60784316, a: 1}
+  originalBossColor: {r: 0.9647059, g: 0.11764706, b: 0.12941177, a: 1}
   colorChangeDuration: 0.3
   noiseDuration: 0.2
   vaccineProgram: {fileID: 1993024623}

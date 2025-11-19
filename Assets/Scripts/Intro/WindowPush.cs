@@ -15,8 +15,15 @@ public class WindowPush : MonoBehaviour
             playerScript = player.GetComponent<Player>();
         }
 
-        // Z�� �ʱ�ȭ (���� ��ǥ �����ϰ�)
-        window.position = new Vector3(window.position.x, window.position.y, 0f);
+        // Z축 초기화 (월드 좌표 유지하며)
+        if (window != null)
+        {
+            window.position = new Vector3(window.position.x, window.position.y, 0f);
+        }
+        else
+        {
+            Debug.LogWarning("[WindowPush] window가 할당되지 않았습니다!");
+        }
     }
 
     void LateUpdate()
