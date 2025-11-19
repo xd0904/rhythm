@@ -674,11 +674,11 @@ PlayerSettings:
   captureStartupLogs: {}
   activeInputHandler: 2
   windowsGamepadBackendHint: 0
-  cloudProjectId: 3a075a0a-8db1-4ecf-be1b-4f05adcb276a
+  cloudProjectId: 10c982e9-08a7-4a4d-a24b-2ce128fc9d0f
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
   projectName: rhythm
-  organizationId: ysh080904
+  organizationId: donghwa70767076
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   hmiLoadingImage: {fileID: 0}
