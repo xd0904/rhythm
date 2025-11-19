@@ -3595,6 +3595,7 @@ MonoBehaviour:
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
+  cursorOffset: {x: 12, y: -20}
 --- !u!212 &1947663128
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -3843,6 +3844,7 @@ MonoBehaviour:
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
+  cursorOffset: {x: 10, y: -10}
 --- !u!212 &2109627508
 SpriteRenderer:
   m_ObjectHideFlags: 0

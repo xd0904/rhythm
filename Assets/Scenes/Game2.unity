@@ -229,6 +229,8 @@ MonoBehaviour:
   targetObject: {fileID: 861044114}
   targetObject2: {fileID: 162484856}
   Exit: {fileID: 8300000, guid: 46fc113fba81ce346990c974f532fe4f, type: 3}
+  fadeBackground: {fileID: 0}
+  fadeDuration: 1
 --- !u!114 &8547964
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4538,6 +4540,7 @@ MonoBehaviour:
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
+  cursorOffset: {x: 12, y: -20}
 --- !u!212 &1947663128
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -4873,6 +4876,7 @@ MonoBehaviour:
   smoothSpeed: 0.1
   zPosition: 0
   hideDefaultCursor: 1
+  cursorOffset: {x: 10, y: -10}
 --- !u!212 &2109627508
 SpriteRenderer:
   m_ObjectHideFlags: 0
