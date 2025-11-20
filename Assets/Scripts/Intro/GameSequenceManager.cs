@@ -292,6 +292,13 @@ public class GameSequenceManager : MonoBehaviour
         
         // 1. 지정된 오브젝트들 비활성화
         DisableObjects(objectsToDisable);
+        
+        // 백신 아이콘 비활성화
+        if (vaccineIcon != null)
+        {
+            vaccineIcon.SetActive(false);
+            Debug.Log("[GameSequenceManager] 백신 아이콘 비활성화");
+        }
 
         // 2. 배경화면 검은색으로
         ChangeBackgroundColor(Color.black);

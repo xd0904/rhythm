@@ -80,52 +80,6 @@ public class ScreenFlipController : MonoBehaviour
             StartCoroutine(FlipScreen());
             return;
         }
-        
-        // 이미 플립 중이면 입력 무시
-        if (isFlipping) return;
-        
-        // 마우스 왼쪽 버튼 눌렀을 때
-        if (Input.GetMouseButtonDown(0))
-        {
-            // 화면 오른쪽 끝 영역인지 체크 (화면 너비의 90% 이상)
-            if (Input.mousePosition.x > Screen.width * 0.9f)
-            {
-                dragStartPos = Input.mousePosition;
-                isDragging = true;
-                CreateDragLine();
-            }
-        }
-        
-        // 드래그 중
-        if (isDragging && Input.GetMouseButton(0))
-        {
-            UpdateDragVisuals();
-            
-            float dragDistance = dragStartPos.x - Input.mousePosition.x;
-            float dragProgress = Mathf.Clamp01(dragDistance / dragThreshold);
-            
-            // 드래그 진행도에 따라 화면 프리뷰 회전
-            UpdateFlipPreview(dragProgress);
-            
-            // 왼쪽으로 충분히 드래그했으면 플립 실행
-            if (dragDistance > dragThreshold)
-            {
-                isDragging = false;
-                DestroyDragVisuals();
-                StartCoroutine(FlipScreen());
-            }
-        }
-        
-        // 마우스 버튼 떼면 드래그 취소 (리셋)
-        if (Input.GetMouseButtonUp(0))
-        {
-            if (isDragging)
-            {
-                isDragging = false;
-                DestroyDragVisuals();
-                StartCoroutine(ResetFlipPreview());
-            }
-        }
     }
     
     IEnumerator MoveMouseToRight()

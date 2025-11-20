@@ -31,9 +31,14 @@ public class BossRectanglePattern : MonoBehaviour
     public Text gaugeText; // 퍼센트 텍스트
     public Text gaugeText2; // 스캔된 개수 텍스트
     public Text gaugeText4; // 진행 단계 텍스트
-    public float percentIncrement = 0.04f; // 4% 증가 (8번 → 37% 도달)
-    private float currentPercent = 0.05f; // 현재 퍼센트 (0.05부터 시작 = 5%)
+    
+    // 자동 계산: 5%에서 시작, 8번 충돌로 37% 도달 (각 4%씩 증가)
+    private float percentIncrement = 0.04f; // 자동 계산됨 (인스펙터에서 수정 불가)
+    private float currentPercent = 0.05f; // 현재 퍼센트 (5%부터 시작)
     private int scannedCount = 1024; // 스캔된 개수
+    private const int TOTAL_COLLISIONS = 8; // 총 충돌 횟수 (4+4)
+    private const float TARGET_PERCENT = 0.37f; // 목표 퍼센트 (37%)
+    private const float START_PERCENT = 0.05f; // 시작 퍼센트 (5%)
     
     [Header("백신 창 표시 시간")]
     public float vaccineProgramDisplayDuration = 0.8f; // 백신 창 표시 시간 (초) - 직사각형 재소환 전에 꺼지도록 짧게
@@ -94,6 +99,10 @@ public class BossRectanglePattern : MonoBehaviour
             currentPercent = redGaugeImage.fillAmount;
             Debug.Log($"[BossRectanglePattern] 백신 게이지 초기값: {Mathf.RoundToInt(currentPercent * 100)}%");
         }
+        
+        // percentIncrement 자동 계산: (목표 - 시작) / 총 충돌 횟수
+        percentIncrement = (TARGET_PERCENT - START_PERCENT) / TOTAL_COLLISIONS;
+        Debug.Log($"[BossRectanglePattern] 자동 계산된 증가량: {percentIncrement:F4} ({Mathf.RoundToInt(percentIncrement * 100)}%) - {TOTAL_COLLISIONS}번 충돌로 {Mathf.RoundToInt(START_PERCENT * 100)}% → {Mathf.RoundToInt(TARGET_PERCENT * 100)}%");
     }
     
     void Update()
@@ -508,43 +517,71 @@ public class BossRectanglePattern : MonoBehaviour
         
         Debug.Log("[BossRectanglePattern] 벽 충돌 효과 시작!");
         
-        // Boss의 SpriteRenderer 찾기
-        SpriteRenderer bossRenderer = boss.GetComponentInChildren<SpriteRenderer>();
-        if (bossRenderer == null)
+        // BossHead와 BossMouse의 SpriteRenderer 찾기
+        SpriteRenderer bossHeadRenderer = null;
+        SpriteRenderer bossMouseRenderer = null;
+        
+        Transform bossHead = boss.Find("BossHead");
+        Transform bossMouse = boss.Find("BossMouse");
+        
+        if (bossHead != null)
         {
-            // Boss 자체에 없으면 BossHead나 BossMouse에서 찾기
-            Transform bossHead = boss.Find("BossHead");
-            if (bossHead != null)
-            {
-                bossRenderer = bossHead.GetComponent<SpriteRenderer>();
-            }
+            bossHeadRenderer = bossHead.GetComponent<SpriteRenderer>();
+        }
+        
+        if (bossMouse != null)
+        {
+            bossMouseRenderer = bossMouse.GetComponent<SpriteRenderer>();
         }
 
         SoundManager.Instance.PlaySFX(Dash);
 
-        if (bossRenderer != null)
+        // BossHead와 BossMouse 모두 색상 변경
+        Color originalHeadColor = bossHeadRenderer != null ? bossHeadRenderer.color : Color.white;
+        Color originalMouseColor = bossMouseRenderer != null ? bossMouseRenderer.color : Color.white;
+        
+        // 1. 백신 색깔로 변경
+        if (bossHeadRenderer != null)
         {
-            Color originalColor = bossRenderer.color;
+            bossHeadRenderer.color = vaccineColor;
+        }
+        if (bossMouseRenderer != null)
+        {
+            bossMouseRenderer.color = vaccineColor;
+        }
+        Debug.Log("[BossRectanglePattern] BossHead + BossMouse 색상 → 백신 초록색");
+        
+        yield return new WaitForSeconds(colorChangeDuration);
+        
+        // 2. 노이즈 효과 (색상 깜빡임)
+        float noiseElapsed = 0f;
+        while (noiseElapsed < noiseDuration)
+        {
+            Color noiseColor = Random.value > 0.5f ? vaccineColor : originalBossColor;
             
-            // 1. 백신 색깔로 변경
-            bossRenderer.color = vaccineColor;
-            Debug.Log("[BossRectanglePattern] Boss 색상 → 백신 초록색");
-            
-            yield return new WaitForSeconds(colorChangeDuration);
-            
-            // 2. 노이즈 효과 (색상 깜빡임)
-            float noiseElapsed = 0f;
-            while (noiseElapsed < noiseDuration)
+            if (bossHeadRenderer != null)
             {
-                bossRenderer.color = Random.value > 0.5f ? vaccineColor : originalBossColor;
-                noiseElapsed += 0.05f;
-                yield return new WaitForSeconds(0.05f);
+                bossHeadRenderer.color = noiseColor;
+            }
+            if (bossMouseRenderer != null)
+            {
+                bossMouseRenderer.color = noiseColor;
             }
             
-            // 3. 원래 빨간색으로 복구
-            bossRenderer.color = originalColor;
-            Debug.Log("[BossRectanglePattern] Boss 색상 → 원래 빨간색 복구");
+            noiseElapsed += 0.05f;
+            yield return new WaitForSeconds(0.05f);
         }
+        
+        // 3. 원래 색상으로 복구
+        if (bossHeadRenderer != null)
+        {
+            bossHeadRenderer.color = originalHeadColor;
+        }
+        if (bossMouseRenderer != null)
+        {
+            bossMouseRenderer.color = originalMouseColor;
+        }
+        Debug.Log("[BossRectanglePattern] BossHead + BossMouse 색상 → 원래 색상 복구");
         
         // 백신 창 표시 및 퍼센트 증가
         yield return ShowVaccineAlarmAndIncreasePercent();
@@ -563,10 +600,13 @@ public class BossRectanglePattern : MonoBehaviour
         // 퍼센트 증가 애니메이션 (Percent.cs 방식)
         if (redGaugeImage != null)
         {
-            float targetPercent = Mathf.Min(currentPercent + percentIncrement, 1f);
+            // 매번 4%씩 증가 (8번 충돌 시 5% + 32% = 37% 도달)
+            float targetPercent = currentPercent + percentIncrement;
             float startPercent = currentPercent;
             float elapsed = 0f;
             float duration = 0.5f;
+            
+            Debug.Log($"[BossRectanglePattern] 퍼센트 증가: {Mathf.RoundToInt(startPercent * 100)}% → {Mathf.RoundToInt(targetPercent * 100)}%");
             
             while (elapsed < duration)
             {

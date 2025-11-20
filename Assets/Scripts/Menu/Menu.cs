@@ -156,7 +156,7 @@ public class Menu : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnQuitButton()
     {
-       // Application.Quit(); 
+       Application.Quit(); 
     }
 
     /// <summary>

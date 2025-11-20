@@ -19,6 +19,7 @@ TagManager:
   - Vaccine
   - File
   - Error
+  - "\uCDA9\uACA9\uD30C"
   layers:
   - Default
   - TransparentFX

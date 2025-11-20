@@ -84,14 +84,9 @@ public class Game1SequenceManager : MonoBehaviour
     /// </summary>
     private void RestoreMousePosition()
     {
-        if (MousePositionData.Instance == null)
-        {
-            Debug.LogWarning("[Game1SequenceManager] MousePositionData가 없습니다!");
-            return;
-        }
-        
-        Vector3 savedPosition = MousePositionData.Instance.GetSavedMousePosition();
-        bool isRedMouse = MousePositionData.Instance.IsRedMouse();
+        // static 메서드로 직접 데이터 가져오기 (인스턴스 필요 없음)
+        Vector3 savedPosition = MousePositionData.GetSavedMousePositionStatic();
+        bool isRedMouse = MousePositionData.IsRedMouseStatic();
         
         Debug.Log($"[Game1SequenceManager] 저장된 마우스 위치 복원: {savedPosition}, 빨간마우스: {isRedMouse}");
         
