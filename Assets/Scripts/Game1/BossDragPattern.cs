@@ -279,14 +279,15 @@ public class BossDragPattern : MonoBehaviour
 
         SoundManager.Instance.PlaySFX(Error);
 
-        // 1. 드래그 영역 이미지를 폭발 이미지로 변경
+        // 1. 드래그 영역 이미지를 폭발 이미지로 변경하고 태그를 RedDrag로 변경
         if (explosionSprite != null)
         {
             SpriteRenderer dragSr = dragArea.GetComponent<SpriteRenderer>();
             if (dragSr != null)
             {
                 dragSr.sprite = explosionSprite;
-                Debug.Log("[BossDragPattern] 드래그 영역 이미지를 폭발 이미지로 변경");
+                dragArea.tag = "RedDrag";
+                Debug.Log("[BossDragPattern] 드래그 영역 이미지를 폭발 이미지로 변경 + 태그를 'RedDrag'로 변경");
             }
         }
         
