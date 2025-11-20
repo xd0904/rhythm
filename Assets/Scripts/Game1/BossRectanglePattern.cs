@@ -43,6 +43,10 @@ public class BossRectanglePattern : MonoBehaviour
     [Header("백신 창 표시 시간")]
     public float vaccineProgramDisplayDuration = 0.8f; // 백신 창 표시 시간 (초) - 직사각형 재소환 전에 꺼지도록 짧게
     
+    [Header("화면 흔들림 설정")]
+    public float shakeIntensity = 0.5f; // 흔들림 강도
+    public float shakeDuration = 0.3f; // 흔들림 지속 시간
+    
     [Header("직사각형 설정")]
     public GameObject[] topRectangles = new GameObject[5]; // 위쪽 직사각형 5개 (1, 2, 3, 4, 5)
     public GameObject[] bottomRectangles = new GameObject[5]; // 아래쪽 직사각형 5개 (1*, 2*, 3*, 4*, 5*)
@@ -517,6 +521,9 @@ public class BossRectanglePattern : MonoBehaviour
         
         Debug.Log("[BossRectanglePattern] 벽 충돌 효과 시작!");
         
+        // 화면 흔들림 효과 시작
+        StartCoroutine(ShakeScreen());
+        
         // BossHead와 BossMouse의 SpriteRenderer 찾기
         SpriteRenderer bossHeadRenderer = null;
         SpriteRenderer bossMouseRenderer = null;
@@ -695,5 +702,39 @@ public class BossRectanglePattern : MonoBehaviour
         
         // 기본값
         return new Bounds(Vector3.zero, new Vector3(6f, 4f, 0f));
+    }
+    
+    IEnumerator ShakeScreen()
+    {
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogWarning("[BossRectanglePattern] 메인 카메라를 찾을 수 없습니다!");
+            yield break;
+        }
+        
+        Vector3 originalPosition = mainCamera.transform.position;
+        float elapsed = 0f;
+        
+        Debug.Log($"[BossRectanglePattern] 화면 흔들림 시작: 강도={shakeIntensity}, 지속시간={shakeDuration}");
+        
+        while (elapsed < shakeDuration)
+        {
+            float x = Random.Range(-shakeIntensity, shakeIntensity);
+            float y = Random.Range(-shakeIntensity, shakeIntensity);
+            
+            mainCamera.transform.position = new Vector3(
+                originalPosition.x + x,
+                originalPosition.y + y,
+                originalPosition.z
+            );
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        // 원래 위치로 복구
+        mainCamera.transform.position = originalPosition;
+        Debug.Log("[BossRectanglePattern] 화면 흔들림 종료");
     }
 }

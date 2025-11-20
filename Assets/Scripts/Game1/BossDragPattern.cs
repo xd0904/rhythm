@@ -344,9 +344,10 @@ public class BossDragPattern : MonoBehaviour
         // duration 동안 대기
         yield return new WaitForSeconds(duration);
         
-        // sortingOrder를 -5로 내려서 숨김
+        // 배경을 원래 색상(검정색)으로 복구하고 sortingOrder를 -5로 내림
+        bgSr.color = originalBackgroundColor;
         bgSr.sortingOrder = -5;
-        Debug.Log($"[BossDragPattern] {background.name} sortingOrder -5로 변경 (숨김)");
+        Debug.Log($"[BossDragPattern] {background.name} 색상 검정색 복구 + sortingOrder -5로 변경 (숨김)");
     }
     
     void SpawnRandomSquare(Vector3 center)
